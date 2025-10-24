@@ -7,13 +7,15 @@ export const AlumniResultsCounter = ({ count }) => {
   const styles = createAlumniStyles(theme);
 
   return (
-    <Box sx={styles.resultsCounter}>
-      <Typography variant="body2" sx={styles.resultsCountText}>
-        <Box component="span" sx={styles.resultsCountNumber}>
-          {count}
-        </Box>{" "}
-        {count === 1 ? "alumni" : "alumni"} found
-      </Typography>
+    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+      <Box sx={styles.resultsCounter}>
+        <Typography variant="body2" sx={styles.resultsCountText}>
+          <Box component="span" sx={styles.resultsCountNumber}>
+            {count}
+          </Box>{" "}
+          Alumni found
+        </Typography>
+      </Box>
     </Box>
   );
 };

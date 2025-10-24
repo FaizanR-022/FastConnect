@@ -73,7 +73,7 @@ export const createAlumniStyles = (theme) => ({
 
   resultsCounter: {
     mb: { xs: 3, md: 4 },
-    p: { xs: 2, md: 2.5 },
+    p: { xs: 1, md: 1.5 },
     backgroundColor: "white",
     borderRadius: 3,
     display: "inline-block",
@@ -82,13 +82,13 @@ export const createAlumniStyles = (theme) => ({
   },
 
   resultsCountText: {
-    color: theme.palette.primary.main,
+    color: theme.palette.primary.dark,
     fontWeight: 600,
-    fontSize: { xs: "0.875rem", md: "1rem" },
+    fontSize: { xs: "0.775rem", md: "0.9rem" },
   },
 
   resultsCountNumber: {
-    fontSize: { xs: "1.1rem", md: "1.25rem" },
+    fontSize: { xs: "1rem", md: "1.1rem" },
   },
 
   alumniCard: {
