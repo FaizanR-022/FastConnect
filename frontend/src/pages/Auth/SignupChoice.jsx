@@ -1,6 +1,6 @@
 // components/auth/SignupChoice.jsx
 import { Box, Grid, Paper, Typography, useTheme } from "@mui/material";
-import { FormContainer } from "../../components/auth/FormContainer";
+import { AuthContainer } from "../../components/auth/FormContainer";
 import { createAuthStyles } from "../../styles/authStyles";
 
 export default function SignupChoice({ onNavigate = () => {} }) {
@@ -8,7 +8,7 @@ export default function SignupChoice({ onNavigate = () => {} }) {
   const styles = createAuthStyles(theme);
 
   return (
-    <FormContainer>
+    <AuthContainer styles={styles}>
       <Box sx={{ textAlign: "center", p: { xs: 4, md: 8 } }}>
         <Typography variant="h3" sx={{ ...styles.title, mb: 2 }}>
           Join FastConnect
@@ -101,6 +101,6 @@ export default function SignupChoice({ onNavigate = () => {} }) {
           </Box>
         </Typography>
       </Box>
-    </FormContainer>
+    </AuthContainer>
   );
 }

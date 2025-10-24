@@ -80,16 +80,21 @@ const colors = {
 
 // ==================== TYPOGRAPHY ====================
 const typography = {
-  fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+  // Primary font: Plus Jakarta Sans (modern, clean, professional)
+  // Fallback: Inter (reliable, readable)
+  fontFamily:
+    '"Plus Jakarta Sans", "Inter", "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif',
 
   h1: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
     fontSize: "2.5rem",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
+    fontWeight: 800,
+    letterSpacing: "-0.03em",
     lineHeight: 1.2,
   },
 
   h2: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
     fontSize: "2rem",
     fontWeight: 700,
     letterSpacing: "-0.02em",
@@ -97,6 +102,7 @@ const typography = {
   },
 
   h3: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
     fontSize: "1.75rem",
     fontWeight: 700,
     letterSpacing: "-0.02em",
@@ -104,6 +110,7 @@ const typography = {
   },
 
   h4: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
     fontSize: "1.5rem",
     fontWeight: 700,
     letterSpacing: "-0.02em",
@@ -111,37 +118,58 @@ const typography = {
   },
 
   h5: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
     fontSize: "1.25rem",
     fontWeight: 600,
     lineHeight: 1.5,
   },
 
   h6: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
     fontSize: "1rem",
     fontWeight: 600,
     lineHeight: 1.5,
   },
 
   body1: {
+    fontFamily: '"Inter", "Plus Jakarta Sans", sans-serif',
     fontSize: "1rem",
+    fontWeight: 400,
     lineHeight: 1.7,
+    letterSpacing: "0.01em",
   },
 
   body2: {
+    fontFamily: '"Inter", "Plus Jakarta Sans", sans-serif',
     fontSize: "0.875rem",
+    fontWeight: 400,
     lineHeight: 1.6,
+    letterSpacing: "0.01em",
   },
 
   button: {
+    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
     fontSize: "1rem",
-    fontWeight: 500,
+    fontWeight: 600,
     textTransform: "none",
     letterSpacing: "0.02em",
   },
 
   caption: {
+    fontFamily: '"Inter", sans-serif',
     fontSize: "0.75rem",
+    fontWeight: 400,
     lineHeight: 1.5,
+    letterSpacing: "0.01em",
+  },
+
+  overline: {
+    fontFamily: '"Plus Jakarta Sans", sans-serif',
+    fontSize: "0.75rem",
+    fontWeight: 700,
+    lineHeight: 2.5,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
   },
 };
 
@@ -182,13 +210,24 @@ const shape = {
 
 // ==================== COMPONENT OVERRIDES ====================
 const components = {
+  MuiCssBaseline: {
+    styleOverrides: {
+      body: {
+        fontFamily: '"Inter", "Plus Jakarta Sans", sans-serif',
+        WebkitFontSmoothing: "antialiased",
+        MozOsxFontSmoothing: "grayscale",
+      },
+    },
+  },
+
   MuiButton: {
     styleOverrides: {
       root: {
+        fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
         borderRadius: 8,
         padding: "10px 24px",
         fontSize: "1rem",
-        fontWeight: 500,
+        fontWeight: 600,
         textTransform: "none",
         boxShadow: "none",
         transition: "all 0.3s ease",

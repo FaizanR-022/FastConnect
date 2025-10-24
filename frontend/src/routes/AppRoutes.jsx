@@ -9,6 +9,7 @@ import Login from "../pages/Auth/Login";
 import SignupStudent from "../pages/Auth/SignupStudent";
 import SignupAlumni from "../pages/Auth/SignupAlumni";
 import SignupChoice from "../pages/Auth/SignupChoice";
+import AlumniList from "../pages/Alumni/AlumniList";
 // import Dashboard from '../pages/Student/Dashboard';
 // import AlumniList from '../pages/Alumni/AlumniList';
 // import AlumniProfile from '../pages/Alumni/AlumniProfile';
@@ -55,6 +56,15 @@ function AppRoutes() {
         element={
           // <PublicRoute>
           <SignupAlumni />
+          // </PublicRoute>
+        }
+      />
+
+      <Route
+        path={ROUTES.ALUMNI_LIST}
+        element={
+          // <PublicRoute>
+          <AlumniList />
           // </PublicRoute>
         }
       />
