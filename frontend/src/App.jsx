@@ -1,4 +1,5 @@
 import { Box, ThemeProvider } from "@mui/material";
+import Header from "./components/layout/Header/Header";
 import AppRoutes from "./routes/AppRoutes";
 import theme from "./global/theme";
 
@@ -8,6 +9,8 @@ function App() {
       <Box
         sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
       >
+        <Header />
+        <Box sx={{ mt: { xs: 8, md: 10 } }} />
         <AppRoutes />
         {/* <SignupChoice /> */}
       </Box>

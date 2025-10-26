@@ -33,13 +33,13 @@ export const createAlumniStyles = (theme) => ({
     color: theme.palette.primary.main,
     fontWeight: 700,
     mb: 1,
-    letterSpacing: "-0.02em",
-    fontSize: { xs: "1.75rem", md: "2.5rem" },
+    letterSpacing: "0",
+    fontSize: { xs: "1.5rem", md: "2.3rem" },
   },
 
   pageSubtitle: {
     color: theme.palette.text.secondary,
-    fontSize: { xs: "0.9rem", md: "1.05rem" },
+    fontSize: { xs: "0.85rem", md: "1.02rem" },
   },
 
   filtersContainer: {
@@ -68,6 +68,7 @@ export const createAlumniStyles = (theme) => ({
       backgroundColor: "white",
       borderRadius: 3,
       boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+      // fontSize: "15px",
     },
   },
 
@@ -92,6 +93,7 @@ export const createAlumniStyles = (theme) => ({
   },
 
   alumniCard: {
+    cursor: "pointer",
     height: "100%",
     minHeight: { xs: "auto", sm: "420px" },
     maxHeight: { xs: "auto", sm: "420px" },
@@ -147,7 +149,7 @@ export const createAlumniStyles = (theme) => ({
     color: theme.palette.text.primary,
     fontWeight: 600,
     mb: 0.5,
-    fontSize: { xs: "1rem", md: "1.25rem" },
+    fontSize: { xs: "0.9rem", md: "1.15rem" },
   },
 
   graduationYear: {
@@ -246,6 +248,32 @@ export const createAlumniStyles = (theme) => ({
       backgroundColor: "#f0fdf4",
       transform: "translateY(-2px)",
     },
+  },
+
+  prevCompaniesLabel: {
+    color: theme.palette.text.secondary,
+    fontSize: { xs: "0.75rem", md: "0.813rem" },
+    fontWeight: 500,
+    mb: 0.25,
+  },
+
+  prevCompaniesText: {
+    color: theme.palette.text.secondary,
+    fontSize: { xs: "0.75rem", md: "0.813rem" },
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+  },
+
+  clickHint: {
+    color: theme.palette.primary.main,
+    fontSize: { xs: "0.688rem", md: "0.75rem" },
+    fontWeight: 500,
+    textAlign: "center",
+    mt: "auto",
+    pt: 1,
   },
 
   emptyState: {

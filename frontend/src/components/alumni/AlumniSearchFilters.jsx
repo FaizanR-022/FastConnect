@@ -45,7 +45,7 @@ export const AlumniSearchFilters = ({
         }}
       >
         {/* Search Field  */}
-        <Box sx={{ flex: { xs: "1 1 100%", md: "1 1 50%" } }}>
+        <Box sx={{ flex: { xs: "1 1 100%", md: "1 1 45%" } }}>
           {/* <TextField
             fullWidth
             placeholder="Search by name, company, position, or expertise..."
@@ -114,14 +114,14 @@ export const AlumniSearchFilters = ({
             display: "flex",
             flexDirection: { xs: "column", sm: "row", md: "row" },
             gap: { xs: 1.5, md: 2 },
-            flex: { xs: "1 1 100%", md: "0 1 50%" },
+            flex: { xs: "1 1 100%", md: "0 1 55%" },
             justifyContent: { md: "flex-end" },
           }}
         >
           {/* Spacing */}
-          <Box sx={{ flex: 1, minWidth: { xs: "0%", sm: "0%", md: "20%" } }} />
+          <Box sx={{ flex: 1, minWidth: { xs: "0%", sm: "0%", md: "30%" } }} />
           {/* Department Filter */}
-          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "50%", md: "40%" } }}>
+          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "50%", md: "35%" } }}>
             <FormControl fullWidth sx={styles.filterSelect}>
               <InputLabel>Department</InputLabel>
               <Select
@@ -140,7 +140,7 @@ export const AlumniSearchFilters = ({
           </Box>
 
           {/* Year Filter */}
-          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "50%", md: "40%" } }}>
+          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "50%", md: "35%" } }}>
             <FormControl fullWidth sx={styles.filterSelect}>
               <InputLabel>Graduation Year</InputLabel>
               <Select

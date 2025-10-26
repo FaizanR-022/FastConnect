@@ -1,29 +1,31 @@
-// components/Alumni/AlumniCard.jsx
 import {
   Card,
   CardContent,
   Typography,
   Avatar,
   Chip,
-  Button,
   Box,
   Stack,
   useTheme,
 } from "@mui/material";
-import { MapPin, Briefcase, GraduationCap, Mail, Linkedin } from "lucide-react";
+import { MapPin, Briefcase, GraduationCap, Building2 } from "lucide-react";
 import { createAlumniStyles } from "../../styles/alumniStyles";
 
-export const AlumniCard = ({ alumni }) => {
+export const AlumniCard = ({ alumni, onClick }) => {
   const theme = useTheme();
   const styles = createAlumniStyles(theme);
 
-  // Show only first 3 expertise tags, rest as "+X"
-  // const maxVisibleTags = 3;
-  // const visibleExpertise = alumni.expertise.slice(0, maxVisibleTags);
-  // const remainingCount = alumni.expertise.length - maxVisibleTags;
+  // Get previous companies display
+  const maxVisiblePrevCompanies = 2;
+  const visiblePrevCompanies = alumni.previousCompanies.slice(
+    0,
+    maxVisiblePrevCompanies
+  );
+  const remainingPrevCompanies =
+    alumni.previousCompanies.length - maxVisiblePrevCompanies;
 
   return (
-    <Card sx={styles.alumniCard}>
+    <Card sx={styles.alumniCard} onClick={() => onClick(alumni)}>
       <CardContent sx={styles.cardContent}>
         {/* Header Section */}
         <Stack direction="row" spacing={1.5} sx={{ mb: { xs: 2, md: 3 } }}>
@@ -39,8 +41,11 @@ export const AlumniCard = ({ alumni }) => {
         </Stack>
 
         {/* Info Section */}
-        <Stack spacing={1} sx={{ mb: { xs: 2, md: 3 } }}>
-          {/* Position & Company */}
+        <Stack
+          spacing={1}
+          sx={{ mb: { xs: 2, md: 3 }, minHeight: { md: "165px" } }}
+        >
+          {/* Current Position & Company */}
           <Stack direction="row" spacing={1} alignItems="flex-start">
             <Box sx={{ mt: 0.25, flexShrink: 0 }}>
               <Briefcase size={16} color={theme.palette.primary.main} />
@@ -54,6 +59,25 @@ export const AlumniCard = ({ alumni }) => {
               </Typography>
             </Box>
           </Stack>
+
+          {/* Previous Companies */}
+          {alumni.previousCompanies.length > 0 && (
+            <Stack direction="row" spacing={1} alignItems="flex-start">
+              <Box sx={{ mt: 0.25, flexShrink: 0 }}>
+                <Building2 size={16} color={theme.palette.text.secondary} />
+              </Box>
+              <Box>
+                <Typography variant="body2" sx={styles.prevCompaniesLabel}>
+                  Previously at:
+                </Typography>
+                <Typography variant="body2" sx={styles.prevCompaniesText}>
+                  {visiblePrevCompanies.map((pc) => pc.companyName).join(", ")}
+                  {remainingPrevCompanies > 0 &&
+                    ` +${remainingPrevCompanies} more`}
+                </Typography>
+              </Box>
+            </Stack>
+          )}
 
           {/* Department */}
           <Stack direction="row" spacing={1} alignItems="center">
@@ -90,30 +114,13 @@ export const AlumniCard = ({ alumni }) => {
                 sx={styles.expertiseChip}
               />
             ))}
-            {/* {remainingCount > 0 && (
-              <Chip
-                label={`+${remainingCount}`}
-                size="small"
-                sx={styles.expertiseMoreChip}
-              />
-            )} */}
           </Box>
         </Box>
 
-        {/* Action Buttons */}
-        <Stack direction="row" spacing={{ xs: 0.75, md: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<Mail size={16} />}
-            sx={styles.connectButton}
-          >
-            Connect
-          </Button>
-          <Button variant="text" size="small" sx={styles.linkedinButton}>
-            <Linkedin size={18} />
-          </Button>
-        </Stack>
+        {/* Click to view hint */}
+        {/* <Typography variant="caption" sx={styles.clickHint}>
+          Click to view full profile
+        </Typography> */}
       </CardContent>
     </Card>
   );
