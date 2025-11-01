@@ -2,10 +2,13 @@
 import { Box, Grid, Paper, Typography, useTheme } from "@mui/material";
 import { AuthContainer } from "../../components/auth/FormContainer";
 import { createAuthStyles } from "../../styles/authStyles";
+import { ROUTES } from "../../constants/constants";
+import { useNavigate } from "react-router-dom";
 
-export default function SignupChoice({ onNavigate = () => {} }) {
+export default function SignupChoice({ props }) {
   const theme = useTheme();
   const styles = createAuthStyles(theme);
+  const navigate = useNavigate();
 
   return (
     <AuthContainer styles={styles}>
@@ -29,7 +32,7 @@ export default function SignupChoice({ onNavigate = () => {} }) {
           {/* Student Option */}
           <Grid item xs={12} md={5}>
             <Paper
-              onClick={() => onNavigate("signup-student")}
+              onClick={() => navigate(ROUTES.SIGNUP_STUDENT)}
               sx={styles.signupCard}
             >
               <Box sx={styles.signupIconBox(theme.palette.gradients.student)}>
@@ -59,7 +62,7 @@ export default function SignupChoice({ onNavigate = () => {} }) {
           {/* Alumni Option */}
           <Grid item xs={12} md={5}>
             <Paper
-              onClick={() => onNavigate("signup-alumni")}
+              onClick={() => navigate(ROUTES.SIGNUP_ALUMNI)}
               sx={styles.signupCard}
             >
               <Box sx={styles.signupIconBox(theme.palette.gradients.alumni)}>
@@ -94,7 +97,7 @@ export default function SignupChoice({ onNavigate = () => {} }) {
           Already have an account?{" "}
           <Box
             component="span"
-            onClick={() => onNavigate("login")}
+            onClick={() => navigate(ROUTES.LOGIN)}
             sx={styles.link}
           >
             Login here

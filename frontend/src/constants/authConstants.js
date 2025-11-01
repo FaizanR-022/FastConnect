@@ -1,10 +1,28 @@
 export const DEPARTMENTS = [
   { value: "cs", label: "Computer Science" },
   { value: "se", label: "Software Engineering" },
+  { value: "ai", label: "Artificial Intelligence" },
+  { value: "ds", label: "Data Science" },
+  { value: "cys", label: "Cyber Security" },
+  { value: "ft", label: "FinTech" },
   { value: "ee", label: "Electrical Engineering" },
-  { value: "ce", label: "Computer Engineering" },
-  { value: "bba", label: "Business Administration" },
+  { value: "ba", label: "Business Administration" },
 ];
+
+const currentYear = new Date().getFullYear();
+export const YEARS = Array.from(
+  { length: currentYear - 2000 + 1 },
+  (_, i) => currentYear - i
+);
+
+// for students
+export const BATCH_YEARS = Array.from({ length: 6 }, (_, i) => currentYear - i);
+
+// for alumnis
+export const GRADUATION_YEARS = Array.from(
+  { length: currentYear - 2000 + 1 },
+  (_, i) => currentYear - i
+);
 
 export const INFO_CONTENT = {
   login: {

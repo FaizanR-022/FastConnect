@@ -1,43 +1,53 @@
-// components/auth/Login.jsx
-import { useState } from "react";
+// pages/Auth/Login.jsx
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
   Button,
   Checkbox,
   FormControlLabel,
-  Grid,
   Stack,
   TextField,
   Typography,
   useTheme,
+  FormHelperText,
 } from "@mui/material";
 import { LogIn } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/constants";
 import { FormContainer } from "../../components/auth/FormContainer";
 import { PageHeader } from "../../components/auth/PageHeader";
-import { InfoSection } from "../../components/auth/InfoSection";
 import { createAuthStyles } from "../../styles/authStyles";
-import { INFO_CONTENT } from "../../constants/authConstants";
+import { loginSchema } from "../../utils/validationSchemas";
 
-export default function Login({ onNavigate = () => {} }) {
+export default function Login({ props }) {
   const theme = useTheme();
   const styles = createAuthStyles(theme);
+  const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: false,
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Login submitted:", formData);
-    // Handle login logic here
-    onNavigate("alumni");
-  };
-
-  const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const onSubmit = async (data) => {
+    try {
+      console.log("Login submitted:", data);
+      // Handle login logic here
+      // await authService.login(data);
+      // onNavigate("alumni");
+      navigate(ROUTES.ALUMNI_LIST);
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   };
 
   return (
@@ -48,28 +58,40 @@ export default function Login({ onNavigate = () => {} }) {
         subtitle="Login to access your FAST-NUCES Alumni Portal account"
       />
 
-      <Box component="form" onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <TextField
-            label="Email Address"
-            type="email"
-            variant="outlined"
-            fullWidth
-            value={formData.email}
-            onChange={(e) => handleChange("email", e.target.value)}
-            required
-            size="small"
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Email Address"
+                type="email"
+                variant="outlined"
+                fullWidth
+                size="small"
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            )}
           />
 
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            value={formData.password}
-            onChange={(e) => handleChange("password", e.target.value)}
-            required
-            size="small"
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                size="small"
+                error={!!errors.password}
+                helperText={errors.password?.message}
+              />
+            )}
           />
 
           <Stack
@@ -77,24 +99,30 @@ export default function Login({ onNavigate = () => {} }) {
             alignItems="center"
             justifyContent="space-between"
           >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.rememberMe}
-                  onChange={(e) => handleChange("rememberMe", e.target.checked)}
-                  sx={{
-                    color: theme.palette.primary.main,
-                    "&.Mui-checked": {
-                      color: theme.palette.primary.main,
-                    },
-                  }}
+            <Controller
+              name="rememberMe"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      {...field}
+                      checked={field.value}
+                      sx={{
+                        color: theme.palette.primary.main,
+                        "&.Mui-checked": {
+                          color: theme.palette.primary.main,
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography variant="body2" color="text.secondary">
+                      Remember me
+                    </Typography>
+                  }
                 />
-              }
-              label={
-                <Typography variant="body2" color="text.secondary">
-                  Remember me
-                </Typography>
-              }
+              )}
             />
             <Typography variant="body2" sx={styles.link}>
               Forgot Password?
@@ -105,9 +133,10 @@ export default function Login({ onNavigate = () => {} }) {
             type="submit"
             variant="contained"
             fullWidth
+            disabled={isSubmitting}
             sx={styles.submitButton}
           >
-            Login
+            {isSubmitting ? "Logging in..." : "Login"}
           </Button>
 
           <Typography
@@ -117,7 +146,7 @@ export default function Login({ onNavigate = () => {} }) {
             Don't have an account?{" "}
             <Box
               component="span"
-              onClick={() => onNavigate("signup-choice")}
+              onClick={() => navigate(ROUTES.SIGNUP_CHOICE)}
               sx={styles.link}
             >
               Sign up here
