@@ -13,8 +13,11 @@ import {
   Typography,
   useTheme,
   FormHelperText,
+  InputAdornment,
+  IconButton,
+  Alert,
 } from "@mui/material";
-import { UserPlus } from "lucide-react";
+import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { FormContainer } from "../../components/auth/FormContainer";
 import { PageHeader } from "../../components/auth/PageHeader";
 import { createAuthStyles } from "../../styles/authStyles";
@@ -22,11 +25,21 @@ import { DEPARTMENTS, BATCH_YEARS } from "../../constants/authConstants";
 import { studentSignupSchema } from "../../utils/validationSchemas";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/constants";
+import { useState } from "react";
+import useAuthStore from "../../store/authStore";
+import authService from "../../services/authService";
 
 export default function SignupStudent({ props }) {
   const theme = useTheme();
   const styles = createAuthStyles(theme);
   const navigate = useNavigate();
+  const [err, setErr] = useState("");
+  const login = useAuthStore((state) => state.login);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleShowPassword = () => setShowPassword((val) => !val);
+  const handleShowConfirmPassword = () => setShowConfirmPassword((val) => !val);
 
   const {
     control,
@@ -49,12 +62,15 @@ export default function SignupStudent({ props }) {
 
   const onSubmit = async (data) => {
     try {
+      setErr("");
       console.log("Student signup submitted:", data);
-      // Handle signup logic here
-      // await authService.signupStudent(data);
+      const { token, user } = await authService.signupStudent(data);
+      login(user, token);
       reset();
+      navigate(ROUTES.ALUMNI_LIST);
     } catch (error) {
       console.error("Signup error:", error);
+      setErr(error.message);
     }
   };
 
@@ -67,6 +83,11 @@ export default function SignupStudent({ props }) {
       />
 
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        {err && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {err}
+          </Alert>
+        )}
         <Stack spacing={2}>
           <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
             <Box sx={{ flex: 1 }}>
@@ -213,12 +234,33 @@ export default function SignupStudent({ props }) {
               <TextField
                 {...field}
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 variant="outlined"
                 fullWidth
                 size="small"
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={
+                          showPassword
+                            ? "hide the password"
+                            : "display the password"
+                        }
+                        onClick={handleShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? (
+                          <Eye size={16} />
+                        ) : (
+                          <EyeOff size={16} />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             )}
           />
@@ -230,12 +272,33 @@ export default function SignupStudent({ props }) {
               <TextField
                 {...field}
                 label="Confirm Password"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 variant="outlined"
                 fullWidth
                 size="small"
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label={
+                          showConfirmPassword
+                            ? "hide the password"
+                            : "display the password"
+                        }
+                        onClick={handleShowConfirmPassword}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? (
+                          <Eye size={16} />
+                        ) : (
+                          <EyeOff size={16} />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             )}
           />
