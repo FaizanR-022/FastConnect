@@ -24,14 +24,16 @@ import { loginSchema } from "../../utils/validationSchemas";
 import authService from "../../services/authService";
 import { useState } from "react";
 import useAuthStore from "../../store/authStore";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Login({ props }) {
+  const { login, error, clearError } = useAuth();
   const theme = useTheme();
   const styles = createAuthStyles(theme);
   const navigate = useNavigate();
-  const [err, setErr] = useState("");
+  // const [err, setErr] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const login = useAuthStore((state) => state.login);
+  // const login = useAuthStore((state) => state.login);
 
   const handleShowPassword = () => setShowPassword((val) => !val);
 
@@ -48,18 +50,24 @@ export default function Login({ props }) {
     },
   });
 
+  // const onSubmit = async (data) => {
+  //   try {
+  //     setErr("");
+  //     console.log("Login submitted:", data);
+  //     const { token, user } = await authService.login(data);
+  //     console.log("heelo");
+  //     login(user, token);
+  //     navigate(ROUTES.ALUMNI_LIST);
+  //   } catch (error) {
+  //     console.error("Login error:", error);
+  //     setErr(error.message);
+  //   }
+  // };
+
   const onSubmit = async (data) => {
-    try {
-      setErr("");
-      console.log("Login submitted:", data);
-      const { token, user } = await authService.login(data);
-      console.log("heelo");
-      login(user, token);
-      navigate(ROUTES.ALUMNI_LIST);
-    } catch (error) {
-      console.error("Login error:", error);
-      setErr(error.message);
-    }
+    clearError();
+    console.log(data);
+    await login(data);
   };
 
   return (
@@ -71,9 +79,9 @@ export default function Login({ props }) {
       />
 
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-        {err && (
+        {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {err}
+            {error}
           </Alert>
         )}
         <Stack spacing={2}>

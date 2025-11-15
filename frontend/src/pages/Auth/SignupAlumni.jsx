@@ -33,13 +33,15 @@ import { ROUTES } from "../../constants/constants";
 import authService from "../../services/authService";
 import { useState } from "react";
 import useAuthStore from "../../store/authStore";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function SignupAlumni({ props }) {
+  const { signupAlumni, error, clearError } = useAuth();
   const theme = useTheme();
   const styles = createAuthStyles(theme);
   const navigate = useNavigate();
-  const [err, setErr] = useState("");
-  const login = useAuthStore((state) => state.login);
+  // const [err, setErr] = useState("");
+  // const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -76,17 +78,26 @@ export default function SignupAlumni({ props }) {
     name: "previousCompanies",
   });
 
+  // const onSubmit = async (data) => {
+  //   try {
+  //     setErr("");
+  //     console.log("Alumni signup submitted:", data);
+  //     const { token, user } = await authService.signupAlumni(data);
+  //     login(user, token);
+  //     reset();
+  //     navigate(ROUTES.ALUMNI_LIST);
+  //   } catch (error) {
+  //     console.error("Signup error:", error);
+  //     setErr(error.message);
+  //   }
+  // };
+
   const onSubmit = async (data) => {
-    try {
-      setErr("");
-      console.log("Alumni signup submitted:", data);
-      const { token, user } = await authService.signupAlumni(data);
-      login(user, token);
+    clearError();
+    console.log(data);
+    const result = await signupAlumni(data);
+    if (result.success) {
       reset();
-      navigate(ROUTES.ALUMNI_LIST);
-    } catch (error) {
-      console.error("Signup error:", error);
-      setErr(error.message);
     }
   };
 
@@ -103,9 +114,9 @@ export default function SignupAlumni({ props }) {
       />
 
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-        {err && (
+        {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
-            {err}
+            {error}
           </Alert>
         )}
         <Stack spacing={2}>
