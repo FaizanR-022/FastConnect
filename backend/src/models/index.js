@@ -1,0 +1,193 @@
+import { sequelize } from "../config/database.js";
+import User from "./User.js";
+import Student from "./Student.js";
+import Alumni from "./Alumni.js";
+import Country from "./Country.js";
+import City from "./City.js";
+import Campus from "./Campus.js";
+import Department from "./Department.js";
+import Company from "./Company.js";
+import JobRole from "./JobRole.js";
+import Skill from "./Skill.js";
+import Experience from "./Experience.js";
+import AlumniSkill from "./AlumniSkill.js";
+
+// User - Student (One to One)
+User.hasOne(Student, {
+  foreignKey: "user_id",
+  as: "studentProfile",
+});
+Student.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+// User - Alumni (One to One)
+User.hasOne(Alumni, {
+  foreignKey: "user_id",
+  as: "alumniProfile",
+});
+Alumni.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+// Country - Cities (One to Many)
+Country.hasMany(City, {
+  foreignKey: "country_id",
+  as: "cities",
+});
+City.belongsTo(Country, {
+  foreignKey: "country_id",
+  as: "country",
+});
+
+// Department - Students (One to Many)
+Department.hasMany(Student, {
+  foreignKey: "department_id",
+  as: "students",
+});
+Student.belongsTo(Department, {
+  foreignKey: "department_id",
+  as: "department",
+});
+
+// Department - Alumni (One to Many)
+Department.hasMany(Alumni, {
+  foreignKey: "department_id",
+  as: "alumni",
+});
+Alumni.belongsTo(Department, {
+  foreignKey: "department_id",
+  as: "department",
+});
+
+// Campus - Students (One to Many)
+Campus.hasMany(Student, {
+  foreignKey: "campus_id",
+  as: "students",
+});
+Student.belongsTo(Campus, {
+  foreignKey: "campus_id",
+  as: "campus",
+});
+
+// Campus - Alumni (One to Many)
+Campus.hasMany(Alumni, {
+  foreignKey: "campus_id",
+  as: "alumni",
+});
+Alumni.belongsTo(Campus, {
+  foreignKey: "campus_id",
+  as: "campus",
+});
+
+// Alumni - Experiences (One to Many)
+Alumni.hasMany(Experience, {
+  foreignKey: "alumni_id",
+  as: "experiences",
+});
+Experience.belongsTo(Alumni, {
+  foreignKey: "alumni_id",
+  as: "alumni",
+});
+
+// Company - Experiences (One to Many)
+Company.hasMany(Experience, {
+  foreignKey: "company_id",
+  as: "experiences",
+});
+Experience.belongsTo(Company, {
+  foreignKey: "company_id",
+  as: "company",
+});
+
+// JobRole - Experiences (One to Many)
+JobRole.hasMany(Experience, {
+  foreignKey: "job_id",
+  as: "experiences",
+});
+Experience.belongsTo(JobRole, {
+  foreignKey: "job_id",
+  as: "jobRole",
+});
+
+// City - Experiences (One to Many)
+City.hasMany(Experience, {
+  foreignKey: "city_id",
+  as: "experiences",
+});
+Experience.belongsTo(City, {
+  foreignKey: "city_id",
+  as: "city",
+});
+
+// JobRole - Alumni (current job) (One to Many)
+JobRole.hasMany(Alumni, {
+  foreignKey: "current_job_id",
+  as: "currentAlumni",
+});
+Alumni.belongsTo(JobRole, {
+  foreignKey: "current_job_id",
+  as: "currentJob",
+});
+
+// Company - Alumni (current company) (One to Many)
+Company.hasMany(Alumni, {
+  foreignKey: "current_company_id",
+  as: "currentAlumni",
+});
+Alumni.belongsTo(Company, {
+  foreignKey: "current_company_id",
+  as: "currentCompany",
+});
+
+// City - Alumni (current city) (One to Many)
+City.hasMany(Alumni, {
+  foreignKey: "current_city_id",
+  as: "currentAlumni",
+});
+Alumni.belongsTo(City, {
+  foreignKey: "current_city_id",
+  as: "currentCity",
+});
+
+// Alumni - Skills (Many to Many through AlumniSkill)
+Alumni.belongsToMany(Skill, {
+  through: AlumniSkill,
+  foreignKey: "alumni_id", // Fk in Alumni
+  otherKey: "skill_id", // Fk in skills
+  as: "skills",
+});
+Skill.belongsToMany(Alumni, {
+  through: AlumniSkill,
+  foreignKey: "skill_id",
+  otherKey: "alumni_id",
+  as: "alumni",
+});
+
+const syncDatabase = async () => {
+  try {
+    await sequelize.sync({ alter: true }); // alter updates tables without dropping
+    console.log("✅ Database synced successfully!");
+  } catch (error) {
+    console.error("❌ Error syncing database:", error);
+  }
+};
+
+export {
+  sequelize,
+  User,
+  Student,
+  Alumni,
+  Country,
+  City,
+  Campus,
+  Department,
+  Company,
+  JobRole,
+  Skill,
+  Experience,
+  AlumniSkill,
+  syncDatabase,
+};
