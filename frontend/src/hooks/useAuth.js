@@ -43,7 +43,7 @@ export const useAuth = () => {
   const signupAlumni = async (alumniData) => {
     try {
       setError("");
-
+      console.log(alumniData);
       const { token, user } = await authService.signupAlumni(alumniData);
       storeLogin(user, token);
       navigate(ROUTES.ALUMNI_LIST);
