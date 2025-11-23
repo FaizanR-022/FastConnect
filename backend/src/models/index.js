@@ -165,6 +165,15 @@ Skill.belongsToMany(Alumni, {
   otherKey: "alumni_id",
   as: "alumni",
 });
+AlumniSkill.belongsTo(Skill, {
+  foreignKey: "skill_id",
+  as: "skill",
+});
+
+AlumniSkill.belongsTo(Alumni, {
+  foreignKey: "alumni_id",
+  as: "alumni",
+});
 
 const syncDatabase = async () => {
   try {
