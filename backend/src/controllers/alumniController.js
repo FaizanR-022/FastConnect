@@ -9,6 +9,7 @@ import {
   Country,
   Experience,
   Skill,
+  sequelize,
 } from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -38,12 +39,13 @@ export const getAlumniById = asyncHandler(async (req, res) => {
     },
   });
 });
+
 export const getAllAlumni = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 12,
-    searchAttribute = "name", // What field to search: name, company, city, country, position, expertise
-    searchQuery = "", // The actual search text
+    searchAttribute = "name",
+    searchQuery = "",
     department,
     graduationYear,
     sortBy = "graduationYear",
@@ -52,7 +54,7 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
 
   // Validate pagination
   const pageNum = Math.max(1, parseInt(page));
-  const limitNum = Math.min(50, Math.max(1, parseInt(limit))); // Max 50 per page
+  const limitNum = Math.min(50, Math.max(1, parseInt(limit)));
   const offset = (pageNum - 1) * limitNum;
 
   // Validate search attribute
@@ -69,8 +71,15 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
     : "name";
 
   const whereClause = {};
-
   const hasSearch = searchQuery && searchQuery.trim();
+
+  // Determine if we need special handling
+  const needsComplexJoin =
+    (hasSearch &&
+      ["company", "city", "country", "position", "expertise"].includes(
+        searchField
+      )) ||
+    department;
 
   if (hasSearch) {
     const searchTerm = searchQuery.trim();
@@ -224,7 +233,6 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
               model: Country,
               as: "country",
               attributes: ["country_name"],
-              required: hasSearch && searchField === "country",
             },
           ],
         },
@@ -252,15 +260,61 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
     order.push(["graduation_year", sortDirection]);
   }
 
-  const { count, rows: alumni } = await Alumni.findAndCountAll({
-    where: whereClause,
-    include: includes,
-    limit: limitNum,
-    offset: offset,
-    order: order,
-    subQuery: false, // Important for complex queries with associations
-    distinct: true, // Ensures correct count with many-to-many relationships
-  });
+  // THE FIX: Use different strategies based on query complexity
+  let count;
+  let alumni;
+
+  if (needsComplexJoin) {
+    // For complex joins with nested associations (company, city, position, skills)
+    // We need to do two separate queries to get accurate counts
+
+    // Step 1: Get unique alumni IDs that match criteria (for accurate count)
+    const uniqueAlumniIds = await Alumni.findAll({
+      attributes: ["alumni_id"],
+      where: whereClause,
+      include: includes.map((inc) => ({
+        ...inc,
+        attributes: [], // Don't fetch data for counting
+      })),
+      raw: true,
+      subQuery: false,
+    });
+
+    // Get unique IDs (in case of duplicates from joins)
+    const uniqueIds = [...new Set(uniqueAlumniIds.map((a) => a.alumni_id))];
+    count = uniqueIds.length;
+
+    // Step 2: Get the actual paginated data
+    // Find which IDs should be on this page
+    const paginatedIds = uniqueIds.slice(offset, offset + limitNum);
+
+    if (paginatedIds.length > 0) {
+      alumni = await Alumni.findAll({
+        where: {
+          alumni_id: { [Op.in]: paginatedIds },
+        },
+        include: includes,
+        order: order,
+      });
+    } else {
+      alumni = [];
+    }
+  } else {
+    // For simple queries (name search, department filter, year filter)
+    // We can use findAndCountAll with distinct
+    const result = await Alumni.findAndCountAll({
+      where: whereClause,
+      include: includes,
+      limit: limitNum,
+      offset: offset,
+      order: order,
+      distinct: true,
+      col: "alumni_id",
+    });
+
+    count = result.count;
+    alumni = result.rows;
+  }
 
   const transformedAlumni = alumni.map((alum) => {
     return {
@@ -282,8 +336,8 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
       skills: alum.skills?.map((skill) => skill.skill_name) || [],
       previousCompanies:
         alum.experiences?.map((exp) => ({
-          company: exp.company.company_name || null,
-          position: exp.jobRole.job_title || null,
+          company: exp.company?.company_name || null,
+          position: exp.jobRole?.job_title || null,
           city: exp.city?.city_name || null,
           country: exp.city?.country?.country_name || null,
           from: exp.start_year,
@@ -292,7 +346,7 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
     };
   });
 
-  // calculate pagination metadata
+  // Calculate pagination metadata
   const totalPages = Math.ceil(count / limitNum);
   const hasNextPage = pageNum < totalPages;
   const hasPrevPage = pageNum > 1;
