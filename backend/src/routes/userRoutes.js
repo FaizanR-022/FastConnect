@@ -9,8 +9,8 @@ import { validateUpdateUser } from "../middleware/validationMiddleware.js";
 
 const router = express.Router();
 
-router.get("/user", protect, getUser); // Get my profile
-router.put("/user", protect, validateUpdateUser, updateUser); // Update my profile
-router.delete("/user", protect, deleteUser);
+router.get("/", protect, getUser); // Get my profile
+router.put("/", protect, validateUpdateUser, updateUser); // Update my profile
+router.delete("/", protect, deleteUser);
 
 export default router;

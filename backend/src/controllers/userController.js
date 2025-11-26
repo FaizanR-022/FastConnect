@@ -78,8 +78,8 @@ export const updateUser = asyncHandler(async (req, res) => {
       phone,
       currentCompany,
       currentPosition,
-      city,
-      country,
+      currentCity,
+      currentCountry,
       linkedin,
       profilePicture,
       previousExperiences = [],
@@ -100,7 +100,7 @@ export const updateUser = asyncHandler(async (req, res) => {
       // Update current company, position, and city
       const currentInfoUpdates = await updateAlumniCurrentInfo(
         alumni,
-        { currentCompany, currentPosition, city, country },
+        { currentCompany, currentPosition, currentCity, currentCountry },
         t
       );
 

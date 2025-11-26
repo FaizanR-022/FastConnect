@@ -70,14 +70,14 @@ export const transformUserData = (user) => {
   } else if (user.user_type === "alumni") {
     const alumni = user.alumniProfile;
     const previousExperiences = alumni.experiences.map((exp) => ({
-      id: exp.experience_id,
+      id: exp.experience_id, // Useful when user is being updated (to find what to create, update and delete)
       company: exp.company.company_name,
       position: exp.jobRole.job_title,
       from: exp.start_year,
       to: exp.end_year,
     }));
     const skills = alumni.skills.map((skill) => ({
-      id: skill.skill_id,
+      id: skill.skill_id, // Useful when user is being updated (to find what to create, update and delete)
       name: skill.skill_name,
     }));
 

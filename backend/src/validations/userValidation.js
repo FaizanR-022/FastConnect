@@ -5,13 +5,13 @@ export const updateStudentProfileSchema = yup.object().shape({
     .string()
     .min(2, "First name must be at least 2 characters")
     .max(50, "First name must not exceed 50 characters")
-    .required("First name is required"), // ✅ Explicit
+    .required("First name is required"),
 
   lastName: yup
     .string()
     .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must not exceed 50 characters")
-    .required("Last name is required"), // ✅ Explicit
+    .required("Last name is required"),
 
   profilePicture: yup
     .string()
@@ -43,9 +43,9 @@ export const updateAlumniProfileSchema = yup.object().shape({
     .min(2, "Position must be at least 2 characters")
     .required("Current position is required"),
 
-  city: yup.string().required("City is required"),
+  currentCity: yup.string().required("City is required"),
 
-  country: yup.string().required("Country is required"),
+  currentCountry: yup.string().required("Country is required"),
 
   phone: yup
     .string()
