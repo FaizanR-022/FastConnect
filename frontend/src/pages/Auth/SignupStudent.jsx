@@ -21,7 +21,11 @@ import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { FormContainer } from "../../components/auth/FormContainer";
 import { PageHeader } from "../../components/auth/PageHeader";
 import { createAuthStyles } from "../../styles/authStyles";
-import { DEPARTMENTS, BATCH_YEARS } from "../../constants/authConstants";
+import {
+  DEPARTMENTS,
+  BATCH_YEARS,
+  CAMPUSES,
+} from "../../constants/authConstants";
 import { studentSignupSchema } from "../../utils/validationSchemas";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/constants";
@@ -54,6 +58,7 @@ export default function SignupStudent({ props }) {
       firstName: "",
       lastName: "",
       email: "",
+      campus: "",
       department: "",
       batch: "",
       password: "",
@@ -160,6 +165,26 @@ export default function SignupStudent({ props }) {
                   errors.email?.message || "Must be a valid @nu.edu.pk email"
                 }
               />
+            )}
+          />
+
+          <Controller
+            name="campus"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth size="small" error={!!errors.campus}>
+                <InputLabel>Campus</InputLabel>
+                <Select {...field} label="Campus">
+                  {CAMPUSES.map((camp) => (
+                    <MenuItem key={camp} value={camp}>
+                      {camp}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.campus && (
+                  <FormHelperText>{errors.campus.message}</FormHelperText>
+                )}
+              </FormControl>
             )}
           />
 

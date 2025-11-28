@@ -9,6 +9,14 @@ export const DEPARTMENTS = [
   { value: "ba", label: "Business Administration" },
 ];
 
+export const CAMPUSES = [
+  "Karachi",
+  "Lahore",
+  "Islamabad",
+  "Peshawar",
+  "Faisalabad",
+];
+
 const currentYear = new Date().getFullYear();
 export const YEARS = Array.from(
   { length: currentYear - 2000 + 1 },

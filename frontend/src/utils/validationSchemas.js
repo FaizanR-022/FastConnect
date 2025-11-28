@@ -30,6 +30,7 @@ export const studentSignupSchema = yup.object().shape({
       "Please use your @nu.edu.pk email address"
     )
     .required("University email is required"),
+  campus: yup.string().required("Campus is required"),
   department: yup.string().required("Department is required"),
   batch: yup
     .number()
@@ -79,6 +80,7 @@ export const alumniSignupSchema = yup.object().shape({
       /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/,
       "Please enter a valid phone number"
     ),
+  campus: yup.string().required("Campus is required"),
   department: yup.string().required("Department is required"),
   graduationYear: yup
     .number()

@@ -23,6 +23,7 @@ import { FormContainer } from "../../components/auth/FormContainer";
 import { PageHeader } from "../../components/auth/PageHeader";
 import { createAuthStyles } from "../../styles/authStyles";
 import {
+  CAMPUSES,
   DEPARTMENTS,
   GRADUATION_YEARS,
   YEARS,
@@ -60,6 +61,7 @@ export default function SignupAlumni({ props }) {
       lastName: "",
       email: "",
       phone: "",
+      campus: "",
       department: "",
       graduationYear: "",
       currentCompany: "",
@@ -190,6 +192,26 @@ export default function SignupAlumni({ props }) {
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
               />
+            )}
+          />
+
+          <Controller
+            name="campus"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth size="small" error={!!errors.campus}>
+                <InputLabel>Campus</InputLabel>
+                <Select {...field} label="Campus">
+                  {CAMPUSES.map((camp) => (
+                    <MenuItem key={camp} value={camp}>
+                      {camp}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.campus && (
+                  <FormHelperText>{errors.campus.message}</FormHelperText>
+                )}
+              </FormControl>
             )}
           />
 

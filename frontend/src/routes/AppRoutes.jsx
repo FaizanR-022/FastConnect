@@ -10,6 +10,8 @@ import SignupStudent from "../pages/Auth/SignupStudent";
 import SignupAlumni from "../pages/Auth/SignupAlumni";
 import SignupChoice from "../pages/Auth/SignupChoice";
 import AlumniList from "../pages/Alumni/AlumniList";
+import Profile from "../pages/Profile";
+import AlumniProfile from "../pages/Alumni/AlumniProfile";
 // import Dashboard from '../pages/Student/Dashboard';
 // import AlumniList from '../pages/Alumni/AlumniList';
 // import AlumniProfile from '../pages/Alumni/AlumniProfile';
@@ -69,31 +71,41 @@ function AppRoutes() {
         }
       />
 
-      {/* Protected Routes
-      <Route
+      {/* Protected Routes */}
+      {/* <Route
         path={ROUTES.DASHBOARD}
         element={
           // <ProtectedRoute>
-            <Dashboard />
+          <Dashboard />
           // </ProtectedRoute>
         }
-      />
+      /> */}
       <Route
         path={ROUTES.ALUMNI_LIST}
         element={
           // <ProtectedRoute>
-            <AlumniList />
+          <AlumniList />
           // </ProtectedRoute>
         }
       />
+
+      <Route
+        path={ROUTES.PROFILE}
+        element={
+          // <ProtectedRoute>
+          <Profile />
+          // </ProtectedRoute>
+        }
+      />
+
       <Route
         path={ROUTES.ALUMNI_PROFILE}
         element={
           // <ProtectedRoute>
-            <AlumniProfile />
+          <AlumniProfile />
           // </ProtectedRoute>
         }
-      /> */}
+      />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

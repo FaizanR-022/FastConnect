@@ -57,7 +57,8 @@ export const AlumniDetailModal = ({ alumni, open, onClose }) => {
               {alumni.name}
             </Typography>
             <Typography variant="body1" sx={styles.graduationYear}>
-              Class of {alumni.graduationYear} • {alumni.department}
+              Class of {alumni.graduationYear} ({alumni.campus}) •{" "}
+              {alumni.department}
             </Typography>
           </Box>
         </Box>

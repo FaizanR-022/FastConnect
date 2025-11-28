@@ -47,6 +47,7 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
     searchAttribute = "name",
     searchQuery = "",
     department,
+    campus,
     graduationYear,
     sortBy = "graduationYear",
     sortOrder = "desc",
@@ -79,7 +80,8 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
       ["company", "city", "country", "position", "expertise"].includes(
         searchField
       )) ||
-    department;
+    department ||
+    campus;
 
   if (hasSearch) {
     const searchTerm = searchQuery.trim();
@@ -163,6 +165,9 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
   if (department) {
     whereClause["$department.department_code$"] = department;
   }
+  if (campus) {
+    whereClause["$campus.campus_name$"] = campus;
+  }
 
   if (graduationYear) {
     const year = parseInt(graduationYear);
@@ -175,7 +180,7 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
     {
       model: User,
       as: "user",
-      attributes: ["public_id"],
+      attributes: ["public_id", "email"],
     },
     {
       model: Department,
@@ -322,6 +327,8 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
       name: `${alum.first_name} ${alum.last_name}`,
       firstName: alum.first_name,
       lastName: alum.last_name,
+      email: alum.user.email || null,
+      phone: alum.phone_number || null,
       department: alum.department?.department_name || null,
       departmentCode: alum.department?.department_code || null,
       graduationYear: alum.graduation_year,

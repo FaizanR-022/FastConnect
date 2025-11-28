@@ -22,6 +22,11 @@ export const API_ENDPOINTS = {
   SIGNUP_ALUMNI: "/auth/signup/alumni",
   VERIFY_EMAIL: "/auth/verify-email",
 
+  // User
+  GET_USER_PROFILE: "/user",
+  UPDATE_USER_PROFILE: "/user",
+  DELETE_USER_PROFILE: "/user",
+
   // Alumni
   GET_ALUMNI: "/alumni",
   GET_ALUMNI_BY_ID: "/alumni/:id",

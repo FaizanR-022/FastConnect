@@ -33,7 +33,7 @@ const seedStaticData = async () => {
         { campus_name: "Lahore" },
         { campus_name: "Islamabad" },
         { campus_name: "Peshawar" },
-        { campus_name: "Chiniot-Faisalabad" },
+        { campus_name: "Faisalabad" },
       ],
       {
         ignoreDuplicates: true,

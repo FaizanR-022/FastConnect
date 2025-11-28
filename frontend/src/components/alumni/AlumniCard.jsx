@@ -35,7 +35,7 @@ export const AlumniCard = ({ alumni, onClick }) => {
               {alumni.name}
             </Typography>
             <Typography variant="body2" sx={styles.graduationYear}>
-              Class of {alumni.graduationYear}
+              Class of {alumni.graduationYear} ({alumni.campus})
             </Typography>
           </Box>
         </Stack>
