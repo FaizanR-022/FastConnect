@@ -13,6 +13,8 @@ export const ROUTES = {
   ALUMNI_LIST: "/alumni",
   ALUMNI_PROFILE: "/alumni/:id",
   PROFILE: "/profile",
+  POSTS: "/posts",
+  MY_POSTS: "/my-posts",
 };
 
 export const API_ENDPOINTS = {
@@ -35,6 +37,19 @@ export const API_ENDPOINTS = {
   // Student
   GET_STUDENT_PROFILE: "/student/profile",
   UPDATE_STUDENT_PROFILE: "/student/profile",
+
+  // Posts
+  GET_ALL_POSTS: "/posts",
+  GET_MY_POSTS: "/posts/my-posts",
+  CREATE_POST: "/posts",
+  DELETE_POST: "/posts/:id",
+  LIKE_POST: "/posts/:id/like",
+  UNLIKE_POST: "/posts/:id/like",
+
+  // Replies
+  GET_POST_REPLIES: "/posts/:id/replies",
+  CREATE_REPLY: "/posts/:id/replies",
+  DELETE_REPLY: "/replies/:id",
 };
 
 export const EMAIL_DOMAINS = {

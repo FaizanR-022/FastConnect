@@ -1,6 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-// import ProtectedRoute from './ProtectedRoute';
-// import PublicRoute from './PublicRoute';
 import { ROUTES } from "../constants/constants";
 
 // Lazy load pages
@@ -12,100 +10,27 @@ import SignupChoice from "../pages/Auth/SignupChoice";
 import AlumniList from "../pages/Alumni/AlumniList";
 import Profile from "../pages/Profile";
 import AlumniProfile from "../pages/Alumni/AlumniProfile";
-// import Dashboard from '../pages/Student/Dashboard';
-// import AlumniList from '../pages/Alumni/AlumniList';
-// import AlumniProfile from '../pages/Alumni/AlumniProfile';
+import PostsFeed from "../pages/Posts/PostsFeed";
+import MyPosts from "../pages/Posts/MyPosts";
 
 function AppRoutes() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route
-        path={ROUTES.HOME}
-        element={
-          // <PublicRoute>
-          <Home />
-          // </PublicRoute>
-        }
-      />
-      <Route
-        path={ROUTES.LOGIN}
-        element={
-          // <PublicRoute>
-          <Login />
-          // </PublicRoute>
-        }
-      />
-
-      <Route
-        path={ROUTES.SIGNUP_CHOICE}
-        element={
-          // <PublicRoute>
-          <SignupChoice />
-          // </PublicRoute>
-        }
-      />
-      <Route
-        path={ROUTES.SIGNUP_STUDENT}
-        element={
-          // <PublicRoute>
-          <SignupStudent />
-          // </PublicRoute>
-        }
-      />
-      <Route
-        path={ROUTES.SIGNUP_ALUMNI}
-        element={
-          // <PublicRoute>
-          <SignupAlumni />
-          // </PublicRoute>
-        }
-      />
-
-      <Route
-        path={ROUTES.ALUMNI_LIST}
-        element={
-          // <PublicRoute>
-          <AlumniList />
-          // </PublicRoute>
-        }
-      />
+      <Route path={ROUTES.HOME} element={<Home />} />
+      <Route path={ROUTES.LOGIN} element={<Login />} />
+      <Route path={ROUTES.SIGNUP_CHOICE} element={<SignupChoice />} />
+      <Route path={ROUTES.SIGNUP_STUDENT} element={<SignupStudent />} />
+      <Route path={ROUTES.SIGNUP_ALUMNI} element={<SignupAlumni />} />
+      <Route path={ROUTES.ALUMNI_LIST} element={<AlumniList />} />
 
       {/* Protected Routes */}
-      {/* <Route
-        path={ROUTES.DASHBOARD}
-        element={
-          // <ProtectedRoute>
-          <Dashboard />
-          // </ProtectedRoute>
-        }
-      /> */}
-      <Route
-        path={ROUTES.ALUMNI_LIST}
-        element={
-          // <ProtectedRoute>
-          <AlumniList />
-          // </ProtectedRoute>
-        }
-      />
+      <Route path={ROUTES.PROFILE} element={<Profile />} />
+      <Route path={ROUTES.ALUMNI_PROFILE} element={<AlumniProfile />} />
 
-      <Route
-        path={ROUTES.PROFILE}
-        element={
-          // <ProtectedRoute>
-          <Profile />
-          // </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path={ROUTES.ALUMNI_PROFILE}
-        element={
-          // <ProtectedRoute>
-          <AlumniProfile />
-          // </ProtectedRoute>
-        }
-      />
+      {/* Posts Routes */}
+      <Route path={ROUTES.POSTS} element={<PostsFeed />} />
+      <Route path={ROUTES.MY_POSTS} element={<MyPosts />} />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

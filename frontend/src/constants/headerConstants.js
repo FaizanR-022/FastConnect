@@ -1,5 +1,5 @@
 // constants/headerConstants.js
-import { Home, Users, MessageSquare } from "lucide-react";
+import { Home, Users, MessageSquare, FileText } from "lucide-react";
 import { ROUTES } from "./constants";
 
 export const NAV_ITEMS = [
@@ -14,14 +14,13 @@ export const NAV_ITEMS = [
     path: ROUTES.ALUMNI_LIST,
   },
   {
-    label: "Feedback",
+    label: "Q&A Posts",
     icon: MessageSquare,
-    path: "/feedback",
+    path: ROUTES.POSTS,
+  },
+  {
+    label: "My Posts",
+    icon: FileText,
+    path: ROUTES.MY_POSTS,
   },
 ];
-
-// If you want to add more navigation items later, just add them here:
-// export const ADMIN_NAV_ITEMS = [
-//   { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-//   { label: "Users", icon: UserCog, path: "/admin/users" },
-// ];
