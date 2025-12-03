@@ -5,7 +5,6 @@ import { User } from "../models/index.js";
 
 export const protect = asyncHandler(async (req, res, next) => {
   let token;
-  console.log("Reaching here");
 
   if (
     req.headers.authorization &&

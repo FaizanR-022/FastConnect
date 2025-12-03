@@ -1,3 +1,4 @@
+import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   updateAlumniProfileSchema,
@@ -20,7 +21,6 @@ export const validate = (schema) => {
 };
 
 export const validateUpdateUser = asyncHandler(async (req, res, next) => {
-  console.log("Reaching here 2");
   // Protect middleware adds this user to req
   const userType = req.user.user_type;
 

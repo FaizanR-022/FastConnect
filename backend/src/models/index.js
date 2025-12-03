@@ -11,6 +11,9 @@ import JobRole from "./JobRole.js";
 import Skill from "./Skill.js";
 import Experience from "./Experience.js";
 import AlumniSkill from "./AlumniSkill.js";
+import Post from "./Post.js";
+import Reply from "./Reply.js";
+import PostLike from "./PostLike.js";
 
 // User - Student (One to One)
 User.hasOne(Student, {
@@ -175,6 +178,70 @@ AlumniSkill.belongsTo(Alumni, {
   as: "alumni",
 });
 
+// User - Posts (One to Many)
+User.hasMany(Post, {
+  foreignKey: "user_id",
+  as: "posts",
+});
+Post.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "author",
+});
+
+// Post - Replies (One to Many)
+Post.hasMany(Reply, {
+  foreignKey: "post_id",
+  as: "replies",
+});
+Reply.belongsTo(Post, {
+  foreignKey: "post_id",
+  as: "post",
+});
+
+// Alumni - Replies (One to Many)
+Alumni.hasMany(Reply, {
+  foreignKey: "alumni_id",
+  as: "replies",
+});
+Reply.belongsTo(Alumni, {
+  foreignKey: "alumni_id",
+  as: "author",
+});
+
+// User - PostLikes (One to Many)
+User.hasMany(PostLike, {
+  foreignKey: "user_id",
+  as: "postLikes",
+});
+PostLike.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+// Post - PostLikes (One to Many)
+Post.hasMany(PostLike, {
+  foreignKey: "post_id",
+  as: "likes",
+});
+PostLike.belongsTo(Post, {
+  foreignKey: "post_id",
+  as: "post",
+});
+
+// Post - Users through PostLikes (Many to Many)
+Post.belongsToMany(User, {
+  through: PostLike,
+  foreignKey: "post_id",
+  otherKey: "user_id",
+  as: "likedByUsers",
+});
+User.belongsToMany(Post, {
+  through: PostLike,
+  foreignKey: "user_id",
+  otherKey: "post_id",
+  as: "likedPosts",
+});
+
 const syncDatabase = async () => {
   try {
     await sequelize.sync({ alter: true }); // alter updates tables without dropping
@@ -198,5 +265,8 @@ export {
   Skill,
   Experience,
   AlumniSkill,
+  Post,
+  Reply,
+  PostLike,
   syncDatabase,
 };
