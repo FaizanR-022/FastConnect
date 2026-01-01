@@ -67,7 +67,8 @@ export default function Login({ props }) {
   const onSubmit = async (data) => {
     clearError();
     console.log(data);
-    await login(data);
+    const res = await login(data);
+    // On res.status = fail, donot let it reload the page and let the same page stay with errors showing
   };
 
   return (

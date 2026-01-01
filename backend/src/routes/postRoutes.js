@@ -2,7 +2,7 @@ import express from "express";
 import {
   createPost,
   getAllPosts,
-  getMyPosts,
+  getPostById,
   deletePost,
   getPostReplies,
   createReply,
@@ -23,7 +23,7 @@ router.post("/", protect, validate(createPostSchema), createPost);
 
 router.get("/", protect, getAllPosts);
 
-router.get("/my-posts", protect, getMyPosts);
+router.get("/:id", protect, getPostById);
 
 router.delete("/:id", protect, deletePost);
 

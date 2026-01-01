@@ -6,7 +6,7 @@ import { handleApiCall } from "../utils/apiHandler";
 export const alumniService = {
   getAllAlumni: async (query) => {
     return handleApiCall(
-      () => api.get(API_ENDPOINTS.GET_ALUMNI, { params: query }),
+      () => api.get(API_ENDPOINTS.GET_ALL_ALUMNI, { params: query }),
       "Failed to fetch alumni. Please try again."
     );
   },

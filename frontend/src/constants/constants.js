@@ -13,6 +13,11 @@ export const ROUTES = {
   ALUMNI_LIST: "/alumni",
   ALUMNI_PROFILE: "/alumni/:id",
   PROFILE: "/profile",
+
+  ALL_POSTS: "/posts",
+  SINGLE_POST: "/posts/:id",
+  // MY_POSTS: "/my-posts",
+  // CREATE_POST: "/posts/create",
 };
 
 export const API_ENDPOINTS = {
@@ -26,15 +31,29 @@ export const API_ENDPOINTS = {
   GET_USER_PROFILE: "/user",
   UPDATE_USER_PROFILE: "/user",
   DELETE_USER_PROFILE: "/user",
+  GET_USER_POSTS: "/user/:id/posts",
 
   // Alumni
-  GET_ALUMNI: "/alumni",
+  GET_ALL_ALUMNI: "/alumni",
   GET_ALUMNI_BY_ID: "/alumni/:id",
   UPDATE_ALUMNI_PROFILE: "/alumni/profile",
 
   // Student
   GET_STUDENT_PROFILE: "/student/profile",
   UPDATE_STUDENT_PROFILE: "/student/profile",
+
+  // Posts
+  GET_ALL_POSTS: "/posts",
+  GET_POST_BY_ID: "/posts/:id", // Not implemented in backend as theres no option on Frontend to open a single post
+  CREATE_POST: "/posts",
+  DELETE_POST: "/posts/:id",
+  LIKE_POST: "/posts/:id/like",
+  UNLIKE_POST: "/posts/:id/like",
+
+  //Replies
+  GET_POST_REPLIES: "/posts/:id/replies",
+  CREATE_REPLY: "/posts/:id/replies",
+  DELETE_REPLY: "/replies/:id",
 };
 
 export const EMAIL_DOMAINS = {

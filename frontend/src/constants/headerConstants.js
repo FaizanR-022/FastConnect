@@ -1,5 +1,5 @@
 // constants/headerConstants.js
-import { Home, Users, MessageSquare } from "lucide-react";
+import { Home, Users, MessageSquare, MessagesSquare } from "lucide-react";
 import { ROUTES } from "./constants";
 
 export const NAV_ITEMS = [
@@ -12,6 +12,11 @@ export const NAV_ITEMS = [
     label: "Alumni Directory",
     icon: Users,
     path: ROUTES.ALUMNI_LIST,
+  },
+  {
+    label: "Q&A Forum",
+    icon: MessagesSquare,
+    path: ROUTES.ALL_POSTS,
   },
   {
     label: "Feedback",

@@ -12,6 +12,8 @@ import SignupChoice from "../pages/Auth/SignupChoice";
 import AlumniList from "../pages/Alumni/AlumniList";
 import Profile from "../pages/Profile";
 import AlumniProfile from "../pages/Alumni/AlumniProfile";
+import AllPosts from "../pages/Posts/AllPosts";
+import SinglePost from "../pages/Posts/SinglePost";
 // import Dashboard from '../pages/Student/Dashboard';
 // import AlumniList from '../pages/Alumni/AlumniList';
 // import AlumniProfile from '../pages/Alumni/AlumniProfile';
@@ -62,14 +64,14 @@ function AppRoutes() {
         }
       />
 
-      <Route
+      {/* <Route
         path={ROUTES.ALUMNI_LIST}
         element={
           // <PublicRoute>
           <AlumniList />
           // </PublicRoute>
         }
-      />
+      /> */}
 
       {/* Protected Routes */}
       {/* <Route
@@ -106,6 +108,9 @@ function AppRoutes() {
           // </ProtectedRoute>
         }
       />
+
+      <Route path={ROUTES.ALL_POSTS} element={<AllPosts />} />
+      <Route path={ROUTES.SINGLE_POST} element={<SinglePost />} />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

@@ -166,6 +166,149 @@ export const getAllPosts = asyncHandler(async (req, res) => {
   });
 });
 
+export const getPostById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const post = await Post.findByPk(id, {
+    include: [
+      {
+        model: User,
+        as: "author",
+        attributes: ["public_id", "user_type"],
+        include: [
+          {
+            model: Student,
+            as: "studentProfile",
+            attributes: ["first_name", "last_name", "pfp_url"],
+          },
+          {
+            model: Alumni,
+            as: "alumniProfile",
+            attributes: ["first_name", "last_name", "pfp_url"],
+          },
+        ],
+      },
+    ],
+  });
+
+  if (!post) {
+    throw new AppError("Post not found", 404);
+  }
+
+  // Check if current user liked this post
+  const userLike = await PostLike.findOne({
+    where: {
+      post_id: id,
+      user_id: req.user.user_id,
+    },
+  });
+
+  // Count replies
+  const repliesCount = await Reply.count({
+    where: { post_id: id },
+  });
+
+  const profile =
+    post.author.user_type === "student"
+      ? post.author.studentProfile
+      : post.author.alumniProfile;
+
+  const transformedPost = {
+    id: post.post_id,
+    title: post.title,
+    body: post.body,
+    author: {
+      id: post.author.public_id,
+      firstName: profile.first_name,
+      lastName: profile.last_name,
+      role: post.author.user_type,
+      profilePicture: profile.pfp_url,
+    },
+    likesCount: post.likes_count,
+    repliesCount: repliesCount,
+    isLikedByCurrentUser: !!userLike,
+    createdAt: post.createdAt,
+  };
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      post: transformedPost,
+    },
+  });
+});
+
+export const getUserPosts = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findOne({
+    where: { public_id: userId },
+    attributes: ["user_id", "user_type"],
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const posts = await Post.findAll({
+    where: { user_id: user.user_id },
+    attributes: ["post_id", "title", "body", "likes_count", "createdAt"],
+    order: [["createdAt", "DESC"]],
+  });
+
+  const postIds = posts.map((p) => p.post_id);
+
+  if (postIds.length === 0) {
+    return res.status(200).json({
+      success: true,
+      data: { posts: [] },
+    });
+  }
+
+  const repliesCounts = await Reply.findAll({
+    where: { post_id: postIds },
+    attributes: [
+      "post_id",
+      [sequelize.fn("COUNT", sequelize.col("reply_id")), "count"],
+    ],
+    group: ["post_id"],
+    raw: true,
+  });
+
+  const repliesCountMap = {};
+  repliesCounts.forEach((item) => {
+    repliesCountMap[item.post_id] = parseInt(item.count);
+  });
+
+  const userLikes = await PostLike.findAll({
+    where: {
+      post_id: postIds,
+      user_id: req.user.user_id,
+    },
+    attributes: ["post_id"],
+    raw: true,
+  });
+
+  const likedPostIds = new Set(userLikes.map((like) => like.post_id));
+
+  const transformedPosts = posts.map((post) => ({
+    id: post.post_id,
+    title: post.title,
+    body: post.body,
+    likesCount: post.likes_count,
+    repliesCount: repliesCountMap[post.post_id] || 0,
+    isLikedByCurrentUser: likedPostIds.has(post.post_id),
+    createdAt: post.createdAt,
+  }));
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      posts: transformedPosts,
+    },
+  });
+});
+
 export const getPostReplies = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -219,60 +362,60 @@ export const getPostReplies = asyncHandler(async (req, res) => {
   });
 });
 
-export const getMyPosts = asyncHandler(async (req, res) => {
-  const user_id = req.user.user_id;
+// export const getMyPosts = asyncHandler(async (req, res) => {
+//   const user_id = req.user.user_id;
 
-  const posts = await Post.findAll({
-    where: { user_id },
-    attributes: ["post_id", "title", "body", "likes_count", "createdAt"],
-    order: [["createdAt", "DESC"]],
-  });
+//   const posts = await Post.findAll({
+//     where: { user_id },
+//     attributes: ["post_id", "title", "body", "likes_count", "createdAt"],
+//     order: [["createdAt", "DESC"]],
+//   });
 
-  const postIds = posts.map((p) => p.post_id);
+//   const postIds = posts.map((p) => p.post_id);
 
-  const repliesCounts = await Reply.findAll({
-    where: { post_id: postIds },
-    attributes: [
-      "post_id",
-      [sequelize.fn("COUNT", sequelize.col("reply_id")), "count"],
-    ],
-    group: ["post_id"],
-    raw: true,
-  });
+//   const repliesCounts = await Reply.findAll({
+//     where: { post_id: postIds },
+//     attributes: [
+//       "post_id",
+//       [sequelize.fn("COUNT", sequelize.col("reply_id")), "count"],
+//     ],
+//     group: ["post_id"],
+//     raw: true,
+//   });
 
-  const repliesCountMap = {};
-  repliesCounts.forEach((item) => {
-    repliesCountMap[item.post_id] = parseInt(item.count);
-  });
+//   const repliesCountMap = {};
+//   repliesCounts.forEach((item) => {
+//     repliesCountMap[item.post_id] = parseInt(item.count);
+//   });
 
-  const userLikes = await PostLike.findAll({
-    where: {
-      post_id: postIds,
-      user_id: user_id,
-    },
-    attributes: ["post_id"],
-    raw: true,
-  });
+//   const userLikes = await PostLike.findAll({
+//     where: {
+//       post_id: postIds,
+//       user_id: user_id,
+//     },
+//     attributes: ["post_id"],
+//     raw: true,
+//   });
 
-  const likedPostIds = new Set(userLikes.map((like) => like.post_id));
+//   const likedPostIds = new Set(userLikes.map((like) => like.post_id));
 
-  const transformedPosts = posts.map((post) => ({
-    id: post.post_id,
-    title: post.title,
-    body: post.body,
-    likesCount: post.likes_count,
-    repliesCount: repliesCountMap[post.post_id] || 0,
-    isLikedByCurrentUser: likedPostIds.has(post.post_id),
-    createdAt: post.createdAt,
-  }));
+//   const transformedPosts = posts.map((post) => ({
+//     id: post.post_id,
+//     title: post.title,
+//     body: post.body,
+//     likesCount: post.likes_count,
+//     repliesCount: repliesCountMap[post.post_id] || 0,
+//     isLikedByCurrentUser: likedPostIds.has(post.post_id),
+//     createdAt: post.createdAt,
+//   }));
 
-  return res.status(200).json({
-    success: true,
-    data: {
-      posts: transformedPosts,
-    },
-  });
-});
+//   return res.status(200).json({
+//     success: true,
+//     data: {
+//       posts: transformedPosts,
+//     },
+//   });
+// });
 
 export const deletePost = asyncHandler(async (req, res) => {
   const { id } = req.params;
