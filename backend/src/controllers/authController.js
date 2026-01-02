@@ -273,7 +273,7 @@ export const signupAlumni = asyncHandler(async (req, res) => {
 });
 
 export const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
 
   const user = await User.findOne({
     where: { email },
@@ -295,6 +295,7 @@ export const login = asyncHandler(async (req, res) => {
   const token = generateToken({
     userId: user.public_id,
     userType: user.user_type,
+    rememberMe: rememberMe || false,
   });
 
   const userData = transformUserData(user);

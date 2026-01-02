@@ -4,7 +4,11 @@ import { AppError } from "./AppError.js";
 dotenv.config();
 
 export const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+  const rmbrMe = payload.rememberMe;
+  delete payload.rememberMe;
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: rmbrMe ? "7d" : "2h",
+  });
 };
 
 export const verifyToken = (token) => {

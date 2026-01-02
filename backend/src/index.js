@@ -14,13 +14,18 @@ import {
   authLimiter,
   globalLimiter,
 } from "./middleware/rateLimitMiddleware.js";
+import { corsOptions } from "./middleware/corsMiddleware.js";
+import { verifyApiKey } from "./middleware/apiKeyMiddleware.js";
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+app.set("trust proxy", 1);
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/api", globalLimiter);
+app.use("/api", verifyApiKey);
 
 app.get("/", (req, res) => {
   res.send("FastConnect Backend Running");
