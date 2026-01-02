@@ -33,6 +33,7 @@ import { useState, useEffect } from "react";
 import useAuthStore from "../../store/authStore";
 import authService from "../../services/authService";
 import { useAuth } from "../../hooks/useAuth";
+import ImageUpload from "../../components/common/ImageUpload";
 
 export default function SignupStudent({ props }) {
   const { signupStudent, error, clearError } = useAuth();
@@ -251,7 +252,7 @@ export default function SignupStudent({ props }) {
             </Box>
           </Stack>
 
-          <Controller
+          {/* <Controller
             name="profilePicture"
             control={control}
             render={({ field }) => (
@@ -267,6 +268,18 @@ export default function SignupStudent({ props }) {
                   errors.profilePicture?.message ||
                   "Paste a link to your profile picture"
                 }
+              />
+            )}
+          /> */}
+
+          <Controller
+            name="profilePicture"
+            control={control}
+            render={({ field }) => (
+              <ImageUpload
+                value={field.value}
+                onChange={field.onChange}
+                label="Profile Picture (Optional)"
               />
             )}
           />

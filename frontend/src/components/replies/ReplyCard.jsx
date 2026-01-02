@@ -28,7 +28,11 @@ export const ReplyCard = ({ reply, currentUser, onDelete }) => {
   return (
     <Box sx={styles.replyCard}>
       <Box sx={styles.replyHeader}>
-        <Avatar sx={styles.replyAvatar} onClick={handleAuthorClick}>
+        <Avatar
+          sx={styles.replyAvatar}
+          onClick={handleAuthorClick}
+          src={reply.author?.profilePicture}
+        >
           {getInitials(reply.author.firstName, reply.author.lastName)}
         </Avatar>
 

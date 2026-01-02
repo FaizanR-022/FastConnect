@@ -66,7 +66,11 @@ export const PostCard = ({
     <Card sx={styles.postCard}>
       <CardContent sx={styles.postCardContent}>
         <Box sx={styles.postHeader}>
-          <Avatar onClick={handleAuthorClick} sx={styles.postCardContent}>
+          <Avatar
+            onClick={handleAuthorClick}
+            sx={styles.postAvatar}
+            src={post.author?.profilePicture}
+          >
             {getInitials(post.author.firstName, post.author.lastName)}
           </Avatar>
           <Box sx={styles.postAuthorInfo}>

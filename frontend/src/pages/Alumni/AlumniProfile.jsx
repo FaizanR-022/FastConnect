@@ -30,6 +30,7 @@ import useAuthStore from "../../store/authStore";
 import { ROUTES } from "../../constants/constants";
 import { YEARS } from "../../constants/authConstants";
 import Loader from "../../components/common/Loader";
+import ImageUpload from "../../components/common/ImageUpload";
 
 export default function AlumniProfile() {
   const theme = useTheme();
@@ -654,7 +655,7 @@ export default function AlumniProfile() {
                   )}
                 />
 
-                <Controller
+                {/* <Controller
                   name="profilePicture"
                   control={control}
                   render={({ field }) => (
@@ -669,6 +670,18 @@ export default function AlumniProfile() {
                         errors.profilePicture?.message ||
                         "Paste a link to your profile picture"
                       }
+                    />
+                  )}
+                /> */}
+
+                <Controller
+                  name="profilePicture"
+                  control={control}
+                  render={({ field }) => (
+                    <ImageUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      label="Profile Picture (Optional)"
                     />
                   )}
                 />

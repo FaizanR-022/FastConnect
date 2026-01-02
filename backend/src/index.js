@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import alumniRoutes from "./routes/alumniRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import replyRoutes from "./routes/replyRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 import { sequelize } from "./config/database.js";
 import { syncDatabase } from "./models/index.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -36,6 +37,7 @@ app.use("/api/user", apiLimiter, userRoutes);
 app.use("/api/alumni", apiLimiter, alumniRoutes);
 app.use("/api/posts", apiLimiter, postRoutes);
 app.use("/api/replies", apiLimiter, replyRoutes);
+app.use("/api/upload", apiLimiter, uploadRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

@@ -35,6 +35,7 @@ import authService from "../../services/authService";
 import { useEffect, useState } from "react";
 import useAuthStore from "../../store/authStore";
 import { useAuth } from "../../hooks/useAuth";
+import ImageUpload from "../../components/common/ImageUpload";
 
 export default function SignupAlumni({ props }) {
   const { signupAlumni, error, clearError } = useAuth();
@@ -508,8 +509,7 @@ export default function SignupAlumni({ props }) {
 
           <Divider sx={{ my: 1 }} />
 
-          {/* Profile Picture */}
-          <Controller
+          {/* <Controller
             name="profilePicture"
             control={control}
             render={({ field }) => (
@@ -525,6 +525,18 @@ export default function SignupAlumni({ props }) {
                   errors.profilePicture?.message ||
                   "Paste a link to your profile picture"
                 }
+              />
+            )}
+          /> */}
+
+          <Controller
+            name="profilePicture"
+            control={control}
+            render={({ field }) => (
+              <ImageUpload
+                value={field.value}
+                onChange={field.onChange}
+                label="Profile Picture (Optional)"
               />
             )}
           />
