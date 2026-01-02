@@ -86,6 +86,8 @@ export const createPostStyles = (theme) => ({
 
   postCardContent: {
     p: { xs: 2.5, md: 3 },
+    cursor: "pointer",
+    "&:hover": { opacity: 0.8 },
   },
 
   postHeader: {
@@ -112,6 +114,11 @@ export const createPostStyles = (theme) => ({
     color: theme.palette.text.primary,
     fontWeight: 600,
     fontSize: { xs: "0.9rem", md: "1rem" },
+    cursor: "pointer",
+    "&:hover": {
+      textDecoration: "underline",
+      color: "primary.main",
+    },
   },
 
   postAuthorRole: {

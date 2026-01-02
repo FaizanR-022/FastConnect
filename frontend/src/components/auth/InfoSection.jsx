@@ -65,7 +65,7 @@ export const InfoSection = ({ title, description, features, gradient }) => {
 
         <Box sx={styles.infoFooter}>
           <Typography variant="body2" sx={styles.infoFooterText}>
-            Proudly serving the FAST-NUCES community
+            Proudly serving the FAST-NUCES community <br /> Developer: Your Name
           </Typography>
         </Box>
       </Box>

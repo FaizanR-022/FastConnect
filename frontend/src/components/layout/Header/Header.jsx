@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AppBar, Toolbar, Container, useTheme } from "@mui/material";
+import { AppBar, Toolbar, Container, useTheme, Box } from "@mui/material";
 import { Home, Users, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../../store/authStore";
@@ -42,33 +42,36 @@ const Header = () => {
   };
 
   return (
-    <AppBar position="fixed" elevation={0} sx={styles.appBar}>
-      <Container maxWidth="xl">
-        <Toolbar sx={styles.toolbar}>
-          {/* Logo */}
-          <Logo onClick={() => handleNavigate(ROUTES.HOME)} />
+    <>
+      <AppBar position="fixed" elevation={0} sx={styles.appBar}>
+        <Container maxWidth="xl">
+          <Toolbar sx={styles.toolbar}>
+            {/* Logo */}
+            <Logo onClick={() => handleNavigate(ROUTES.HOME)} />
 
-          {/* Navigation Links - Desktop */}
-          <NavLinksDesktop navItems={NAV_ITEMS} onNavigate={handleNavigate} />
+            {/* Navigation Links - Desktop */}
+            <NavLinksDesktop navItems={NAV_ITEMS} onNavigate={handleNavigate} />
 
-          {/* Navigation Links - Mobile */}
-          <NavLinksMobile navItems={NAV_ITEMS} onNavigate={handleNavigate} />
+            {/* Navigation Links - Mobile */}
+            <NavLinksMobile navItems={NAV_ITEMS} onNavigate={handleNavigate} />
 
-          {/* Profile Button */}
-          <ProfileButton user={user} onClick={handleMenuOpen} />
+            {/* Profile Button */}
+            <ProfileButton user={user} onClick={handleMenuOpen} />
 
-          {/* Profile Menu */}
-          <ProfileMenu
-            user={user}
-            anchorEl={anchorEl}
-            isOpen={isMenuOpen}
-            onClose={handleMenuClose}
-            onNavigateProfile={handleNavigateProfile}
-            onLogout={handleLogout}
-          />
-        </Toolbar>
-      </Container>
-    </AppBar>
+            {/* Profile Menu */}
+            <ProfileMenu
+              user={user}
+              anchorEl={anchorEl}
+              isOpen={isMenuOpen}
+              onClose={handleMenuClose}
+              onNavigateProfile={handleNavigateProfile}
+              onLogout={handleLogout}
+            />
+          </Toolbar>
+        </Container>
+      </AppBar>
+      <Box sx={{ mt: { xs: 11, md: 16 } }} />
+    </>
   );
 };
 

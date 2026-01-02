@@ -13,6 +13,8 @@ export const ROUTES = {
   ALUMNI_LIST: "/alumni",
   ALUMNI_PROFILE: "/alumni/:id",
   PROFILE: "/profile",
+  USER_PROFILE: "/user/:userId",
+  EDIT_PROFILE: "/profile/edit",
 
   ALL_POSTS: "/posts",
   SINGLE_POST: "/posts/:id",
@@ -29,9 +31,11 @@ export const API_ENDPOINTS = {
 
   // User
   GET_USER_PROFILE: "/user",
+  GET_USER_BY_ID: "/user/:userId",
   UPDATE_USER_PROFILE: "/user",
   DELETE_USER_PROFILE: "/user",
-  GET_USER_POSTS: "/user/:id/posts",
+  GET_USER_POSTS: "/user/:userId/posts",
+  GET_USER_REPLIES: "/user/:userId/replies",
 
   // Alumni
   GET_ALL_ALUMNI: "/alumni",
@@ -57,14 +61,21 @@ export const API_ENDPOINTS = {
 };
 
 export const EMAIL_DOMAINS = {
-  STUDENT: "@nu.edu",
+  STUDENT: "@nu.edu.pk",
 };
 
 export const VALIDATION_MESSAGES = {
   REQUIRED: "This field is required",
   INVALID_EMAIL: "Please enter a valid email address",
   STUDENT_EMAIL_REQUIRED: "Please use your @nu.edu email address",
-  PASSWORD_MIN: "Password must be at least 8 characters",
+  PASSWORD_MIN: "Password must be at least 6 characters",
   PASSWORD_MISMATCH: "Passwords do not match",
   PHONE_INVALID: "Please enter a valid phone number",
+};
+
+export const SOCIAL_LINKS = {
+  linkedin: "https://www.linkedin.com/in/faizan-raza-302360245/",
+  github: "https://github.com/FaizanR-022",
+  whatsapp: "https://wa.me/923248209792",
+  instagram: "https://www.instagram.com/faizanraza022/",
 };

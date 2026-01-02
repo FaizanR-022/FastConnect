@@ -22,7 +22,7 @@ import { PageHeader } from "../../components/auth/PageHeader";
 import { createAuthStyles } from "../../styles/authStyles";
 import { loginSchema } from "../../utils/validationSchemas";
 import authService from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuthStore from "../../store/authStore";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -31,6 +31,7 @@ export default function Login({ props }) {
   const theme = useTheme();
   const styles = createAuthStyles(theme);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   // const [err, setErr] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   // const login = useAuthStore((state) => state.login);
@@ -64,9 +65,15 @@ export default function Login({ props }) {
   //   }
   // };
 
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     navigate("/", { replace: true });
+  //   }
+  // }, []);
+
   const onSubmit = async (data) => {
     clearError();
-    console.log(data);
+    // console.log(data);
     const res = await login(data);
     // On res.status = fail, donot let it reload the page and let the same page stay with errors showing
   };

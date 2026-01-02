@@ -326,6 +326,11 @@ export const getPostReplies = asyncHandler(async (req, res) => {
         attributes: ["first_name", "last_name", "pfp_url"],
         include: [
           {
+            model: User,
+            as: "user",
+            attributes: ["public_id"],
+          },
+          {
             model: Company,
             as: "currentCompany",
             attributes: ["company_name"],
@@ -345,6 +350,7 @@ export const getPostReplies = asyncHandler(async (req, res) => {
     id: reply.reply_id,
     body: reply.body,
     author: {
+      id: reply.author.user?.public_id || null,
       firstName: reply.author.first_name,
       lastName: reply.author.last_name,
       profilePicture: reply.author.pfp_url,

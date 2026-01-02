@@ -12,6 +12,8 @@ import {
 import { Heart, MessageCircle, Trash2 } from "lucide-react";
 import { createPostStyles } from "../../styles/postStyles";
 import { formatDistanceToNow } from "../../utils/dateHelpers";
+import { ROUTES } from "../../constants/constants";
+import { useNavigate } from "react-router-dom";
 
 export const PostCard = ({
   post,
@@ -21,9 +23,11 @@ export const PostCard = ({
   currentUser,
 }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const styles = createPostStyles(theme);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  console.log(post.author);
   const isOwnPost = currentUser?.id === post.author.id;
   const isLiked = post.isLikedByCurrentUser;
 
@@ -49,6 +53,11 @@ export const PostCard = ({
     setIsExpanded(!isExpanded);
   };
 
+  const handleAuthorClick = (e) => {
+    e.stopPropagation();
+    navigate(ROUTES.USER_PROFILE.replace(":userId", post.author.id));
+  };
+
   const getInitials = (firstName, lastName) => {
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
@@ -57,12 +66,16 @@ export const PostCard = ({
     <Card sx={styles.postCard}>
       <CardContent sx={styles.postCardContent}>
         <Box sx={styles.postHeader}>
-          <Avatar sx={styles.postAvatar}>
+          <Avatar onClick={handleAuthorClick} sx={styles.postCardContent}>
             {getInitials(post.author.firstName, post.author.lastName)}
           </Avatar>
           <Box sx={styles.postAuthorInfo}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="body1" sx={styles.postAuthorName}>
+              <Typography
+                variant="body1"
+                sx={styles.postAuthorName}
+                onClick={handleAuthorClick}
+              >
                 {post.author.firstName} {post.author.lastName}
               </Typography>
               <Chip

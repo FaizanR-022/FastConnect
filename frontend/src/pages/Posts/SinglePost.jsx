@@ -44,12 +44,6 @@ export default function SinglePost() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    if (post === null && !loading) {
-      navigate(ROUTES.ALL_POSTS);
-    }
-  }, [post, loading, navigate]);
-
   const handleLike = async () => {
     if (post.isLikedByCurrentUser) {
       await unlikePost();

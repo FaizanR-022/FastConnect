@@ -4,7 +4,6 @@ import { API_ENDPOINTS } from "../constants/constants";
 import { handleApiCall } from "../utils/apiHandler";
 
 export const userService = {
-  // Get current user profile
   getUserProfile: async () => {
     return handleApiCall(
       () => api.get(API_ENDPOINTS.GET_USER_PROFILE),
@@ -12,7 +11,6 @@ export const userService = {
     );
   },
 
-  // Update user profile
   updateUserProfile: async (userData) => {
     return handleApiCall(
       () => api.put(API_ENDPOINTS.UPDATE_USER_PROFILE, userData),
@@ -20,7 +18,27 @@ export const userService = {
     );
   },
 
-  // Delete user account
+  getUserById: async (userId) => {
+    return handleApiCall(
+      () => api.get(API_ENDPOINTS.GET_USER_BY_ID.replace(":userId", userId)),
+      "Failed to fetch user profile. Please try again."
+    );
+  },
+
+  getUserPosts: async (userId) => {
+    return handleApiCall(
+      () => api.get(API_ENDPOINTS.GET_USER_POSTS.replace(":userId", userId)),
+      "Failed to fetch user posts. Please try again."
+    );
+  },
+
+  getUserReplies: async (userId) => {
+    return handleApiCall(
+      () => api.get(API_ENDPOINTS.GET_USER_REPLIES.replace(":userId", userId)),
+      "Failed to fetch user replies. Please try again."
+    );
+  },
+
   deleteUserAccount: async () => {
     return handleApiCall(
       () => api.delete(API_ENDPOINTS.DELETE_USER_ACCOUNT),

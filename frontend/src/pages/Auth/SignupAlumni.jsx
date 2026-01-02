@@ -32,12 +32,14 @@ import { alumniSignupSchema } from "../../utils/validationSchemas";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/constants";
 import authService from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuthStore from "../../store/authStore";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function SignupAlumni({ props }) {
   const { signupAlumni, error, clearError } = useAuth();
+  const { isAuthenticated } = useAuthStore();
+
   const theme = useTheme();
   const styles = createAuthStyles(theme);
   const navigate = useNavigate();
@@ -48,6 +50,12 @@ export default function SignupAlumni({ props }) {
 
   const handleShowPassword = () => setShowPassword((val) => !val);
   const handleShowConfirmPassword = () => setShowConfirmPassword((val) => !val);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const {
     control,

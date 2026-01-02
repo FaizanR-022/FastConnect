@@ -4,11 +4,20 @@ import { AuthContainer } from "../../components/auth/FormContainer";
 import { createAuthStyles } from "../../styles/authStyles";
 import { ROUTES } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import useAuthStore from "../../store/authStore";
 
 export default function SignupChoice({ props }) {
   const theme = useTheme();
   const styles = createAuthStyles(theme);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
     <AuthContainer styles={styles}>

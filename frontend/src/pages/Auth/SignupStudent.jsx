@@ -29,7 +29,7 @@ import {
 import { studentSignupSchema } from "../../utils/validationSchemas";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/constants";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useAuthStore from "../../store/authStore";
 import authService from "../../services/authService";
 import { useAuth } from "../../hooks/useAuth";
@@ -39,6 +39,8 @@ export default function SignupStudent({ props }) {
   const theme = useTheme();
   const styles = createAuthStyles(theme);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+
   // const [err, setErr] = useState("");
   // const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
@@ -46,6 +48,12 @@ export default function SignupStudent({ props }) {
 
   const handleShowPassword = () => setShowPassword((val) => !val);
   const handleShowConfirmPassword = () => setShowConfirmPassword((val) => !val);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const {
     control,

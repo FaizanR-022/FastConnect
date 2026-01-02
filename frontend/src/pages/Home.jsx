@@ -1,7 +1,5 @@
-import { Box } from "@mui/material";
-import Header from "../components/layout/Header/Header";
+import Dashboard from "./Home/Dashboard";
 
-// pages/Home.jsx
 export default function Home() {
-  return <div>Home Page</div>;
+  return <Dashboard />;
 }

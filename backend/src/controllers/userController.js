@@ -1,6 +1,13 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { AppError } from "../utils/AppError.js";
-import { User, Student, Alumni, sequelize } from "../models/index.js";
+import {
+  User,
+  Student,
+  Alumni,
+  sequelize,
+  Reply,
+  Post,
+} from "../models/index.js";
 import {
   getUserIncludes,
   transformUserData,
@@ -10,6 +17,8 @@ import {
   updateAlumniSkills,
   updateAlumniCurrentInfo,
 } from "../utils/updateHelpers.js";
+
+// These are all for current User
 
 export const getUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({
@@ -184,5 +193,95 @@ export const deleteUser = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Account deleted successfully",
+  });
+});
+
+// To get other User
+export const getUserById = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findOne({
+    where: { public_id: userId },
+    include: getUserIncludes(),
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const userData = transformUserData(user);
+
+  const isOwnProfile = req.user.public_id === userId;
+
+  if (!isOwnProfile) {
+    if (userData.role === "student") {
+      delete userData.email;
+    }
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: { user: userData, isOwnProfile },
+  });
+});
+
+export const getUserReplies = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findOne({
+    where: { public_id: userId },
+    attributes: ["user_id", "user_type"],
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  if (user.user_type !== "alumni") {
+    return res.status(200).json({
+      success: true,
+      data: { replies: [] },
+    });
+  }
+
+  const alumni = await Alumni.findOne({
+    where: { user_id: user.user_id },
+    attributes: ["alumni_id"],
+  });
+
+  if (!alumni) {
+    return res.status(200).json({
+      success: true,
+      data: { replies: [] },
+    });
+  }
+
+  const replies = await Reply.findAll({
+    where: { alumni_id: alumni.alumni_id },
+    attributes: ["reply_id", "body", "createdAt"],
+    include: [
+      {
+        model: Post,
+        as: "post",
+        attributes: ["post_id", "title"],
+      },
+    ],
+    order: [["createdAt", "DESC"]],
+    limit: 10, // Return last 10 replies
+  });
+
+  const transformedReplies = replies.map((reply) => ({
+    id: reply.reply_id,
+    body: reply.body,
+    postId: reply.post.post_id,
+    postTitle: reply.post.title,
+    createdAt: reply.createdAt,
+  }));
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      replies: transformedReplies,
+    },
   });
 });

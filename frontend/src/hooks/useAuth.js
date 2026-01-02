@@ -1,14 +1,20 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import authService from "../services/authService";
 import { ROUTES } from "../constants/constants";
 
 export const useAuth = () => {
   const navigate = useNavigate();
-  const { login: storeLogin, logout: storeLogout } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const {
+    login: storeLogin,
+    logout: storeLogout,
+    isAuthenticated,
+  } = useAuthStore();
 
   const [error, setError] = useState("");
+  const returnUrl = searchParams.get("returnUrl");
 
   const login = async (credentials) => {
     try {
@@ -16,7 +22,9 @@ export const useAuth = () => {
 
       const { token, user } = await authService.login(credentials);
       storeLogin(user, token);
-      navigate(ROUTES.ALUMNI_LIST);
+
+      const dest = returnUrl ? decodeURIComponent(returnUrl) : ROUTES.HOME;
+      navigate(dest, { replace: true });
 
       return { success: true };
     } catch (err) {
@@ -31,7 +39,8 @@ export const useAuth = () => {
 
       const { token, user } = await authService.signupStudent(studentData);
       storeLogin(user, token);
-      navigate(ROUTES.ALUMNI_LIST);
+
+      navigate(ROUTES.HOME, { replace: true });
 
       return { success: true };
     } catch (err) {
@@ -43,10 +52,11 @@ export const useAuth = () => {
   const signupAlumni = async (alumniData) => {
     try {
       setError("");
-      console.log(alumniData);
+
       const { token, user } = await authService.signupAlumni(alumniData);
       storeLogin(user, token);
-      navigate(ROUTES.ALUMNI_LIST);
+
+      navigate(ROUTES.HOME, { replace: true });
 
       return { success: true };
     } catch (err) {
@@ -57,7 +67,7 @@ export const useAuth = () => {
 
   const logout = () => {
     storeLogout();
-    navigate(ROUTES.LOGIN);
+    navigate(ROUTES.LOGIN, { replace: true });
   };
 
   const clearError = () => setError("");
@@ -69,5 +79,6 @@ export const useAuth = () => {
     logout,
     error,
     clearError,
+    isAuthenticated,
   };
 };

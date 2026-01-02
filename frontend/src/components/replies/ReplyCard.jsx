@@ -2,9 +2,12 @@ import { Box, Typography, Avatar, Stack, useTheme } from "@mui/material";
 import { Trash2 } from "lucide-react";
 import { createReplyStyles } from "../../styles/replyStyles";
 import { formatDistanceToNow } from "../../utils/dateHelpers";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/constants";
 
 export const ReplyCard = ({ reply, currentUser, onDelete }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const styles = createReplyStyles(theme);
 
   const isOwnReply =
@@ -14,6 +17,10 @@ export const ReplyCard = ({ reply, currentUser, onDelete }) => {
     onDelete(reply.id);
   };
 
+  const handleAuthorClick = () => {
+    navigate(ROUTES.USER_PROFILE.replace(":userId", reply.author.id));
+  };
+
   const getInitials = (firstName, lastName) => {
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
@@ -21,13 +28,17 @@ export const ReplyCard = ({ reply, currentUser, onDelete }) => {
   return (
     <Box sx={styles.replyCard}>
       <Box sx={styles.replyHeader}>
-        <Avatar sx={styles.replyAvatar}>
+        <Avatar sx={styles.replyAvatar} onClick={handleAuthorClick}>
           {getInitials(reply.author.firstName, reply.author.lastName)}
         </Avatar>
 
         <Box sx={styles.replyAuthorInfo}>
           <Stack direction="row" alignItems="center" spacing={0.5}>
-            <Typography variant="body1" sx={styles.replyAuthorName}>
+            <Typography
+              variant="body1"
+              sx={styles.replyAuthorName}
+              onClick={handleAuthorClick}
+            >
               {reply.author.firstName} {reply.author.lastName}
             </Typography>
             <Box sx={styles.alumniRoleBadge}>Alumni</Box>

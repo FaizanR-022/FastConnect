@@ -1,20 +1,41 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import useAuthStore from "../store/authStore";
-import { ROUTES } from "../utils/constants";
+import Header from "../components/layout/Header/Header";
+import { Box } from "@mui/material";
+import { Footer } from "../components/layout/Footer/Footer";
 
-function ProtectedRoute({ children, ...props }) {
-  const { isAuthenticated, user } = useAuthStore();
+const ProtectedRoute = ({ children }) => {
+  const location = useLocation();
+  const { isAuthenticated, token, logout } = useAuthStore();
 
-  if (!isAuthenticated) {
-    return <Navigate to={ROUTES.LOGIN} replace />;
+  if (!isAuthenticated || !token) {
+    const returnUrl = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
   }
 
-  // // Check role if required
-  // if (requiredRole && user?.role !== requiredRole) {
-  //   return <Navigate to={ROUTES.DASHBOARD} replace />;
-  // }
+  try {
+    const tokenPayload = JSON.parse(atob(token.split(".")[1]));
+    const expirationTime = tokenPayload.exp * 1000;
+    const currentTime = Date.now();
 
-  return children;
-}
+    if (currentTime >= expirationTime) {
+      logout();
+      const returnUrl = encodeURIComponent(location.pathname + location.search);
+      return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
+    }
+  } catch (error) {
+    console.error("Invalid token:", error);
+    logout();
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <>
+      <Header />
+      <Box component="main">{children}</Box>
+      <Footer />
+    </>
+  );
+};
 
 export default ProtectedRoute;

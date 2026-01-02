@@ -9,8 +9,6 @@ function App() {
       <Box
         sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
       >
-        <Header />
-        <Box sx={{ mt: { xs: 8, md: 10 } }} />
         <AppRoutes />
         {/* <SignupChoice /> */}
       </Box>

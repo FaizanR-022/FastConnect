@@ -55,6 +55,8 @@ export const createReplyStyles = (theme) => ({
     fontSize: { xs: "0.875rem", md: "1rem" },
     fontWeight: 600,
     boxShadow: "0 2px 8px rgba(5, 150, 105, 0.25)",
+    cursor: "pointer",
+    "&:hover": { opacity: 0.8 },
   },
 
   replyAuthorInfo: {
@@ -66,6 +68,8 @@ export const createReplyStyles = (theme) => ({
     color: theme.palette.text.primary,
     fontWeight: 600,
     fontSize: { xs: "0.875rem", md: "0.938rem" },
+    cursor: "pointer",
+    "&:hover": { textDecoration: "underline" },
   },
 
   replyAuthorPosition: {
