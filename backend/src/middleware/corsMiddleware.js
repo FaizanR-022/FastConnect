@@ -5,7 +5,7 @@ export const corsOptions = {
       "http://localhost:3000",
     ];
 
-    if (process.env.NODE_ENV === "development" && !origin) {
+    if (process.env.NODE_ENV === "development") {
       return callback(null, true);
     }
 

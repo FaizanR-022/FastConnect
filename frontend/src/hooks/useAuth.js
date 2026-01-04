@@ -11,6 +11,7 @@ export const useAuth = () => {
     login: storeLogin,
     logout: storeLogout,
     isAuthenticated,
+    markEmailVerified,
   } = useAuthStore();
 
   const [error, setError] = useState("");
@@ -40,7 +41,8 @@ export const useAuth = () => {
       const { token, user } = await authService.signupStudent(studentData);
       storeLogin(user, token);
 
-      navigate(ROUTES.HOME, { replace: true });
+      // navigate(ROUTES.HOME, { replace: true });
+      navigate(ROUTES.VERIFY_EMAIL, { replace: true });
 
       return { success: true };
     } catch (err) {
@@ -56,7 +58,34 @@ export const useAuth = () => {
       const { token, user } = await authService.signupAlumni(alumniData);
       storeLogin(user, token);
 
-      navigate(ROUTES.HOME, { replace: true });
+      // navigate(ROUTES.HOME, { replace: true });
+      navigate(ROUTES.VERIFY_EMAIL, { replace: true });
+
+      return { success: true };
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
+    }
+  };
+
+  const verifyOTP = async (otp) => {
+    try {
+      setError("");
+
+      const { user } = await authService.verifySignupOTP(otp);
+      markEmailVerified();
+      return { success: true, data: user };
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
+    }
+  };
+
+  const resendOTP = async () => {
+    try {
+      setError("");
+
+      await authService.resendSignupOTP();
 
       return { success: true };
     } catch (err) {
@@ -76,6 +105,8 @@ export const useAuth = () => {
     login,
     signupStudent,
     signupAlumni,
+    verifyOTP,
+    resendOTP,
     logout,
     error,
     clearError,

@@ -66,6 +66,7 @@ export const transformUserData = (user) => {
       batch: student.batch_year,
       campus: student.campus.campus_name,
       profilePicture: student.pfp_url,
+      isEmailVerified: user.is_email_verified,
     };
   } else if (user.user_type === "alumni") {
     const alumni = user.alumniProfile;
@@ -101,6 +102,7 @@ export const transformUserData = (user) => {
       profilePicture: alumni.pfp_url,
       previousExperiences,
       skills,
+      isEmailVerified: user.is_email_verified,
     };
   }
 };

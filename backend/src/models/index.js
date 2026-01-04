@@ -14,6 +14,7 @@ import AlumniSkill from "./AlumniSkill.js";
 import Post from "./Post.js";
 import Reply from "./Reply.js";
 import PostLike from "./PostLike.js";
+import OTP from "./OTP.js";
 
 // User - Student (One to One)
 User.hasOne(Student, {
@@ -242,6 +243,16 @@ User.belongsToMany(Post, {
   as: "likedPosts",
 });
 
+// User - OTP (One to Many)
+User.hasMany(OTP, {
+  foreignKey: "user_id",
+  as: "otps",
+});
+OTP.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
 const syncDatabase = async () => {
   try {
     await sequelize.sync({ alter: true }); // alter updates tables without dropping
@@ -268,5 +279,6 @@ export {
   Post,
   Reply,
   PostLike,
+  OTP,
   syncDatabase,
 };

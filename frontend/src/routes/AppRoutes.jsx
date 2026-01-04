@@ -1,11 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ROUTES } from "../constants/constants";
 import ProtectedRoute from "./ProtectedRoutes";
+import EmailVerificationRoute from "./EmailVerificationRoute";
 
 import Login from "../pages/Auth/Login";
 import SignupStudent from "../pages/Auth/SignupStudent";
 import SignupAlumni from "../pages/Auth/SignupAlumni";
 import SignupChoice from "../pages/Auth/SignupChoice";
+import VerifyEmail from "../pages/Auth/VerifyEmail";
 
 import Home from "../pages/Home";
 import AlumniList from "../pages/Alumni/AlumniList";
@@ -22,6 +24,15 @@ function AppRoutes() {
       <Route path={ROUTES.SIGNUP_CHOICE} element={<SignupChoice />} />
       <Route path={ROUTES.SIGNUP_STUDENT} element={<SignupStudent />} />
       <Route path={ROUTES.SIGNUP_ALUMNI} element={<SignupAlumni />} />
+
+      <Route
+        path={ROUTES.VERIFY_EMAIL}
+        element={
+          <EmailVerificationRoute>
+            <VerifyEmail />
+          </EmailVerificationRoute>
+        }
+      />
 
       <Route
         path={ROUTES.HOME}

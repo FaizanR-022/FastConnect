@@ -24,6 +24,20 @@ export const authService = {
     );
   },
 
+  verifySignupOTP: async (otp) => {
+    return handleApiCall(
+      () => api.post(API_ENDPOINTS.VERIFY_SIGNUP_OTP, { otp }),
+      "OTP Verification Failed"
+    );
+  },
+
+  resendSignupOTP: async () => {
+    return handleApiCall(
+      () => api.post(API_ENDPOINTS.RESEND_SIGNUP_OTP),
+      "Failed to Resend OTP"
+    );
+  },
+
   logout: () => {
     // You might not even need an API call for this
     localStorage.removeItem("token");

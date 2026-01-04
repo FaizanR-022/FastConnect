@@ -29,7 +29,9 @@ export const AlumniCard = ({ alumni, onClick }) => {
       <CardContent sx={styles.cardContent}>
         {/* Header Section */}
         <Stack direction="row" spacing={1.5} sx={{ mb: { xs: 2, md: 3 } }}>
-          <Avatar sx={styles.avatar}>{alumni.avatar}</Avatar>
+          <Avatar sx={styles.avatar} src={alumni?.profilePicture}>
+            {alumni.avatar}
+          </Avatar>
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant="h6" sx={styles.alumniName}>
               {alumni.name}

@@ -9,6 +9,7 @@ export const ROUTES = {
   SIGNUP_CHOICE: "/signup",
   SIGNUP_STUDENT: "/signup/student",
   SIGNUP_ALUMNI: "/signup/alumni",
+  VERIFY_EMAIL: "/verify-email",
   DASHBOARD: "/dashboard",
   ALUMNI_LIST: "/alumni",
   ALUMNI_PROFILE: "/alumni/:id",
@@ -28,6 +29,8 @@ export const API_ENDPOINTS = {
   SIGNUP_STUDENT: "/auth/signup/student",
   SIGNUP_ALUMNI: "/auth/signup/alumni",
   VERIFY_EMAIL: "/auth/verify-email",
+  VERIFY_SIGNUP_OTP: "/auth/verify-signup-otp", // ← ADD THIS
+  RESEND_SIGNUP_OTP: "/auth/resend-signup-otp", // ← ADD THIS
 
   // User
   GET_USER_PROFILE: "/user",

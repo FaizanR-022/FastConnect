@@ -136,6 +136,7 @@ export default function AlumniList() {
         },
       })),
       avatar: alum.firstName?.[0] + alum.lastName?.[0] || "AL",
+      profilePicture: alum.profilePicture,
     }));
   };
 

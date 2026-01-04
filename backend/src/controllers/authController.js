@@ -10,6 +10,7 @@ import {
   City,
   Country,
   Experience,
+  OTP,
 } from "../models/index.js";
 import { comparePassword, hashPassword } from "../utils/passwordHelper.js";
 import { generateToken } from "../utils/jwtHelper.js";
@@ -19,6 +20,12 @@ import {
   getUserIncludes,
   transformUserData,
 } from "../utils/controllerHelper.js";
+import {
+  checkOTPAttempts,
+  createAndSendOTP,
+  verifyOTP,
+} from "../utils/otpHelper.js";
+import { Op } from "sequelize";
 
 export const signupStudent = asyncHandler(async (req, res) => {
   const {
@@ -55,6 +62,7 @@ export const signupStudent = asyncHandler(async (req, res) => {
         email,
         password: hashedPassword,
         user_type: "student",
+        is_email_verified: false,
       },
       { transaction: t }
     );
@@ -75,6 +83,8 @@ export const signupStudent = asyncHandler(async (req, res) => {
     );
     return { user, student };
   });
+
+  const otpResult = await createAndSendOTP(result.user);
 
   const token = generateToken({
     userId: result.user.public_id,
@@ -97,6 +107,7 @@ export const signupStudent = asyncHandler(async (req, res) => {
         departmentCode: dept.department_code,
         campus: camp.campus_name,
         profilePicture: result.student.pfp_url,
+        isEmailVerified: false,
       },
     },
   });
@@ -239,6 +250,8 @@ export const signupAlumni = asyncHandler(async (req, res) => {
     return { user, alumni, experiences };
   });
 
+  const otpResult = await createAndSendOTP(result.user);
+
   const token = generateToken({
     userId: result.user.public_id,
     userType: result.user.user_type,
@@ -267,7 +280,103 @@ export const signupAlumni = asyncHandler(async (req, res) => {
         profilePicture: result.alumni.pfp_url,
         linkedin: result.alumni.linkedin_url,
         previousExperiences: result.experiences,
+        isEmailVerified: false,
       },
+    },
+  });
+});
+
+export const verifySignupOTP = asyncHandler(async (req, res) => {
+  const { otp } = req.body;
+  const user_id = req.user.user_id;
+
+  if (!otp) {
+    throw new AppError("OTP is required", 400);
+  }
+
+  const user = await User.findOne({
+    where: {
+      user_id,
+      is_email_verified: false,
+    },
+    include: getUserIncludes(),
+  });
+
+  if (!user) {
+    throw new AppError("User not found or already verified", 404);
+  }
+
+  const attemptsCheck = await checkOTPAttempts(user_id);
+  if (attemptsCheck.locked) {
+    throw new AppError(attemptsCheck.message, 429);
+  }
+
+  const verification = await verifyOTP(user_id, otp);
+
+  if (!verification.valid) {
+    throw new AppError(verification.reason, 400);
+  }
+
+  await user.update({
+    is_email_verified: true,
+    last_login: new Date(),
+  });
+
+  const userData = transformUserData(user);
+
+  return res.status(200).json({
+    success: true,
+    message: "Email verified successfully",
+    data: {
+      user: {
+        ...userData,
+        isEmailVerified: true,
+      },
+    },
+  });
+});
+
+export const resendSignupOTP = asyncHandler(async (req, res) => {
+  const user_id = req.user.user_id;
+
+  const user = await User.findOne({
+    where: {
+      user_id,
+      is_email_verified: false,
+    },
+  });
+
+  if (!user) {
+    throw new AppError("User not found or already verified", 404);
+  }
+
+  const recentOTP = await OTP.findOne({
+    where: {
+      user_id,
+      createdAt: {
+        [Op.gt]: new Date(Date.now() - 60 * 1000), // Last 60 seconds
+      },
+    },
+  });
+
+  if (recentOTP) {
+    throw new AppError(
+      "Please wait 60 seconds before requesting a new OTP",
+      429
+    );
+  }
+
+  const otpResult = await createAndSendOTP(user);
+
+  if (!otpResult.success) {
+    throw new AppError("Failed to send OTP. Please try again.", 500);
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "New verification code sent to your email",
+    data: {
+      expiresAt: otpResult.expiresAt,
     },
   });
 });
