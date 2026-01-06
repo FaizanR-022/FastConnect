@@ -19,6 +19,7 @@ export const ROUTES = {
 
   ALL_POSTS: "/posts",
   SINGLE_POST: "/posts/:id",
+  NOTIFICATIONS: "/notifications",
   // MY_POSTS: "/my-posts",
   // CREATE_POST: "/posts/create",
 };
@@ -48,6 +49,13 @@ export const API_ENDPOINTS = {
   // Student
   GET_STUDENT_PROFILE: "/student/profile",
   UPDATE_STUDENT_PROFILE: "/student/profile",
+
+  // Notifications
+  GET_NOTIFICATIONS: "/notifications",
+  GET_UNREAD_COUNT: "/notifications/unread-count",
+  MARK_NOTIFICATION_AS_READ: "/notifications/:id/read",
+  MARK_ALL_NOTIFICATIONS_AS_READ: "/notifications/read-all",
+  DELETE_NOTIFICATION: "/notifications/:id",
 
   // Posts
   GET_ALL_POSTS: "/posts",

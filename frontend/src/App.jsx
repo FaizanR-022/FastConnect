@@ -2,8 +2,11 @@ import { Box, ThemeProvider } from "@mui/material";
 import Header from "./components/layout/Header/Header";
 import AppRoutes from "./routes/AppRoutes";
 import theme from "./global/theme";
+import useNotificationPolling from "./hooks/useNotificationPolling";
 
 function App() {
+  useNotificationPolling();
+
   return (
     <ThemeProvider theme={theme}>
       <Box

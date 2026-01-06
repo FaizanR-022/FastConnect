@@ -1,4 +1,5 @@
 import { sequelize } from "../config/database.js";
+import { Op } from "sequelize";
 import {
   Alumni,
   Company,
@@ -11,6 +12,11 @@ import {
 } from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import {
+  createBulkNotifications,
+  createNotification,
+} from "../services/notificationService.js";
+
 export const createPost = asyncHandler(async (req, res) => {
   const { title, body } = req.body;
 
@@ -23,15 +29,64 @@ export const createPost = asyncHandler(async (req, res) => {
   });
 
   let profile;
+  let currentJob = null;
+  let currentCompany = null;
 
   if (user.user_type === "student") {
     profile = await Student.findOne({ where: { user_id: user.user_id } });
   } else {
-    profile = await Alumni.findOne({ where: { user_id: user.user_id } });
+    profile = await Alumni.findOne({
+      where: { user_id: user.user_id },
+      include: [
+        {
+          model: Company,
+          as: "currentCompany",
+          attributes: ["company_name"],
+        },
+        {
+          model: JobRole,
+          as: "currentJob",
+          attributes: ["job_title"],
+        },
+      ],
+    });
+    currentJob = profile?.currentJob;
+    currentCompany = profile?.currentCompany;
   }
 
   if (!profile) {
     throw new AppError("User profile not found", 500);
+  }
+
+  const allUsers = await User.findAll({
+    where: {
+      user_id: {
+        [Op.ne]: user.user_id, // Exclude post author
+      },
+    },
+    attributes: ["user_id"],
+    raw: true,
+  });
+
+  const recipientIds = allUsers.map((u) => u.user_id);
+
+  if (recipientIds.length > 0) {
+    // Create bulk notifications (async - don't block response)
+    createBulkNotifications({
+      recipientIds,
+      actorId: user.user_id,
+      type: "new_post",
+      targetType: "post",
+      targetId: post.post_id,
+      metadata: {
+        postTitle: post.title,
+        postPreview: post.body.substring(0, 200),
+        postUuid: post.post_id, // Using post_id as identifier
+      },
+      sendEmail: true, // Send email after 5-10 min delay
+    }).catch((err) => {
+      console.error("Failed to create notifications for new post:", err);
+    });
   }
 
   const data = {
@@ -44,9 +99,19 @@ export const createPost = asyncHandler(async (req, res) => {
       id: user.public_id,
       firstName: profile.first_name,
       lastName: profile.last_name,
+      role: user.user_type,
       profilePicture: profile.pfp_url,
     },
   };
+
+  if (user.user_type === "student") {
+    data.author.email = user.email;
+  }
+
+  if (user.user_type === "alumni") {
+    data.author.currentPosition = currentJob?.job_title || null;
+    data.author.currentCompany = currentCompany?.company_name || null;
+  }
 
   return res.status(201).json({
     success: true,
@@ -69,7 +134,7 @@ export const getAllPosts = asyncHandler(async (req, res) => {
       {
         model: User,
         as: "author",
-        attributes: ["public_id", "user_type"],
+        attributes: ["public_id", "user_type", "email"],
         include: [
           {
             model: Student,
@@ -80,6 +145,18 @@ export const getAllPosts = asyncHandler(async (req, res) => {
             model: Alumni,
             as: "alumniProfile",
             attributes: ["first_name", "last_name", "pfp_url"],
+            include: [
+              {
+                model: Company,
+                as: "currentCompany",
+                attributes: ["company_name"],
+              },
+              {
+                model: JobRole,
+                as: "currentJob",
+                attributes: ["job_title"],
+              },
+            ],
           },
         ],
       },
@@ -132,17 +209,30 @@ export const getAllPosts = asyncHandler(async (req, res) => {
         ? post.author.studentProfile
         : post.author.alumniProfile;
 
+    const authorData = {
+      id: post.author.public_id,
+      firstName: profile.first_name,
+      lastName: profile.last_name,
+      role: post.author.user_type,
+      profilePicture: profile.pfp_url,
+    };
+
+    if (post.author.user_type === "student") {
+      authorData.email = post.author.email;
+    }
+
+    if (post.author.user_type === "alumni") {
+      authorData.currentPosition =
+        post.author.alumniProfile.currentJob?.job_title || null;
+      authorData.currentCompany =
+        post.author.alumniProfile.currentCompany?.company_name || null;
+    }
+
     return {
       id: post.post_id,
       title: post.title,
       body: post.body,
-      author: {
-        id: post.author.public_id,
-        firstName: profile.first_name,
-        lastName: profile.last_name,
-        role: post.author.user_type,
-        profilePicture: profile.pfp_url,
-      },
+      author: authorData,
       likesCount: post.likes_count,
       repliesCount: repliesCountMap[post.post_id] || 0,
       isLikedByCurrentUser: likedPostIds.has(post.post_id),
@@ -174,7 +264,7 @@ export const getPostById = asyncHandler(async (req, res) => {
       {
         model: User,
         as: "author",
-        attributes: ["public_id", "user_type"],
+        attributes: ["public_id", "user_type", "email"],
         include: [
           {
             model: Student,
@@ -185,6 +275,18 @@ export const getPostById = asyncHandler(async (req, res) => {
             model: Alumni,
             as: "alumniProfile",
             attributes: ["first_name", "last_name", "pfp_url"],
+            include: [
+              {
+                model: Company,
+                as: "currentCompany",
+                attributes: ["company_name"],
+              },
+              {
+                model: JobRole,
+                as: "currentJob",
+                attributes: ["job_title"],
+              },
+            ],
           },
         ],
       },
@@ -213,17 +315,30 @@ export const getPostById = asyncHandler(async (req, res) => {
       ? post.author.studentProfile
       : post.author.alumniProfile;
 
+  const authorData = {
+    id: post.author.public_id,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    role: post.author.user_type,
+    profilePicture: profile.pfp_url,
+  };
+
+  if (post.author.user_type === "student") {
+    authorData.email = post.author.email;
+  }
+
+  if (post.author.user_type === "alumni") {
+    authorData.currentPosition =
+      post.author.alumniProfile.currentJob?.job_title || null;
+    authorData.currentCompany =
+      post.author.alumniProfile.currentCompany?.company_name || null;
+  }
+
   const transformedPost = {
     id: post.post_id,
     title: post.title,
     body: post.body,
-    author: {
-      id: post.author.public_id,
-      firstName: profile.first_name,
-      lastName: profile.last_name,
-      role: post.author.user_type,
-      profilePicture: profile.pfp_url,
-    },
+    author: authorData,
     likesCount: post.likes_count,
     repliesCount: repliesCount,
     isLikedByCurrentUser: !!userLike,
@@ -241,13 +356,39 @@ export const getPostById = asyncHandler(async (req, res) => {
 export const getUserPosts = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
+  // Get user info to determine user type
   const user = await User.findOne({
     where: { public_id: userId },
-    attributes: ["user_id", "user_type"],
+    attributes: ["user_id", "user_type", "email"],
   });
 
   if (!user) {
     throw new AppError("User not found", 404);
+  }
+
+  let profile;
+  if (user.user_type === "student") {
+    profile = await Student.findOne({
+      where: { user_id: user.user_id },
+      attributes: ["first_name", "last_name", "pfp_url"],
+    });
+  } else {
+    profile = await Alumni.findOne({
+      where: { user_id: user.user_id },
+      attributes: ["first_name", "last_name", "pfp_url"],
+      include: [
+        {
+          model: Company,
+          as: "currentCompany",
+          attributes: ["company_name"],
+        },
+        {
+          model: JobRole,
+          as: "currentJob",
+          attributes: ["job_title"],
+        },
+      ],
+    });
   }
 
   const posts = await Post.findAll({
@@ -291,10 +432,28 @@ export const getUserPosts = asyncHandler(async (req, res) => {
 
   const likedPostIds = new Set(userLikes.map((like) => like.post_id));
 
+  const authorData = {
+    id: userId,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    role: user.user_type,
+    profilePicture: profile.pfp_url,
+  };
+
+  if (user.user_type === "student") {
+    authorData.email = user.email;
+  }
+
+  if (user.user_type === "alumni") {
+    authorData.currentPosition = profile.currentJob?.job_title || null;
+    authorData.currentCompany = profile.currentCompany?.company_name || null;
+  }
+
   const transformedPosts = posts.map((post) => ({
     id: post.post_id,
     title: post.title,
     body: post.body,
+    author: authorData,
     likesCount: post.likes_count,
     repliesCount: repliesCountMap[post.post_id] || 0,
     isLikedByCurrentUser: likedPostIds.has(post.post_id),
@@ -367,61 +526,6 @@ export const getPostReplies = asyncHandler(async (req, res) => {
     },
   });
 });
-
-// export const getMyPosts = asyncHandler(async (req, res) => {
-//   const user_id = req.user.user_id;
-
-//   const posts = await Post.findAll({
-//     where: { user_id },
-//     attributes: ["post_id", "title", "body", "likes_count", "createdAt"],
-//     order: [["createdAt", "DESC"]],
-//   });
-
-//   const postIds = posts.map((p) => p.post_id);
-
-//   const repliesCounts = await Reply.findAll({
-//     where: { post_id: postIds },
-//     attributes: [
-//       "post_id",
-//       [sequelize.fn("COUNT", sequelize.col("reply_id")), "count"],
-//     ],
-//     group: ["post_id"],
-//     raw: true,
-//   });
-
-//   const repliesCountMap = {};
-//   repliesCounts.forEach((item) => {
-//     repliesCountMap[item.post_id] = parseInt(item.count);
-//   });
-
-//   const userLikes = await PostLike.findAll({
-//     where: {
-//       post_id: postIds,
-//       user_id: user_id,
-//     },
-//     attributes: ["post_id"],
-//     raw: true,
-//   });
-
-//   const likedPostIds = new Set(userLikes.map((like) => like.post_id));
-
-//   const transformedPosts = posts.map((post) => ({
-//     id: post.post_id,
-//     title: post.title,
-//     body: post.body,
-//     likesCount: post.likes_count,
-//     repliesCount: repliesCountMap[post.post_id] || 0,
-//     isLikedByCurrentUser: likedPostIds.has(post.post_id),
-//     createdAt: post.createdAt,
-//   }));
-
-//   return res.status(200).json({
-//     success: true,
-//     data: {
-//       posts: transformedPosts,
-//     },
-//   });
-// });
 
 export const deletePost = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -505,6 +609,25 @@ export const createReply = asyncHandler(async (req, res) => {
       },
     ],
   });
+
+  if (post.user_id !== user_id) {
+    // Don't notify if replying to own post
+    createNotification({
+      recipientId: post.user_id,
+      actorId: user_id,
+      type: "post_reply",
+      targetType: "post",
+      targetId: post.post_id,
+      metadata: {
+        postTitle: post.title,
+        replyPreview: body.substring(0, 200),
+        postUuid: post.post_id,
+      },
+      sendEmail: true, // Send email after 5-10 min delay
+    }).catch((err) => {
+      console.error("Failed to create notification for reply:", err);
+    });
+  }
 
   const responseData = {
     id: createdReply.reply_id,
@@ -592,6 +715,24 @@ export const likePost = asyncHandler(async (req, res) => {
   });
 
   await post.reload(); // Refresh post data from DB
+
+  if (post.user_id !== user_id) {
+    // Don't notify if liking own post
+    createNotification({
+      recipientId: post.user_id,
+      actorId: user_id,
+      type: "post_like",
+      targetType: "post",
+      targetId: post.post_id,
+      metadata: {
+        postTitle: post.title,
+        postUuid: post.post_id,
+      },
+      sendEmail: false, // No email for likes
+    }).catch((err) => {
+      console.error("Failed to create notification for like:", err);
+    });
+  }
 
   return res.status(200).json({
     success: true,

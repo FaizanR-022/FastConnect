@@ -16,6 +16,7 @@ import AlumniProfile from "../pages/Alumni/AlumniProfile";
 import AllPosts from "../pages/Posts/AllPosts";
 import SinglePost from "../pages/Posts/SinglePost";
 import UserProfile from "../pages/User/UserProfile";
+import NotificationsPage from "../pages/Notifications/NotificationsPage";
 
 function AppRoutes() {
   return (
@@ -93,6 +94,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <SinglePost />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path={ROUTES.NOTIFICATIONS}
+        element={
+          <ProtectedRoute>
+            <NotificationsPage />
           </ProtectedRoute>
         }
       />

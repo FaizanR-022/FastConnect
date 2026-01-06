@@ -9,6 +9,7 @@ import { Logo } from "./Logo";
 import { NavLinksDesktop, NavLinksMobile } from "./NavLinks";
 import { ProfileButton, ProfileMenu } from "./ProfileMenu";
 import { NAV_ITEMS } from "../../../constants/headerConstants";
+import BellIcon from "../../notifications/BellIcon";
 
 const Header = () => {
   const theme = useTheme();
@@ -46,7 +47,6 @@ const Header = () => {
       <AppBar position="fixed" elevation={0} sx={styles.appBar}>
         <Container maxWidth="xl">
           <Toolbar sx={styles.toolbar}>
-            {/* Logo */}
             <Logo onClick={() => handleNavigate(ROUTES.HOME)} />
 
             {/* Navigation Links - Desktop */}
@@ -55,10 +55,9 @@ const Header = () => {
             {/* Navigation Links - Mobile */}
             <NavLinksMobile navItems={NAV_ITEMS} onNavigate={handleNavigate} />
 
-            {/* Profile Button */}
-            <ProfileButton user={user} onClick={handleMenuOpen} />
+            <BellIcon />
 
-            {/* Profile Menu */}
+            <ProfileButton user={user} onClick={handleMenuOpen} />
             <ProfileMenu
               user={user}
               anchorEl={anchorEl}

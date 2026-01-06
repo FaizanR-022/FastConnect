@@ -22,12 +22,12 @@ export const useDashboard = () => {
         setPostsError("");
         const data = await userService.getUserPosts(user.id);
         console.log(data);
-        data.posts = data.posts.map((post) => {
-          return {
-            ...post,
-            author: { id, firstName, lastName, role, profilePicture },
-          };
-        });
+        // data.posts = data.posts.map((post) => {
+        //   return {
+        //     ...post,
+        //     author: { id, firstName, lastName, role, profilePicture },
+        //   };
+        // });
         console.log(data + "posts");
         setPosts(data.posts || []);
       } catch (err) {

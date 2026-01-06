@@ -14,13 +14,17 @@ import { createPostStyles } from "../../styles/postStyles";
 import { formatDistanceToNow } from "../../utils/dateHelpers";
 import { ROUTES } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
+import {
+  formatAlumniInfo,
+  extractRollNumber,
+} from "../../utils/userInfoHelpers";
 
 export const PostCard = ({
   post,
   onRepliesClick,
   onLike,
   onDelete,
-  currentUser,
+  currentUserId,
 }) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -28,7 +32,8 @@ export const PostCard = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   console.log(post.author);
-  const isOwnPost = currentUser?.id === post.author.id;
+  console.log;
+  const isOwnPost = currentUserId === post.author.id;
   const isLiked = post.isLikedByCurrentUser;
 
   const isTruncated = post.body.length > 200;
@@ -62,6 +67,20 @@ export const PostCard = ({
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
 
+  const getAuthorInfo = () => {
+    if (post.author.role === "alumni") {
+      return formatAlumniInfo(
+        post.author.currentPosition,
+        post.author.currentCompany
+      );
+    } else if (post.author.role === "student") {
+      return extractRollNumber(post.author.email);
+    }
+    return null;
+  };
+
+  const authorInfo = getAuthorInfo();
+
   return (
     <Card sx={styles.postCard}>
       <CardContent sx={styles.postCardContent}>
@@ -92,6 +111,19 @@ export const PostCard = ({
                 }
               />
             </Stack>
+            {authorInfo && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: theme.palette.primary.main,
+                  fontSize: { xs: "0.75rem", md: "0.813rem" },
+                  fontWeight: 500,
+                  mt: 0.25,
+                }}
+              >
+                {authorInfo}
+              </Typography>
+            )}
             <Typography variant="caption" sx={styles.postTimestamp}>
               {formatDistanceToNow(post.createdAt)}
             </Typography>

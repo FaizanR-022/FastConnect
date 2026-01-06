@@ -7,6 +7,7 @@ import alumniRoutes from "./routes/alumniRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import replyRoutes from "./routes/replyRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import { sequelize } from "./config/database.js";
 import { syncDatabase } from "./models/index.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -17,6 +18,7 @@ import {
 } from "./middleware/rateLimitMiddleware.js";
 import { corsOptions } from "./middleware/corsMiddleware.js";
 import { verifyApiKey } from "./middleware/apiKeyMiddleware.js";
+import { initializeCronJobs } from "./jobs/cronJobs.js";
 
 dotenv.config();
 
@@ -38,6 +40,7 @@ app.use("/api/alumni", apiLimiter, alumniRoutes);
 app.use("/api/posts", apiLimiter, postRoutes);
 app.use("/api/replies", apiLimiter, replyRoutes);
 app.use("/api/upload", apiLimiter, uploadRoutes);
+app.use("/api/notifications", apiLimiter, notificationRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
@@ -50,6 +53,8 @@ app.listen(PORT, async () => {
 
     await syncDatabase();
     console.log("Synced successfully!");
+
+    initializeCronJobs();
   } catch (error) {
     console.error("Unable to connect to the database:", error);
   }

@@ -13,6 +13,7 @@ import { useDashboard } from "../../hooks/useDashboard";
 import { usePosts } from "../../hooks/usePosts";
 import { usePost } from "../../hooks/usePost";
 import useAuthStore from "../../store/authStore";
+import NotificationWidget from "../../components/notifications/NotificationWidget";
 
 export default function Dashboard() {
   const theme = useTheme();
@@ -139,6 +140,8 @@ export default function Dashboard() {
             <Box sx={styles.sidebarCard}>
               <UserInfoCard />
             </Box>
+
+            <NotificationWidget />
 
             {user?.role === "alumni" && (
               <RepliesSidebar

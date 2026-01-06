@@ -43,7 +43,7 @@ export const MyPosts = ({
             <PostCard
               key={post.id}
               post={post}
-              currentUser={currentUserId}
+              currentUserId={currentUserId}
               onRepliesClick={onRepliesClick}
               onLike={onLike}
               onDelete={onDelete}
