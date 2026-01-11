@@ -13,10 +13,8 @@ import {
   enforceNotificationLimit,
   deleteExpiredNotifications,
   getActorInfo,
-  calculateEmailDelay,
   notificationExists,
 } from "../utils/notificationHelpers.js";
-import { sendNotificationEmail } from "./emailService.js";
 
 export const createNotification = async ({
   recipientId,
@@ -25,7 +23,7 @@ export const createNotification = async ({
   targetType,
   targetId,
   metadata = {},
-  sendEmail = false,
+  sendEmail = false, // Parameter kept for backward compatibility but not used
 }) => {
   const transaction = await sequelize.transaction();
 
@@ -54,8 +52,7 @@ export const createNotification = async ({
       metadata
     );
 
-    const emailScheduledAt = sendEmail ? calculateEmailDelay() : null;
-
+    // No longer scheduling individual emails - all will be sent via daily digest
     const notification = await Notification.create(
       {
         recipient_id: recipientId,
@@ -71,7 +68,7 @@ export const createNotification = async ({
           actorPfp: actorInfo.actorPfp,
         },
         email_sent: false,
-        email_scheduled_at: emailScheduledAt,
+        email_scheduled_at: null, // Not used anymore - daily digest handles emails
       },
       { transaction }
     );
@@ -96,7 +93,7 @@ export const createBulkNotifications = async ({
   targetType,
   targetId,
   metadata = {},
-  sendEmail = false,
+  sendEmail = false, // Parameter kept for backward compatibility but not used
 }) => {
   try {
     const actorInfo = await getActorInfo(actorId);
@@ -110,8 +107,7 @@ export const createBulkNotifications = async ({
       metadata
     );
 
-    const emailScheduledAt = sendEmail ? calculateEmailDelay() : null;
-
+    // No longer scheduling individual emails - daily digest handles all emails
     const notificationsData = recipientIds.map((recipientId) => ({
       recipient_id: recipientId,
       actor_id: actorId,
@@ -126,11 +122,12 @@ export const createBulkNotifications = async ({
         actorPfp: actorInfo.actorPfp,
       },
       email_sent: false,
-      email_scheduled_at: emailScheduledAt,
+      email_scheduled_at: null, // Not used anymore - daily digest handles emails
     }));
 
     const notifications = await Notification.bulkCreate(notificationsData);
 
+    // Enforce limits asynchronously
     recipientIds.forEach((recipientId) => {
       enforceNotificationLimit(recipientId).catch((err) =>
         console.error(`Error enforcing limit for user ${recipientId}:`, err)
@@ -263,79 +260,13 @@ export const deleteNotification = async (notificationUuid, userId) => {
   }
 };
 
+// No longer used - daily digest handles all emails
+// Kept for backward compatibility in case of rollback
 export const sendPendingEmails = async () => {
-  try {
-    // Find notifications where email should be sent now
-    const pendingNotifications = await Notification.findAll({
-      where: {
-        email_sent: false,
-        email_scheduled_at: {
-          [Op.lte]: new Date(),
-          [Op.not]: null,
-        },
-      },
-      include: [
-        {
-          model: User,
-          as: "recipient",
-          attributes: ["user_id", "email", "user_type", "is_email_verified"],
-          where: {
-            is_email_verified: true, //Only send to verified users - no false emails
-          },
-        },
-        {
-          model: User,
-          as: "actor",
-          attributes: ["public_id", "user_type"],
-          include: [
-            {
-              model: Student,
-              as: "studentProfile",
-              attributes: ["first_name", "last_name"],
-            },
-            {
-              model: Alumni,
-              as: "alumniProfile",
-              attributes: ["first_name", "last_name"],
-            },
-          ],
-        },
-      ],
-      limit: 100, // Process 100 at a time
-    });
-
-    if (pendingNotifications.length === 0) {
-      return 0;
-    }
-
-    console.log(`Sending ${pendingNotifications.length} pending emails...`);
-
-    let sentCount = 0;
-
-    for (const notification of pendingNotifications) {
-      try {
-        const emailResult = await sendNotificationEmail(notification);
-
-        if (emailResult.success) {
-          await notification.update({ email_sent: true });
-          sentCount++;
-        }
-      } catch (err) {
-        console.error(
-          `Failed to send email for notification ${notification.uuid}:`,
-          err
-        );
-      }
-    }
-
-    console.log(
-      `Sent ${sentCount}/${pendingNotifications.length} notification emails`
-    );
-    return sentCount;
-  } catch (error) {
-    console.error("Error sending pending emails:", error);
-    throw error;
-  }
+  console.log(
+    "sendPendingEmails is deprecated - daily digest now handles all emails"
+  );
+  return 0;
 };
 
 export const cleanupNotifications = async () => {

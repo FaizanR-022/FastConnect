@@ -98,7 +98,7 @@ export const transformUserData = (user) => {
       currentPosition: alumni.currentJob?.job_title || null,
       currentCity: alumni.currentCity?.city_name || null,
       currentCountry: alumni.currentCity?.country?.country_name || null,
-      linkedIn: alumni.linkedin_url,
+      linkedin: alumni.linkedin_url,
       profilePicture: alumni.pfp_url,
       previousExperiences,
       skills,

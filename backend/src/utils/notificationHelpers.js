@@ -99,8 +99,8 @@ export const getActorInfo = async (userId) => {
 };
 
 export const calculateEmailDelay = () => {
-  const minDelay = 5 * 60 * 1000; // 5 mins
-  const maxDelay = 10 * 60 * 1000; // 10 mins
+  const minDelay = 3 * 60 * 1000; // 5 mins
+  const maxDelay = 6 * 60 * 1000; // 10 mins
   const randomDelay = Math.floor(
     Math.random() * (maxDelay - minDelay + 1) + minDelay
   );

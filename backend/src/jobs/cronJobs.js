@@ -1,24 +1,8 @@
 import cron from "node-cron";
-import {
-  sendPendingEmails,
-  cleanupNotifications,
-} from "../services/notificationService.js";
+import { cleanupNotifications } from "../services/notificationService.js";
 
 export const initializeCronJobs = () => {
   console.log("Initializing cron jobs...");
-
-  // Send pending notification emails every 5 minutes
-  cron.schedule("*/15 * * * *", async () => {
-    try {
-      console.log("Running: Send pending notification emails");
-      const sentCount = await sendPendingEmails();
-      if (sentCount > 0) {
-        console.log(`Sent ${sentCount} pending emails`);
-      }
-    } catch (error) {
-      console.error("Error in sendPendingEmails cron:", error);
-    }
-  });
 
   // Cleanup old notifications (>30 days) - runs daily at 2 AM
   cron.schedule("0 2 * * *", async () => {
@@ -34,14 +18,15 @@ export const initializeCronJobs = () => {
   });
 
   console.log("Cron jobs initialized");
-  console.log("   - Send pending emails: Every 5 minutes");
   console.log("   - Cleanup old notifications: Daily at 2 AM");
+  console.log(
+    "   - Daily digest emails: Handled by Vercel cron (4 PM PKT / 11 AM UTC)"
+  );
 };
 
 /**
  * Cron schedule explanations:
  *
- * "* /5 * * * *" = Every 5 minutes
  * "0 2 * * *"   = Daily at 2:00 AM
  *
  * Format: minute hour day month weekday
@@ -50,4 +35,7 @@ export const initializeCronJobs = () => {
  * day: 1-31
  * month: 1-12
  * weekday: 0-7 (0 and 7 are Sunday)
+ *
+ * NOTE: Individual notification emails are no longer sent via node-cron
+ * Daily digest emails are triggered by Vercel cron job at 4 PM PKT (11 AM UTC)
  */

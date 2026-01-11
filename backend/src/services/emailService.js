@@ -156,7 +156,7 @@ FastConnect - Connecting FAST-NUCES students with alumni
             }
             .cta-button {
               display: inline-block;
-              background: #047857
+              background: #047857;
               color: white;
               padding: 14px 32px;
               text-decoration: none;

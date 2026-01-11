@@ -16,6 +16,7 @@ import Reply from "./Reply.js";
 import PostLike from "./PostLike.js";
 import OTP from "./OTP.js";
 import Notification from "./Notification.js";
+import Feedback from "./Feedback.js";
 
 // User - Student (One to One)
 User.hasOne(Student, {
@@ -272,9 +273,18 @@ Notification.belongsTo(User, {
   as: "actor",
 });
 
+User.hasMany(Feedback, {
+  foreignKey: "user_id",
+  as: "feedbacks",
+});
+Feedback.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
 const syncDatabase = async () => {
   try {
-    await sequelize.sync({ alter: true }); // alter updates tables without dropping
+    await sequelize.sync(); // alter updates tables without dropping
     console.log("Database synced successfully!");
   } catch (error) {
     console.error("Error syncing database:", error);
@@ -300,5 +310,6 @@ export {
   PostLike,
   OTP,
   Notification,
+  Feedback,
   syncDatabase,
 };

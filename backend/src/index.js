@@ -8,6 +8,8 @@ import postRoutes from "./routes/postRoutes.js";
 import replyRoutes from "./routes/replyRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import digestRoutes from "./routes/digestRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 import { sequelize } from "./config/database.js";
 import { syncDatabase } from "./models/index.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -41,6 +43,8 @@ app.use("/api/posts", apiLimiter, postRoutes);
 app.use("/api/replies", apiLimiter, replyRoutes);
 app.use("/api/upload", apiLimiter, uploadRoutes);
 app.use("/api/notifications", apiLimiter, notificationRoutes);
+app.use("/api/feedback", apiLimiter, feedbackRoutes);
+app.use("/api/digest", digestRoutes); // NEW: Daily digest endpoint (no rate limit - called by Vercel cron)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
