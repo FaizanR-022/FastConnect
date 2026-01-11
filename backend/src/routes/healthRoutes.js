@@ -1,4 +1,5 @@
 // routes/healthRoutes.js
+import express from "express";
 
 // (Not added in routes yet)
 const router = express.Router();
