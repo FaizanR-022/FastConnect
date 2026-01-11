@@ -1,145 +1,111 @@
-import {
-  Box,
-  Paper,
-  Typography,
-  Avatar,
-  Stack,
-  IconButton,
-  Chip,
-  useTheme,
-  Button,
-} from "@mui/material";
 import { Heart, Trash2 } from "lucide-react";
-import { createPostStyles } from "../../styles/postStyles";
+import { Card, CardContent } from "../ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { formatDistanceToNow } from "../../utils/dateHelpers";
+import { formatStudentInfo } from "../../utils/userInfoHelpers";
+import { ROUTES } from "../../constants/constants";
+import { useNavigate } from "react-router-dom";
 
 export const PostDetailView = ({ post, onLike, onDelete, showDelete }) => {
-  const theme = useTheme();
-  const styles = createPostStyles(theme);
-
   if (!post) return null;
+  const navigate = useNavigate();
 
   const { author, title, body, likesCount, isLikedByCurrentUser, createdAt } =
     post;
+
+  const handleAuthorClick = (e) => {
+    e.stopPropagation();
+    navigate(ROUTES.USER_PROFILE.replace(":userId", author.id));
+  };
 
   const getInitials = (firstName, lastName) => {
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
 
   return (
-    <Paper elevation={0} sx={styles.postCard}>
-      <Box sx={styles.postContent}>
+    <Card>
+      <CardContent className="p-6">
         {/* Author Info */}
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="flex-start"
-          sx={{ mb: 3 }}
-        >
+        <div className="flex items-start gap-4 mb-4">
           <Avatar
-            sx={{
-              ...styles.postAvatar,
-              width: 56,
-              height: 56,
-              fontSize: "1.25rem",
-            }}
+            className="w-14 h-14 cursor-pointer"
+            onClick={handleAuthorClick}
           >
-            {getInitials(author.firstName, author.lastName)}
+            <AvatarImage src={author.profilePicture} />
+            <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
+              {getInitials(author.firstName, author.lastName)}
+            </AvatarFallback>
           </Avatar>
-          <Box sx={{ flex: 1 }}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="h6" sx={styles.postAuthorName}>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h3
+                className="font-semibold text-lg cursor-pointer hover:underline"
+                onClick={handleAuthorClick}
+              >
                 {author.firstName} {author.lastName}
-              </Typography>
-              <Chip
-                label={author.role.toUpperCase()}
-                size="small"
-                sx={
-                  author.role === "alumni"
-                    ? styles.alumniRoleBadge
-                    : styles.studentRoleBadge
-                }
-              />
-            </Stack>
-            <Typography variant="caption" sx={styles.postTimestamp}>
+              </h3>
+              <Badge
+                variant={author.role === "student" ? "default" : "secondary"}
+                className="text-xs"
+              >
+                {author.role.toUpperCase()}
+              </Badge>
+            </div>
+            {author.role === "alumni" && author.currentPosition && (
+              <p className="text-m text-primary font-medium mb-2">
+                {author.currentPosition}
+                {author.currentCompany && ` at ${author.currentCompany}`}
+              </p>
+            )}
+            {author.role === "student" && author.email && (
+              <p className="text-m text-primary font-medium mb-2">
+                {formatStudentInfo(author.email)}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground">
               {formatDistanceToNow(createdAt)}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
-          {/* Delete Button (for own posts) */}
+          {/* Delete Button */}
           {showDelete && (
-            <IconButton
+            <button
               onClick={onDelete}
-              sx={styles.deleteButton}
-              size="small"
+              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
             >
-              <Trash2 size={18} />
-            </IconButton>
+              <Trash2 className="w-5 h-5" />
+            </button>
           )}
-        </Stack>
+        </div>
 
         {/* Post Title */}
-        <Typography
-          variant="h5"
-          sx={{
-            ...styles.postTitle,
-            mb: 2,
-            fontSize: { xs: "1.25rem", md: "1.5rem" },
-          }}
-        >
-          {title}
-        </Typography>
+        <h1 className="text-xl md:text-2xl font-bold mb-4">{title}</h1>
 
-        {/* Post Body - Full text, no truncation */}
-        <Typography
-          variant="body1"
-          sx={{
-            ...styles.postBody,
-            color: theme.palette.text.primary,
-            lineHeight: 1.7,
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
-        >
+        {/* Post Body */}
+        <p className="text-foreground leading-7 whitespace-pre-wrap break-words">
           {body}
-        </Typography>
+        </p>
 
         {/* Action Buttons */}
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          sx={{
-            mt: 3,
-            pt: 2,
-            borderTop: `1px solid ${theme.palette.grey[200]}`,
-          }}
-        >
-          {/* Like Button */}
+        <div className="flex items-center gap-4 mt-6 pt-4 border-t">
           <Button
+            variant="ghost"
             onClick={onLike}
-            startIcon={
-              <Heart
-                size={18}
-                fill={isLikedByCurrentUser ? theme.palette.error.main : "none"}
-                color={
-                  isLikedByCurrentUser
-                    ? theme.palette.error.main
-                    : theme.palette.text.secondary
-                }
-              />
+            className={
+              isLikedByCurrentUser ? "text-red-500 hover:text-red-600" : ""
             }
-            sx={{
-              ...styles.likeButton,
-              color: isLikedByCurrentUser
-                ? theme.palette.error.main
-                : theme.palette.text.secondary,
-            }}
           >
+            <Heart
+              className={`w-5 h-5 mr-2 ${
+                isLikedByCurrentUser ? "fill-current" : ""
+              }`}
+            />
             {likesCount} {likesCount === 1 ? "Like" : "Likes"}
           </Button>
-        </Stack>
-      </Box>
-    </Paper>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

@@ -1,27 +1,28 @@
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-  FormHelperText,
-  IconButton,
-  Divider,
-  InputAdornment,
-  Alert,
-} from "@mui/material";
 import { UserPlus, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-import { FormContainer } from "../../components/auth/FormContainer";
-import { PageHeader } from "../../components/auth/PageHeader";
-import { createAuthStyles } from "../../styles/authStyles";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Separator } from "../../components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+
 import {
   CAMPUSES,
   DEPARTMENTS,
@@ -29,23 +30,16 @@ import {
   YEARS,
 } from "../../constants/authConstants";
 import { alumniSignupSchema } from "../../utils/validationSchemas";
-import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/constants";
-import authService from "../../services/authService";
-import { useEffect, useState } from "react";
 import useAuthStore from "../../store/authStore";
 import { useAuth } from "../../hooks/useAuth";
 import ImageUpload from "../../components/common/ImageUpload";
 
-export default function SignupAlumni({ props }) {
+export default function SignupAlumni() {
   const { signupAlumni, error, clearError } = useAuth();
   const { isAuthenticated } = useAuthStore();
-
-  const theme = useTheme();
-  const styles = createAuthStyles(theme);
   const navigate = useNavigate();
-  // const [err, setErr] = useState("");
-  // const login = useAuthStore((state) => state.login);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -78,6 +72,7 @@ export default function SignupAlumni({ props }) {
       previousCompanies: [],
       city: "",
       country: "",
+      linkedin: "",
       password: "",
       confirmPassword: "",
       profilePicture: "",
@@ -89,23 +84,8 @@ export default function SignupAlumni({ props }) {
     name: "previousCompanies",
   });
 
-  // const onSubmit = async (data) => {
-  //   try {
-  //     setErr("");
-  //     console.log("Alumni signup submitted:", data);
-  //     const { token, user } = await authService.signupAlumni(data);
-  //     login(user, token);
-  //     reset();
-  //     navigate(ROUTES.ALUMNI_LIST);
-  //   } catch (error) {
-  //     console.error("Signup error:", error);
-  //     setErr(error.message);
-  //   }
-  // };
-
   const onSubmit = async (data) => {
     clearError();
-    console.log(data);
     const result = await signupAlumni(data);
     if (result.success) {
       reset();
@@ -117,532 +97,595 @@ export default function SignupAlumni({ props }) {
   };
 
   return (
-    <FormContainer name="signupAlumni">
-      <PageHeader
-        icon={UserPlus}
-        title="Alumni Registration"
-        subtitle="Join as an alumni and help guide the next generation"
-      />
+    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-8 px-4">
+      <Card className="w-full max-w-lg">
+        <CardHeader className="text-center pb-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <UserPlus className="w-8 h-8 text-primary" />
+          </div>
+          <CardTitle className="text-2xl">Alumni Registration</CardTitle>
+          <CardDescription>
+            Join as an alumni and help guide the next generation
+          </CardDescription>
+        </CardHeader>
 
-      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        <Stack spacing={2}>
-          {/* First Name & Last Name */}
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <Box sx={{ flex: 1 }}>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">
+                {error}
+              </div>
+            )}
+
+            {/* First Name & Last Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Controller
+                  name="firstName"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="firstName"
+                      placeholder="John"
+                      className={errors.firstName ? "border-destructive" : ""}
+                    />
+                  )}
+                />
+                {errors.firstName && (
+                  <p className="text-xs text-destructive">
+                    {errors.firstName.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Controller
+                  name="lastName"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="lastName"
+                      placeholder="Doe"
+                      className={errors.lastName ? "border-destructive" : ""}
+                    />
+                  )}
+                />
+                {errors.lastName && (
+                  <p className="text-xs text-destructive">
+                    {errors.lastName.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
               <Controller
-                name="firstName"
+                name="email"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="First Name"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    error={!!errors.firstName}
-                    helperText={errors.firstName?.message}
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    className={errors.email ? "border-destructive" : ""}
                   />
                 )}
               />
-            </Box>
-            <Box sx={{ flex: 1 }}>
+              {errors.email && (
+                <p className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Phone */}
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number (Optional)</Label>
               <Controller
-                name="lastName"
+                name="phone"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="Last Name"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    error={!!errors.lastName}
-                    helperText={errors.lastName?.message}
+                    id="phone"
+                    placeholder="+92 300 1234567"
+                    className={errors.phone ? "border-destructive" : ""}
                   />
                 )}
               />
-            </Box>
-          </Stack>
+              <p className="text-xs text-muted-foreground">
+                useful for students to ask for guidance.
+              </p>
+              {errors.phone && (
+                <p className="text-xs text-destructive">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
 
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Email Address"
-                type="email"
-                variant="outlined"
-                fullWidth
-                size="small"
-                placeholder="your.email@example.com"
-                error={!!errors.email}
-                helperText={errors.email?.message}
-              />
-            )}
-          />
-
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Phone Number (Optional)"
-                variant="outlined"
-                fullWidth
-                size="small"
-                placeholder="+92 300 1234567"
-                error={!!errors.phone}
-                helperText={errors.phone?.message}
-              />
-            )}
-          />
-
-          <Controller
-            name="campus"
-            control={control}
-            render={({ field }) => (
-              <FormControl fullWidth size="small" error={!!errors.campus}>
-                <InputLabel>Campus</InputLabel>
-                <Select {...field} label="Campus">
-                  {CAMPUSES.map((camp) => (
-                    <MenuItem key={camp} value={camp}>
-                      {camp}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.campus && (
-                  <FormHelperText>{errors.campus.message}</FormHelperText>
-                )}
-              </FormControl>
-            )}
-          />
-
-          {/* Department & Graduation Year */}
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <Box sx={{ flex: 1 }}>
+            {/* Campus */}
+            <div className="space-y-2">
+              <Label>Campus</Label>
               <Controller
-                name="department"
+                name="campus"
                 control={control}
                 render={({ field }) => (
-                  <FormControl
-                    fullWidth
-                    size="small"
-                    error={!!errors.department}
-                  >
-                    <InputLabel>Department</InputLabel>
-                    <Select {...field} label="Department">
-                      {DEPARTMENTS.map((dept) => (
-                        <MenuItem key={dept.value} value={dept.value}>
-                          {dept.label}
-                        </MenuItem>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger
+                      className={errors.campus ? "border-destructive" : ""}
+                    >
+                      <SelectValue placeholder="Select campus" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CAMPUSES.map((camp) => (
+                        <SelectItem key={camp} value={camp}>
+                          {camp}
+                        </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.campus && (
+                <p className="text-xs text-destructive">
+                  {errors.campus.message}
+                </p>
+              )}
+            </div>
+
+            {/* Department & Graduation Year */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Department</Label>
+                <Controller
+                  name="department"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger
+                        className={
+                          errors.department ? "border-destructive" : ""
+                        }
+                      >
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DEPARTMENTS.map((dept) => (
+                          <SelectItem key={dept.value} value={dept.value}>
+                            {dept.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
-                    {errors.department && (
-                      <FormHelperText>
-                        {errors.department.message}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
+                  )}
+                />
+                {errors.department && (
+                  <p className="text-xs text-destructive">
+                    {errors.department.message}
+                  </p>
                 )}
-              />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Controller
-                name="graduationYear"
-                control={control}
-                render={({ field }) => (
-                  <FormControl
-                    fullWidth
-                    size="small"
-                    error={!!errors.graduationYear}
-                  >
-                    <InputLabel>Graduation Year</InputLabel>
-                    <Select {...field} label="Graduation Year">
-                      {GRADUATION_YEARS.map((year) => (
-                        <MenuItem key={year} value={year}>
-                          {year}
-                        </MenuItem>
-                      ))}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Graduation Year</Label>
+                <Controller
+                  name="graduationYear"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger
+                        className={
+                          errors.graduationYear ? "border-destructive" : ""
+                        }
+                      >
+                        <SelectValue placeholder="Select year" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GRADUATION_YEARS.map((year) => (
+                          <SelectItem key={year} value={year}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
-                    {errors.graduationYear && (
-                      <FormHelperText>
-                        {errors.graduationYear.message}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
+                  )}
+                />
+                {errors.graduationYear && (
+                  <p className="text-xs text-destructive">
+                    {errors.graduationYear.message}
+                  </p>
                 )}
-              />
-            </Box>
-          </Stack>
+              </div>
+            </div>
 
-          {/* Current Company & Position */}
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <Box sx={{ flex: 1 }}>
+            {/* Current Company & Position */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentCompany">Current Company</Label>
+                <Controller
+                  name="currentCompany"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="currentCompany"
+                      placeholder="e.g., Google"
+                      className={
+                        errors.currentCompany ? "border-destructive" : ""
+                      }
+                    />
+                  )}
+                />
+                {errors.currentCompany && (
+                  <p className="text-xs text-destructive">
+                    {errors.currentCompany.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="currentPosition">Current Position</Label>
+                <Controller
+                  name="currentPosition"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="currentPosition"
+                      placeholder="e.g., Software Engineer"
+                      className={
+                        errors.currentPosition ? "border-destructive" : ""
+                      }
+                    />
+                  )}
+                />
+                {errors.currentPosition && (
+                  <p className="text-xs text-destructive">
+                    {errors.currentPosition.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* City & Country */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Controller
+                  name="city"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="city"
+                      placeholder="e.g., San Francisco"
+                      className={errors.city ? "border-destructive" : ""}
+                    />
+                  )}
+                />
+                {errors.city && (
+                  <p className="text-xs text-destructive">
+                    {errors.city.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="country"
+                      placeholder="e.g., USA"
+                      className={errors.country ? "border-destructive" : ""}
+                    />
+                  )}
+                />
+                {errors.country && (
+                  <p className="text-xs text-destructive">
+                    {errors.country.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="linkedin">LinkedIn Profile URL</Label>
               <Controller
-                name="currentCompany"
+                name="linkedin"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="Current Company"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    error={!!errors.currentCompany}
-                    helperText={errors.currentCompany?.message}
+                    id="linkedin"
+                    type="url"
+                    placeholder="https://www.linkedin.com/in/your-profile"
+                    className={errors.linkedin ? "border-destructive" : ""}
                   />
                 )}
               />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Controller
-                name="currentPosition"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Current Position"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    placeholder="e.g., Software Engineer"
-                    error={!!errors.currentPosition}
-                    helperText={errors.currentPosition?.message}
-                  />
-                )}
-              />
-            </Box>
-          </Stack>
+              {errors.linkedin && (
+                <p className="text-xs text-destructive">
+                  {errors.linkedin.message}
+                </p>
+              )}
+            </div>
 
-          {/* City & Country */}
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <Box sx={{ flex: 1 }}>
-              <Controller
-                name="city"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="City"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    error={!!errors.city}
-                    helperText={errors.city?.message}
-                  />
-                )}
-              />
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Controller
-                name="country"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Country"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    error={!!errors.country}
-                    helperText={errors.country?.message}
-                  />
-                )}
-              />
-            </Box>
-          </Stack>
-
-          {/* Previous Companies Section */}
-          <Box>
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
-              sx={{ mb: 1.5 }}
-            >
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                Previous Companies (Optional)
-              </Typography>
-              <Button
-                size="small"
-                startIcon={<Plus size={16} />}
-                onClick={addPreviousCompany}
-                sx={{
-                  textTransform: "none",
-                  color: theme.palette.primary.main,
-                }}
-              >
-                Add Company
-              </Button>
-            </Stack>
-
-            {fields.map((field, index) => (
-              <Box
-                key={field.id}
-                sx={{
-                  p: 2,
-                  pt: 6,
-                  mb: 2,
-                  border: `1px solid ${theme.palette.grey[300]}`,
-                  borderRadius: 2,
-                  position: "relative",
-                }}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => remove(index)}
-                  sx={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    color: theme.palette.error.main,
-                  }}
+            {/* Previous Companies Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-sm font-semibold">
+                  Previous Companies (Optional)
+                </Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={addPreviousCompany}
+                  className="text-primary"
                 >
-                  <Trash2 size={18} />
-                </IconButton>
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Company
+                </Button>
+              </div>
 
-                <Stack spacing={2}>
-                  <Controller
-                    name={`previousCompanies.${index}.company`}
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Company Name"
-                        variant="outlined"
-                        fullWidth
-                        size="small"
-                        error={!!errors.previousCompanies?.[index]?.company}
-                        helperText={
-                          errors.previousCompanies?.[index]?.company?.message
-                        }
-                      />
-                    )}
-                  />
+              {fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="relative p-4 pt-8 mb-3 border rounded-lg"
+                >
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className="absolute top-2 right-2 p-1 text-destructive hover:bg-destructive/10 rounded"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
 
-                  <Controller
-                    name={`previousCompanies.${index}.role`}
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label="Role"
-                        variant="outlined"
-                        fullWidth
-                        size="small"
-                        error={!!errors.previousCompanies?.[index]?.role}
-                        helperText={
-                          errors.previousCompanies?.[index]?.role?.message
-                        }
-                      />
-                    )}
-                  />
-
-                  {/* From & To Years */}
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                    <Box sx={{ flex: 1 }}>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label>Company Name</Label>
                       <Controller
-                        name={`previousCompanies.${index}.from`}
+                        name={`previousCompanies.${index}.company`}
                         control={control}
                         render={({ field }) => (
-                          <FormControl
-                            fullWidth
-                            size="small"
-                            error={!!errors.previousCompanies?.[index]?.from}
-                          >
-                            <InputLabel>From</InputLabel>
-                            <Select {...field} label="From">
-                              {YEARS.map((year) => (
-                                <MenuItem key={year} value={year}>
-                                  {year}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                            {errors.previousCompanies?.[index]?.from && (
-                              <FormHelperText>
-                                {errors.previousCompanies[index].from.message}
-                              </FormHelperText>
-                            )}
-                          </FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Company name"
+                            className={
+                              errors.previousCompanies?.[index]?.company
+                                ? "border-destructive"
+                                : ""
+                            }
+                          />
                         )}
                       />
-                    </Box>
-                    <Box sx={{ flex: 1 }}>
+                      {errors.previousCompanies?.[index]?.company && (
+                        <p className="text-xs text-destructive">
+                          {errors.previousCompanies[index].company.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Role</Label>
                       <Controller
-                        name={`previousCompanies.${index}.to`}
+                        name={`previousCompanies.${index}.role`}
                         control={control}
                         render={({ field }) => (
-                          <FormControl
-                            fullWidth
-                            size="small"
-                            error={!!errors.previousCompanies?.[index]?.to}
-                          >
-                            <InputLabel>To</InputLabel>
-                            <Select {...field} label="To">
-                              {YEARS.map((year) => (
-                                <MenuItem key={year} value={year}>
-                                  {year}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                            {errors.previousCompanies?.[index]?.to && (
-                              <FormHelperText>
-                                {errors.previousCompanies[index].to.message}
-                              </FormHelperText>
-                            )}
-                          </FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Your role"
+                            className={
+                              errors.previousCompanies?.[index]?.role
+                                ? "border-destructive"
+                                : ""
+                            }
+                          />
                         )}
                       />
-                    </Box>
-                  </Stack>
-                </Stack>
-              </Box>
-            ))}
-          </Box>
+                      {errors.previousCompanies?.[index]?.role && (
+                        <p className="text-xs text-destructive">
+                          {errors.previousCompanies[index].role.message}
+                        </p>
+                      )}
+                    </div>
 
-          <Divider sx={{ my: 1 }} />
-
-          {/* <Controller
-            name="profilePicture"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Profile Picture URL (Optional)"
-                variant="outlined"
-                fullWidth
-                size="small"
-                placeholder="https://example.com/your-photo.jpg"
-                error={!!errors.profilePicture}
-                helperText={
-                  errors.profilePicture?.message ||
-                  "Paste a link to your profile picture"
-                }
-              />
-            )}
-          /> */}
-
-          <Controller
-            name="profilePicture"
-            control={control}
-            render={({ field }) => (
-              <ImageUpload
-                value={field.value}
-                onChange={field.onChange}
-                label="Profile Picture (Optional)"
-              />
-            )}
-          />
-
-          {/* Password Fields */}
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                variant="outlined"
-                fullWidth
-                size="small"
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label={
-                          showPassword
-                            ? "hide the password"
-                            : "display the password"
-                        }
-                        onClick={handleShowPassword}
-                        edge="end"
-                      >
-                        {showPassword ? (
-                          <Eye size={16} />
-                        ) : (
-                          <EyeOff size={16} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label>From</Label>
+                        <Controller
+                          name={`previousCompanies.${index}.from`}
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger
+                                className={
+                                  errors.previousCompanies?.[index]?.from
+                                    ? "border-destructive"
+                                    : ""
+                                }
+                              >
+                                <SelectValue placeholder="Year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {YEARS.map((year) => (
+                                  <SelectItem key={year} value={year}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.previousCompanies?.[index]?.from && (
+                          <p className="text-xs text-destructive">
+                            {errors.previousCompanies[index].from.message}
+                          </p>
                         )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )}
-          />
+                      </div>
 
-          <Controller
-            name="confirmPassword"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Confirm Password"
-                type={showConfirmPassword ? "text" : "password"}
-                variant="outlined"
-                fullWidth
-                size="small"
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label={
-                          showConfirmPassword
-                            ? "hide the password"
-                            : "display the password"
-                        }
-                        onClick={handleShowConfirmPassword}
-                        edge="end"
-                      >
-                        {showConfirmPassword ? (
-                          <Eye size={16} />
-                        ) : (
-                          <EyeOff size={16} />
+                      <div className="space-y-2">
+                        <Label>To</Label>
+                        <Controller
+                          name={`previousCompanies.${index}.to`}
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger
+                                className={
+                                  errors.previousCompanies?.[index]?.to
+                                    ? "border-destructive"
+                                    : ""
+                                }
+                              >
+                                <SelectValue placeholder="Year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {YEARS.map((year) => (
+                                  <SelectItem key={year} value={year}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.previousCompanies?.[index]?.to && (
+                          <p className="text-xs text-destructive">
+                            {errors.previousCompanies[index].to.message}
+                          </p>
                         )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )}
-          />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            disabled={isSubmitting}
-            sx={styles.submitButton}
-          >
-            {isSubmitting ? "Creating Account..." : "Create Alumni Account"}
-          </Button>
+            <Separator />
 
-          <Typography
-            variant="body2"
-            sx={{ textAlign: "center", color: "text.secondary", mt: 2 }}
-          >
-            Already have an account?{" "}
-            <Box
-              component="span"
-              onClick={() => navigate(ROUTES.LOGIN)}
-              sx={styles.link}
-            >
-              Login here
-            </Box>
-          </Typography>
-        </Stack>
-      </Box>
-    </FormContainer>
+            {/* Profile Picture */}
+            <Controller
+              name="profilePicture"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  label="Profile Picture (Optional)"
+                />
+              )}
+            />
+
+            {/* Password */}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      className={
+                        errors.password ? "border-destructive pr-10" : "pr-10"
+                      }
+                    />
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={handleShowPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-xs text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Controller
+                  name="confirmPassword"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      className={
+                        errors.confirmPassword
+                          ? "border-destructive pr-10"
+                          : "pr-10"
+                      }
+                    />
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={handleShowConfirmPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showConfirmPassword ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-xs text-destructive">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Creating Account..." : "Create Alumni Account"}
+            </Button>
+
+            <p className="text-sm text-center text-muted-foreground">
+              Already have an account?{" "}
+              <span
+                onClick={() => navigate(ROUTES.LOGIN)}
+                className="text-primary hover:underline cursor-pointer"
+              >
+                Login here
+              </span>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import authService from "../services/authService";
 import { ROUTES } from "../constants/constants";
+import { toast } from "sonner";
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -24,9 +25,9 @@ export const useAuth = () => {
       const { token, user } = await authService.login(credentials);
       storeLogin(user, token);
 
-      const dest = returnUrl ? decodeURIComponent(returnUrl) : ROUTES.HOME;
+      const dest = returnUrl ? decodeURIComponent(returnUrl) : ROUTES.DASHBOARD;
       navigate(dest, { replace: true });
-
+      toast.success("Logged in successfully!");
       return { success: true };
     } catch (err) {
       setError(err.message);

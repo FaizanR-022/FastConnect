@@ -1,24 +1,18 @@
 import { useEffect } from "react";
-import {
-  Container,
-  Box,
-  Typography,
-  Paper,
-  Avatar,
-  Button,
-  useTheme,
-  Divider,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
 import { Bell, Check, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
+import { Separator } from "../../components/ui/separator";
+import { PageContainer, PageContent, LoadingSpinner, ErrorMessage } from "../../components/layout";
+
 import useNotificationStore from "../../store/useNotificationStore";
 import { formatDistanceToNow } from "../../utils/dateHelpers";
 import { ROUTES } from "../../constants/constants";
 
 export default function NotificationsPage() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const {
     notifications,
@@ -53,219 +47,108 @@ export default function NotificationsPage() {
     await deleteNotification(notificationId);
   };
 
+  // Loading State
   if (loading && notifications.length === 0) {
-    return (
-      <Container maxWidth="md" sx={{ py: 5 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "50vh",
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      </Container>
-    );
+    return <LoadingSpinner fullScreen />;
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        background:
-          theme.palette.gradients?.background ||
-          theme.palette.background.default,
-        py: 5,
-      }}
-    >
-      <Container maxWidth="md">
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 4,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Bell size={32} color={theme.palette.primary.main} />
-            <Box>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 700,
-                  color: theme.palette.text.primary,
-                }}
-              >
-                Notifications
-              </Typography>
+    <PageContainer>
+      <PageContent maxWidth="3xl">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Bell className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-2xl font-bold">Notifications</h1>
               {unreadCount > 0 && (
-                <Typography
-                  variant="body2"
-                  sx={{ color: theme.palette.text.secondary }}
-                >
+                <p className="text-sm text-muted-foreground">
                   {unreadCount} unread
-                </Typography>
+                </p>
               )}
-            </Box>
-          </Box>
+            </div>
+          </div>
 
           {unreadCount > 0 && (
-            <Button
-              variant="outlined"
-              startIcon={<Check size={18} />}
-              onClick={handleMarkAllAsRead}
-              sx={{
-                textTransform: "none",
-                borderRadius: 2,
-              }}
-            >
+            <Button variant="outline" onClick={handleMarkAllAsRead}>
+              <Check className="w-4 h-4 mr-2" />
               Mark all read
             </Button>
           )}
-        </Box>
+        </div>
 
+        {/* Error Message */}
         {error && (
-          <Alert severity="error" onClose={clearError} sx={{ mb: 3 }}>
-            {error}
-          </Alert>
+          <div className="p-4 mb-6 text-sm text-destructive bg-destructive/10 rounded-lg flex items-center justify-between">
+            <span>{error}</span>
+            <button onClick={clearError} className="text-destructive hover:underline">
+              Dismiss
+            </button>
+          </div>
         )}
 
+        {/* Empty State */}
         {notifications.length === 0 ? (
-          <Paper
-            elevation={3}
-            sx={{
-              p: 6,
-              textAlign: "center",
-              borderRadius: 3,
-            }}
-          >
-            <Bell
-              size={64}
-              color={theme.palette.text.disabled}
-              style={{ opacity: 0.5 }}
-            />
-            <Typography
-              variant="h6"
-              sx={{
-                mt: 2,
-                mb: 1,
-                color: theme.palette.text.secondary,
-              }}
-            >
-              No notifications yet
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: theme.palette.text.secondary }}
-            >
-              When someone posts, replies, or likes your content, you'll see it
-              here.
-            </Typography>
-          </Paper>
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <Bell className="w-16 h-16 text-muted-foreground/50 mb-4" />
+              <h2 className="text-lg font-semibold mb-2">No notifications yet</h2>
+              <p className="text-sm text-muted-foreground">
+                When someone posts, replies, or likes your content, you'll see it here.
+              </p>
+            </CardContent>
+          </Card>
         ) : (
-          <Paper
-            elevation={3}
-            sx={{
-              borderRadius: 3,
-              overflow: "hidden",
-            }}
-          >
+          <Card className="overflow-hidden">
             {notifications.map((notification, index) => (
-              <Box key={notification.id}>
-                <Box
+              <div key={notification.id}>
+                <div
                   onClick={() => handleNotificationClick(notification)}
-                  sx={{
-                    display: "flex",
-                    gap: 2,
-                    alignItems: "flex-start",
-                    p: 2.5,
-                    cursor: "pointer",
-                    backgroundColor: notification.isRead
-                      ? "transparent"
-                      : `${theme.palette.primary.main}08`,
-                    borderLeft: notification.isRead
-                      ? "none"
-                      : `4px solid ${theme.palette.primary.main}`,
-                    transition: "background-color 0.2s",
-                    "&:hover": {
-                      backgroundColor: theme.palette.action.hover,
-                    },
-                  }}
+                  className={`flex gap-3 p-4 cursor-pointer transition-colors hover:bg-muted ${
+                    !notification.isRead
+                      ? "bg-primary/5 border-l-4 border-primary"
+                      : ""
+                  }`}
                 >
-                  <Avatar
-                    src={notification.actor?.profilePicture}
-                    sx={{ width: 48, height: 48 }}
-                  >
-                    {notification.actor?.name?.[0] || "?"}
+                  <Avatar className="w-12 h-12 flex-shrink-0">
+                    <AvatarImage src={notification.actor?.profilePicture} />
+                    <AvatarFallback>
+                      {notification.actor?.name?.[0] || "?"}
+                    </AvatarFallback>
                   </Avatar>
 
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: notification.isRead ? 400 : 600,
-                        color: theme.palette.text.primary,
-                        mb: 0.5,
-                      }}
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`mb-1 ${
+                        !notification.isRead ? "font-semibold" : ""
+                      }`}
                     >
                       {notification.message}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: theme.palette.text.secondary,
-                      }}
-                    >
+                    </p>
+                    <p className="text-sm text-muted-foreground">
                       {formatDistanceToNow(notification.createdAt)}
-                    </Typography>
-                  </Box>
+                    </p>
+                  </div>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                    }}
-                  >
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {!notification.isRead && (
-                      <Box
-                        sx={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          backgroundColor: theme.palette.primary.main,
-                        }}
-                      />
+                      <div className="w-2.5 h-2.5 rounded-full bg-primary" />
                     )}
 
-                    <Button
-                      size="small"
+                    <button
                       onClick={(e) => handleDelete(notification.id, e)}
-                      sx={{
-                        minWidth: 36,
-                        width: 36,
-                        height: 36,
-                        p: 0,
-                        color: theme.palette.text.secondary,
-                        "&:hover": {
-                          color: theme.palette.error.main,
-                          backgroundColor: `${theme.palette.error.main}08`,
-                        },
-                      }}
+                      className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                     >
-                      <Trash2 size={18} />
-                    </Button>
-                  </Box>
-                </Box>
-                {index !== notifications.length - 1 && <Divider />}
-              </Box>
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                {index !== notifications.length - 1 && <Separator />}
+              </div>
             ))}
-          </Paper>
+          </Card>
         )}
-      </Container>
-    </Box>
+      </PageContent>
+    </PageContainer>
   );
 }

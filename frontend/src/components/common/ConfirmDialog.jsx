@@ -1,14 +1,14 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
 import { AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 
 /**
  * Reusable confirmation dialog for destructive actions
@@ -32,72 +32,27 @@ export const ConfirmDialog = ({
   cancelText = "Cancel",
   loading = false,
 }) => {
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullScreen={fullScreen}
-      maxWidth="xs"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: { xs: 0, sm: 3 },
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1.5,
-          color: theme.palette.error.main,
-          fontWeight: 600,
-        }}
-      >
-        <AlertTriangle size={24} />
-        {title}
-      </DialogTitle>
-
-      <DialogContent>
-        <DialogContentText
-          sx={{
-            color: theme.palette.text.primary,
-            fontSize: "0.95rem",
-          }}
-        >
-          {message}
-        </DialogContentText>
-      </DialogContent>
-
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button
-          onClick={onClose}
-          disabled={loading}
-          sx={{
-            textTransform: "none",
-            color: theme.palette.text.secondary,
-          }}
-        >
-          {cancelText}
-        </Button>
-        <Button
-          onClick={onConfirm}
-          disabled={loading}
-          variant="contained"
-          sx={{
-            textTransform: "none",
-            bgcolor: theme.palette.error.main,
-            "&:hover": {
-              bgcolor: theme.palette.error.dark,
-            },
-          }}
-        >
-          {loading ? "Deleting..." : confirmText}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <AlertDialog open={open} onOpenChange={onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+            <AlertTriangle className="w-5 h-5" />
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription>{message}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={loading}>{cancelText}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            disabled={loading}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {loading ? "Deleting..." : confirmText}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };

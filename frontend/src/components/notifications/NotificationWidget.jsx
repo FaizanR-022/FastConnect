@@ -1,21 +1,17 @@
 import { useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  Avatar,
-  Button,
-  useTheme,
-  Divider,
-} from "@mui/material";
 import { Bell, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Separator } from "../ui/separator";
+
 import useNotificationStore from "../../store/useNotificationStore";
 import { formatDistanceToNow } from "../../utils/dateHelpers";
 import { ROUTES } from "../../constants/constants";
 
 export const NotificationWidget = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
   const { notifications, fetchNotifications, markAsRead } =
     useNotificationStore();
@@ -39,163 +35,78 @@ export const NotificationWidget = () => {
   const recentNotifications = notifications.slice(0, 5);
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 3,
-        borderRadius: 3,
-        background: theme.palette.background.paper,
-        border: `1px solid ${theme.palette.divider}`,
-      }}
-    >
-      {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 2,
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Bell size={24} color={theme.palette.primary.main} />
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              color: theme.palette.text.primary,
-            }}
-          >
-            Recent Notifications
-          </Typography>
-        </Box>
-      </Box>
-
-      {/* Notifications List */}
-      {recentNotifications.length === 0 ? (
-        <Box sx={{ py: 4, textAlign: "center" }}>
-          <Bell
-            size={48}
-            color={theme.palette.text.disabled}
-            style={{ opacity: 0.5 }}
-          />
-          <Typography
-            variant="body2"
-            sx={{
-              mt: 2,
-              color: theme.palette.text.secondary,
-            }}
-          >
-            No notifications yet
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              display: "block",
-              mt: 0.5,
-              color: theme.palette.text.secondary,
-            }}
-          >
-            You'll see updates here when someone posts or replies
-          </Typography>
-        </Box>
-      ) : (
-        <>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            {recentNotifications.map((notification, index) => (
-              <Box key={notification.id}>
-                <Box
-                  onClick={() => handleNotificationClick(notification)}
-                  sx={{
-                    display: "flex",
-                    gap: 1.5,
-                    alignItems: "flex-start",
-                    p: 1.5,
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    backgroundColor: notification.isRead
-                      ? "transparent"
-                      : `${theme.palette.primary.main}08`,
-                    transition: "background-color 0.2s",
-                    "&:hover": {
-                      backgroundColor: theme.palette.action.hover,
-                    },
-                  }}
-                >
-                  <Avatar
-                    src={notification.actor?.profilePicture}
-                    sx={{ width: 40, height: 40 }}
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Bell className="w-5 h-5 text-primary" />
+          Recent Notifications
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {recentNotifications.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <Bell className="w-12 h-12 text-muted-foreground/50 mb-4" />
+            <p className="text-sm text-muted-foreground">
+              No notifications yet
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              You'll see updates here when someone posts or replies
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              {recentNotifications.map((notification, index) => (
+                <div key={notification.id}>
+                  <div
+                    onClick={() => handleNotificationClick(notification)}
+                    className={`flex gap-3 p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted ${
+                      !notification.isRead ? "bg-primary/5" : ""
+                    }`}
                   >
-                    {notification.actor?.name?.[0] || "?"}
-                  </Avatar>
+                    <Avatar className="w-10 h-10 flex-shrink-0">
+                      <AvatarImage src={notification.actor?.profilePicture} />
+                      <AvatarFallback>
+                        {notification.actor?.name?.[0] || "?"}
+                      </AvatarFallback>
+                    </Avatar>
 
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: notification.isRead ? 400 : 600,
-                        color: theme.palette.text.primary,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {notification.message}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: theme.palette.text.secondary,
-                        display: "block",
-                        mt: 0.5,
-                      }}
-                    >
-                      {formatDistanceToNow(notification.createdAt)}
-                    </Typography>
-                  </Box>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-sm line-clamp-2 ${
+                          !notification.isRead ? "font-semibold" : ""
+                        }`}
+                      >
+                        {notification.message}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {formatDistanceToNow(notification.createdAt)}
+                      </p>
+                    </div>
 
-                  {!notification.isRead && (
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        backgroundColor: theme.palette.primary.main,
-                        flexShrink: 0,
-                        mt: 1,
-                      }}
-                    />
+                    {!notification.isRead && (
+                      <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                    )}
+                  </div>
+                  {index !== recentNotifications.length - 1 && (
+                    <Separator className="my-1" />
                   )}
-                </Box>
-                {index !== recentNotifications.length - 1 && (
-                  <Divider sx={{ my: 0.5 }} />
-                )}
-              </Box>
-            ))}
-          </Box>
+                </div>
+              ))}
+            </div>
 
-          {/* View All Button */}
-          <Button
-            fullWidth
-            endIcon={<ArrowRight size={18} />}
-            onClick={handleViewAll}
-            sx={{
-              mt: 2,
-              textTransform: "none",
-              fontWeight: 600,
-              color: theme.palette.primary.main,
-              "&:hover": {
-                backgroundColor: `${theme.palette.primary.main}08`,
-              },
-            }}
-          >
-            View All Notifications
-          </Button>
-        </>
-      )}
-    </Paper>
+            <Button
+              variant="ghost"
+              className="w-full mt-4 text-primary"
+              onClick={handleViewAll}
+            >
+              View All Notifications
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

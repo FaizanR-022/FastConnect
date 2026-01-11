@@ -1,23 +1,22 @@
 import { useState } from "react";
-import { Box, Container } from "@mui/material";
-import { useTheme } from "@mui/material";
-import { createDashboardStyles } from "../../styles/dashboardStyles";
+import { useNavigate } from "react-router-dom";
+
 import { WelcomeSection } from "../../components/dashboard/WelcomeSection";
 import { MyPosts } from "../../components/dashboard/MyPosts";
 import { UserInfoCard } from "../../components/dashboard/UserInfoCard";
 import { RepliesSidebar } from "../../components/dashboard/RepliesSidebar";
 import { CreatePost } from "../../components/posts/CreatePost";
-import { RepliesModal } from "../../components/replies/RepliesModal";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
-import { useDashboard } from "../../hooks/useDashboard";
-import { usePosts } from "../../hooks/usePosts";
-import { usePost } from "../../hooks/usePost";
-import useAuthStore from "../../store/authStore";
 import NotificationWidget from "../../components/notifications/NotificationWidget";
+import { PageContainer, TwoColumnLayout } from "../../components/layout";
+
+import { useDashboard } from "../..//hooks/useDashboard";
+import { usePosts } from "../../hooks/usePosts";
+import useAuthStore from "../../store/authStore";
+import { ROUTES } from "../../constants/constants";
 
 export default function Dashboard() {
-  const theme = useTheme();
-  const styles = createDashboardStyles(theme);
+  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const {
@@ -25,7 +24,6 @@ export default function Dashboard() {
     replies,
     postsLoading,
     repliesLoading,
-    postsError,
     createPost,
     removePost,
     updatePostLikes,
@@ -34,20 +32,9 @@ export default function Dashboard() {
   const { likePost, unlikePost, deletePost } = usePosts();
 
   const [createPostOpen, setCreatePostOpen] = useState(false);
-  const [repliesModalOpen, setRepliesModalOpen] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-
-  const {
-    post: selectedPost,
-    replies: postReplies,
-    repliesLoading: postRepliesLoading,
-    repliesError,
-    createReply,
-    deleteReply,
-  } = usePost(selectedPostId);
 
   const handleOpenCreatePost = () => {
     setCreatePostOpen(true);
@@ -63,18 +50,14 @@ export default function Dashboard() {
       setCreatePostOpen(false);
     }
   };
-  const handleRepliesClick = (postId) => {
-    setSelectedPostId(postId);
-    setRepliesModalOpen(true);
-  };
 
-  const handleCloseRepliesModal = () => {
-    setRepliesModalOpen(false);
-    setTimeout(() => setSelectedPostId(null), 200);
+  // Navigate to single post page (for replies)
+  const handleRepliesClick = (postId) => {
+    navigate(`${ROUTES.ALL_POSTS}/${postId}`);
   };
 
   const handleReplyClick = (postId) => {
-    handleRepliesClick(postId);
+    navigate(`${ROUTES.ALL_POSTS}/${postId}`);
   };
 
   const handleLike = async (postId, isLiked) => {
@@ -102,7 +85,7 @@ export default function Dashboard() {
       setDeleteDialogOpen(false);
       setPostToDelete(null);
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error("Delete failed");
     } finally {
       setDeleting(false);
     }
@@ -113,18 +96,17 @@ export default function Dashboard() {
     setPostToDelete(null);
   };
 
-  // View All Replies (for future implementation)
+  // View All Replies - navigate to all posts
   const handleViewAllReplies = () => {
-    // Navigate to a dedicated replies page or open modal with all replies
-    console.log("View all replies");
+    navigate(ROUTES.ALL_POSTS);
   };
 
   return (
-    <Box sx={styles.pageContainer}>
-      <WelcomeSection onNewPostClick={handleOpenCreatePost} />
+    <PageContainer>
+      <WelcomeSection />
 
-      <Container>
-        <Box sx={styles.dashboardGrid}>
+      <TwoColumnLayout
+        main={
           <MyPosts
             posts={posts}
             loading={postsLoading}
@@ -134,15 +116,11 @@ export default function Dashboard() {
             onDelete={handleDeleteClick}
             onNewPostClick={handleOpenCreatePost}
           />
-
-          {/* Sidebar */}
-          <Box sx={styles.sidebar}>
-            <Box sx={styles.sidebarCard}>
-              <UserInfoCard />
-            </Box>
-
+        }
+        sidebar={
+          <>
+            <UserInfoCard />
             <NotificationWidget />
-
             {user?.role === "alumni" && (
               <RepliesSidebar
                 replies={replies}
@@ -151,28 +129,18 @@ export default function Dashboard() {
                 onViewAll={handleViewAllReplies}
               />
             )}
-          </Box>
-        </Box>
-      </Container>
+          </>
+        }
+      />
 
+      {/* Create Post Modal */}
       <CreatePost
         open={createPostOpen}
         onClose={handleCloseCreatePost}
         onSubmit={handleCreatePost}
       />
 
-      <RepliesModal
-        open={repliesModalOpen}
-        onClose={handleCloseRepliesModal}
-        post={selectedPost}
-        replies={postReplies}
-        repliesLoading={postRepliesLoading}
-        repliesError={repliesError}
-        currentUser={user}
-        onCreateReply={createReply}
-        onDeleteReply={deleteReply}
-      />
-
+      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
         onClose={handleCancelDelete}
@@ -183,6 +151,6 @@ export default function Dashboard() {
         cancelText="Cancel"
         loading={deleting}
       />
-    </Box>
+    </PageContainer>
   );
 }

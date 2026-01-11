@@ -1,24 +1,21 @@
 import { useState } from "react";
-import {
-  IconButton,
-  Badge,
-  Menu,
-  MenuItem,
-  Typography,
-  Box,
-  Divider,
-  Avatar,
-  Button,
-  useTheme,
-} from "@mui/material";
-import { Bell, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Bell, Check } from "lucide-react";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "../ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { ScrollArea } from "../ui/scroll-area";
 import useNotificationStore from "../../store/useNotificationStore";
 import { formatDistanceToNow } from "../../utils/dateHelpers";
 import { ROUTES } from "../../constants/constants";
 
-export const BellIcon = () => {
-  const theme = useTheme();
+export default function BellIcon() {
   const navigate = useNavigate();
   const {
     notifications,
@@ -28,207 +25,122 @@ export const BellIcon = () => {
     markAllAsRead,
   } = useNotificationStore();
 
-  // Anchor Element
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-    fetchNotifications();
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleOpen = (isOpen) => {
+    setOpen(isOpen);
+    if (isOpen) {
+      fetchNotifications();
+    }
   };
 
   const handleNotificationClick = async (notification) => {
     if (!notification.isRead) {
       await markAsRead(notification.id);
     }
-
-    // navigate(`/posts/${notification.metadata.postUuid}`);
     navigate(ROUTES.SINGLE_POST.replace(":id", notification.metadata.postUuid));
-
-    handleClose();
+    setOpen(false);
   };
 
-  const handleMarkAllAsRead = async () => {
+  const handleMarkAllAsRead = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     await markAllAsRead();
   };
 
   const handleViewAll = () => {
     navigate(ROUTES.NOTIFICATIONS);
-    handleClose();
+    setOpen(false);
   };
 
   const recentNotifications = notifications.slice(0, 5);
 
   return (
-    <>
-      <IconButton
-        onClick={handleClick}
-        sx={{
-          color: theme.palette.text.primary,
-          "&:hover": {
-            backgroundColor: theme.palette.action.hover,
-          },
-        }}
-      >
-        <Badge badgeContent={unreadCount} color="error">
-          <Bell size={24} />
-        </Badge>
-      </IconButton>
-
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        PaperProps={{
-          sx: {
-            width: 400,
-            maxHeight: 500,
-            mt: 1.5,
-            borderRadius: 2,
-            boxShadow: theme.shadows[10],
-          },
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
+    <DropdownMenu open={open} onOpenChange={handleOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="rounded-full relative">
+          <Bell className="w-5 h-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full min-w-5 h-5 flex items-center justify-center px-1">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-96">
         {/* Header */}
-        <Box
-          sx={{
-            px: 2,
-            py: 1.5,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderBottom: `1px solid ${theme.palette.divider}`,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            Notifications
-          </Typography>
+        <div className="flex items-center justify-between px-4 py-2 border-b">
+          <span className="font-semibold">Notifications</span>
           {unreadCount > 0 && (
             <Button
-              size="small"
-              startIcon={<Check size={16} />}
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 text-xs text-primary gap-1"
               onClick={handleMarkAllAsRead}
-              sx={{
-                textTransform: "none",
-                fontSize: "0.875rem",
-              }}
             >
+              <Check className="w-3 h-3" />
               Mark all read
             </Button>
           )}
-        </Box>
+        </div>
 
         {/* Notifications List */}
         {recentNotifications.length === 0 ? (
-          <Box sx={{ px: 3, py: 4, textAlign: "center" }}>
-            <Bell size={48} color={theme.palette.text.disabled} />
-            <Typography
-              variant="body2"
-              sx={{ mt: 2, color: theme.palette.text.secondary }}
-            >
-              No notifications yet
-            </Typography>
-          </Box>
+          <div className="px-4 py-8 text-center">
+            <Bell className="w-12 h-12 mx-auto text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground">No notifications yet</p>
+          </div>
         ) : (
           <>
-            {recentNotifications.map((notification, index) => (
-              <MenuItem
-                key={notification.id}
-                onClick={() => handleNotificationClick(notification)}
-                sx={{
-                  px: 2,
-                  py: 1.5,
-                  backgroundColor: notification.isRead
-                    ? "transparent"
-                    : `${theme.palette.primary.main}08`,
-                  borderLeft: notification.isRead
-                    ? "none"
-                    : `3px solid ${theme.palette.primary.main}`,
-                  "&:hover": {
-                    backgroundColor: theme.palette.action.hover,
-                  },
-                  ...(index !== recentNotifications.length - 1 && {
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                  }),
-                }}
-              >
-                <Box sx={{ display: "flex", gap: 1.5, width: "100%" }}>
-                  <Avatar
-                    src={notification.actor?.profilePicture}
-                    sx={{ width: 40, height: 40 }}
-                  >
-                    {notification.actor?.name?.[0] || "?"}
-                  </Avatar>
+            <ScrollArea className="max-h-[400px]">
+              {recentNotifications.map((notification) => (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className={`px-4 py-3 cursor-pointer ${
+                    !notification.isRead ? "bg-accent border-l-2 border-l-primary" : ""
+                  }`}
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <div className="flex gap-3 w-full">
+                    <Avatar className="w-10 h-10 shrink-0">
+                      <AvatarImage src={notification.actor?.profilePicture} />
+                      <AvatarFallback>
+                        {notification.actor?.name?.[0] || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-sm line-clamp-2 ${
+                          !notification.isRead ? "font-semibold" : ""
+                        }`}
+                      >
+                        {notification.message}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {formatDistanceToNow(notification.createdAt)}
+                      </p>
+                    </div>
+                    {!notification.isRead && (
+                      <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1" />
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </ScrollArea>
 
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: notification.isRead ? 400 : 600,
-                        color: theme.palette.text.primary,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {notification.message}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: theme.palette.text.secondary,
-                        display: "block",
-                        mt: 0.5,
-                      }}
-                    >
-                      {formatDistanceToNow(notification.createdAt)}
-                    </Typography>
-                  </Box>
-
-                  {!notification.isRead && (
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        backgroundColor: theme.palette.primary.main,
-                        flexShrink: 0,
-                        mt: 0.5,
-                      }}
-                    />
-                  )}
-                </Box>
-              </MenuItem>
-            ))}
-
-            {/* View All Button */}
-            <Divider />
-            <Box sx={{ p: 1 }}>
+            <DropdownMenuSeparator />
+            <div className="p-1">
               <Button
-                fullWidth
+                variant="ghost"
+                className="w-full text-primary"
                 onClick={handleViewAll}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 600,
-                  color: theme.palette.primary.main,
-                }}
               >
                 View All Notifications
               </Button>
-            </Box>
+            </div>
           </>
         )}
-      </Menu>
-    </>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-};
-
-export default BellIcon;
+}

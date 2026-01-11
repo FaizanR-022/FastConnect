@@ -1,23 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Container,
-  Paper,
-  TextField,
-  Typography,
-  Alert,
-  CircularProgress,
-  useTheme,
-} from "@mui/material";
-import { Mail, RefreshCw } from "lucide-react";
+import { Mail, RefreshCw, Loader2 } from "lucide-react";
+
+import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+
 import useAuthStore from "../../store/authStore";
 import { useAuth } from "../../hooks/useAuth";
 import { ROUTES } from "../../constants/constants";
+import { toast } from "sonner";
 
 export default function VerifyEmail() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { verifyOTP, resendOTP, error, clearError } = useAuth();
@@ -81,6 +75,7 @@ export default function VerifyEmail() {
 
     if (result.success) {
       setSuccess(true);
+      toast.success("Email verified successfully!");
 
       setTimeout(() => {
         navigate(ROUTES.HOME);
@@ -123,258 +118,104 @@ export default function VerifyEmail() {
   }
 
   const displayError = localError || error;
+
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: theme.palette.gradients.background,
-        py: 4,
-      }}
-    >
-      <Container maxWidth="sm">
-        <Paper
-          elevation={10}
-          sx={{
-            p: { xs: 4, sm: 6 },
-            borderRadius: 3,
-            textAlign: "center",
-            boxShadow: theme.shadows[20],
-          }}
-        >
-          <Box
-            sx={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              background: theme.palette.gradients.primary,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 24px",
-              boxShadow: theme.shadows[8],
-            }}
-          >
-            <Mail size={40} color="white" />
-          </Box>
+    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-8 px-4">
+      <Card className="w-full max-w-md">
+        <CardContent className="pt-8 pb-8 text-center">
+          {/* Icon */}
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Mail className="w-10 h-10 text-primary-foreground" />
+          </div>
 
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              mb: 1.5,
-              color: theme.palette.text.primary,
-            }}
-          >
-            Verify Your Email
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: theme.palette.text.secondary,
-              mb: 0.5,
-            }}
-          >
+          {/* Title */}
+          <h1 className="text-2xl font-bold mb-2">Verify Your Email</h1>
+          <p className="text-muted-foreground mb-1">
             We sent a 6-digit code to
-          </Typography>
+          </p>
+          <p className="text-primary font-semibold mb-6">{user.email}</p>
 
-          <Typography
-            variant="body1"
-            sx={{
-              color: theme.palette.primary.main,
-              fontWeight: 600,
-              mb: 4,
-            }}
-          >
-            {user.email}
-          </Typography>
-
+          {/* Success Message */}
           {success && (
-            <Alert
-              severity="success"
-              sx={{
-                mb: 3,
-                borderRadius: 2,
-              }}
-            >
+            <div className="p-3 mb-4 text-sm text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30 rounded-lg">
               Email verified successfully! Redirecting...
-            </Alert>
+            </div>
           )}
 
+          {/* Error Message */}
           {displayError && (
-            <Alert
-              severity="error"
-              sx={{
-                mb: 3,
-                borderRadius: 2,
-              }}
-            >
+            <div className="p-3 mb-4 text-sm text-destructive bg-destructive/10 rounded-lg">
               {displayError}
-            </Alert>
+            </div>
           )}
 
           {/* OTP Form */}
           {!success && (
-            <Box component="form" onSubmit={handleVerify}>
-              <Box
-                sx={{
-                  maxWidth: 400,
-                  mx: "auto",
-                  mb: 3,
-                }}
-              >
-                <TextField
-                  fullWidth
+            <form onSubmit={handleVerify}>
+              <div className="max-w-xs mx-auto mb-4">
+                <Input
                   value={otp}
                   onChange={handleOtpChange}
                   placeholder="000000"
-                  inputProps={{
-                    maxLength: 6,
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
-                    style: {
-                      fontSize: "32px",
-                      fontWeight: 600,
-                      letterSpacing: "10px",
-                      textAlign: "center",
-                      padding: "16px",
-                    },
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      backgroundColor: theme.palette.background.default,
-                      border: `2px solid ${theme.palette.divider}`,
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        borderColor: theme.palette.primary.main,
-                        backgroundColor: theme.palette.background.paper,
-                      },
-                      "&.Mui-focused": {
-                        borderColor: theme.palette.primary.main,
-                        backgroundColor: theme.palette.background.paper,
-                        boxShadow: `0 0 0 4px ${theme.palette.primary.main}20`,
-                      },
-                      "& fieldset": {
-                        border: "none",
-                      },
-                    },
-                  }}
+                  maxLength={6}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  className="text-center text-3xl font-semibold tracking-widest h-14 bg-muted/50"
                   autoFocus
                   disabled={loading || resending}
                 />
-
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: "block",
-                    color: theme.palette.text.secondary,
-                    mt: 1.5,
-                    fontSize: "0.85rem",
-                  }}
-                >
+                <p className="text-xs text-muted-foreground mt-2">
                   Enter the 6-digit code from your email
-                </Typography>
-              </Box>
+                </p>
+              </div>
 
-              <Box
-                sx={{
-                  maxWidth: 400,
-                  mx: "auto",
-                  mb: 3,
-                }}
-              >
+              <div className="max-w-xs mx-auto mb-4">
                 <Button
                   type="submit"
-                  variant="contained"
-                  fullWidth
+                  className="w-full"
                   disabled={loading || resending || otp.length !== 6}
-                  sx={{
-                    py: 1.5,
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    borderRadius: 2,
-                    background: theme.palette.gradients.primary,
-                    boxShadow: theme.shadows[4],
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      background: theme.palette.gradients.primary,
-                      transform: "translateY(-2px)",
-                      boxShadow: theme.shadows[8],
-                    },
-                    "&:active": {
-                      transform: "translateY(0)",
-                    },
-                    "&.Mui-disabled": {
-                      background: theme.palette.action.disabledBackground,
-                      color: theme.palette.action.disabled,
-                    },
-                  }}
                 >
                   {loading ? (
-                    <CircularProgress size={24} color="inherit" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     "Verify Email"
                   )}
                 </Button>
-              </Box>
+              </div>
 
-              <Typography
-                variant="body2"
-                sx={{
-                  color: theme.palette.text.secondary,
-                  mb: 1,
-                  fontSize: "0.95rem",
-                }}
-              >
+              <p className="text-sm text-muted-foreground mb-2">
                 Didn't receive the code?
-              </Typography>
+              </p>
 
               {canResend ? (
                 <Button
+                  type="button"
+                  variant="ghost"
                   onClick={handleResendOTP}
                   disabled={resending || loading}
-                  startIcon={resending ? null : <RefreshCw size={16} />}
-                  sx={{
-                    textTransform: "none",
-                    fontWeight: 600,
-                    fontSize: "0.95rem",
-                    color: theme.palette.primary.main,
-                    "&:hover": {
-                      background: `${theme.palette.primary.main}10`,
-                    },
-                  }}
+                  className="text-primary"
                 >
-                  {resending ? <CircularProgress size={20} /> : "Resend OTP"}
+                  {resending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Resend OTP
+                    </>
+                  )}
                 </Button>
               ) : (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: theme.palette.text.secondary,
-                    fontWeight: 600,
-                    fontSize: "0.95rem",
-                  }}
-                >
+                <p className="text-sm text-muted-foreground">
                   Resend OTP in{" "}
-                  <Box
-                    component="span"
-                    sx={{
-                      color: theme.palette.primary.main,
-                      fontWeight: 700,
-                    }}
-                  >
+                  <span className="text-primary font-bold">
                     {formatTimer(resendTimer)}
-                  </Box>
-                </Typography>
+                  </span>
+                </p>
               )}
-            </Box>
+            </form>
           )}
-        </Paper>
-      </Container>
-    </Box>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

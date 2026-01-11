@@ -1,28 +1,17 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Dialog,
-  DialogContent,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  Stack,
-  Alert,
-  CircularProgress,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import { X, Send } from "lucide-react";
-import { createPostStyles } from "../../styles/postStyles";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+
 import { createPostSchema } from "../../utils/postValidationSchemas";
+import { toast } from "sonner";
 
 export const CreatePost = ({ open, onClose, onSubmit, loading }) => {
-  const theme = useTheme();
-  const styles = createPostStyles(theme);
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [error, setError] = useState("");
 
   const {
@@ -50,105 +39,90 @@ export const CreatePost = ({ open, onClose, onSubmit, loading }) => {
       await onSubmit(data);
       reset();
       handleClose();
+      toast.success("Post created successfully!");
     } catch (err) {
       setError(err.message || "Failed to create post");
     }
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-      fullScreen={fullScreen}
-      PaperProps={{
-        sx: styles.modalPaper,
-      }}
-    >
-      <DialogContent sx={styles.modalContent}>
-        <Box sx={styles.modalHeader}>
-          <Typography variant="h5" sx={styles.modalTitle}>
-            Create New Post
-          </Typography>
-          <IconButton onClick={handleClose} sx={styles.closeButton}>
-            <X size={24} />
-          </IconButton>
-        </Box>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-medium">
+            Ask a Question
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            Share your question with the community and get expert advice from
+            alumni
+          </p>
+        </DialogHeader>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">
             {error}
-          </Alert>
+          </div>
         )}
 
-        {/* Form */}
-        <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
-          <Stack spacing={3}>
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="space-y-4 pt-4"
+        >
+          <div className="space-y-2">
+            <Label htmlFor="title">Question Title</Label>
             <Controller
               name="title"
               control={control}
               render={({ field }) => (
-                <TextField
+                <Input
                   {...field}
-                  label="Post Title"
-                  variant="outlined"
-                  fullWidth
-                  placeholder="Ask a question or share your thoughts..."
-                  error={!!errors.title}
-                  helperText={errors.title?.message}
-                  sx={styles.formField}
+                  id="title"
+                  placeholder="e.g., How to prepare for technical interviews?"
+                  className={errors.title ? "border-destructive" : ""}
                 />
               )}
             />
+            {errors.title && (
+              <p className="text-xs text-destructive">{errors.title.message}</p>
+            )}
+          </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="body">Question Details</Label>
             <Controller
               name="body"
               control={control}
               render={({ field }) => (
-                <TextField
+                <Textarea
                   {...field}
-                  label="Post Content"
-                  variant="outlined"
-                  fullWidth
-                  multiline
-                  rows={8}
-                  placeholder="Provide details about your question or topic..."
-                  error={!!errors.body}
-                  helperText={
-                    errors.body?.message ||
-                    `${field.value.length}/5000 characters`
-                  }
-                  sx={styles.formField}
+                  id="body"
+                  rows={6}
+                  placeholder="Provide more context about your question..."
+                  className={`resize-none ${
+                    errors.body ? "border-destructive" : ""
+                  }`}
                 />
               )}
             />
+            {errors.body && (
+              <p className="text-xs text-destructive">{errors.body.message}</p>
+            )}
+          </div>
 
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <Button
-                variant="text"
-                onClick={handleClose}
-                sx={styles.cancelButton}
-                disabled={isSubmitting || loading}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                startIcon={isSubmitting || loading ? null : <Send size={18} />}
-                sx={styles.submitButton}
-                disabled={isSubmitting || loading}
-              >
-                {isSubmitting || loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Create Post"
-                )}
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting || loading}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting || loading}>
+              {isSubmitting || loading ? "Posting..." : "Post Question"}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

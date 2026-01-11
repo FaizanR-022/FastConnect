@@ -1,71 +1,75 @@
-import { Box, Typography, Button, CircularProgress } from "@mui/material";
-import { useTheme } from "@mui/material";
-import { createDashboardStyles } from "../../styles/dashboardStyles";
+import { Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
 
 export const RepliesSidebar = ({
   replies,
   loading,
   onReplyClick,
-  onViewAll,
+  onViewAll = () => {},
 }) => {
-  const theme = useTheme();
-  const styles = createDashboardStyles(theme);
-
   if (loading) {
     return (
-      <Box sx={styles.sidebarCard}>
-        <Typography sx={styles.sidebarTitle}>💬 Recent Replies</Typography>
-        <Box sx={{ textAlign: "center", py: 4 }}>
-          <CircularProgress size={32} />
-        </Box>
-      </Box>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            Recent Replies
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center py-8">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <Box sx={styles.sidebarCard}>
-      <Typography sx={styles.sidebarTitle}>💬 Recent Replies</Typography>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          Recent Replies
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {replies && replies.length > 0 ? (
+          <>
+            <div className="space-y-3">
+              {replies.slice(0, 5).map((reply) => (
+                <div
+                  key={reply.id}
+                  onClick={() => onReplyClick(reply.postId)}
+                  className="p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
+                >
+                  <p className="text-sm line-clamp-2 mb-2">{reply.body}</p>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <span>On:</span>
+                    <span className="font-medium text-foreground truncate">
+                      {reply.postTitle}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-      {replies && replies.length > 0 ? (
-        <>
-          <Box sx={styles.replyList}>
-            {replies.slice(0, 5).map((reply) => (
-              <Box
-                key={reply.id}
-                sx={styles.replyItem}
-                onClick={() => onReplyClick(reply.postId)}
+            {/* {replies.length > 5 && (
+              <Button
+                variant="outline"
+                className="w-full mt-4"
+                onClick={onViewAll}
               >
-                <Typography sx={styles.replyText}>{reply.body}</Typography>
-                <Box sx={styles.replyMeta}>
-                  <Typography sx={styles.replyLabel}>On:</Typography>
-                  <Typography sx={styles.replyPostTitle}>
-                    {reply.postTitle}
-                  </Typography>
-                </Box>
-              </Box>
-            ))}
-          </Box>
-
-          {replies.length > 5 && (
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={onViewAll}
-              sx={styles.viewAllButton}
-            >
-              View All Replies →
-            </Button>
-          )}
-        </>
-      ) : (
-        <Box sx={styles.repliesEmpty}>
-          <Typography>
-            No replies yet.
-            <br />
-            Start helping students by answering their questions!
-          </Typography>
-        </Box>
-      )}
-    </Box>
+                View All Replies →
+              </Button>
+            )} */}
+          </>
+        ) : (
+          <div className="text-center py-6 text-sm text-muted-foreground">
+            <p>No replies yet.</p>
+            <p className="mt-1">
+              Start helping students by answering their questions!
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };

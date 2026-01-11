@@ -2,7 +2,6 @@ export const getErrorMessage = (err, msg = "Something went Wrong") => {
   if (err.response) {
     return err.response.data?.message || err.response.data?.error || msg;
   } else if (err.request) {
-    console.log(err);
     return "Network Error. Check your connection";
   } else {
     return err.message || msg;

@@ -1,8 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
 import useAuthStore from "../store/authStore";
-import Header from "../components/layout/Header/Header";
-import { Box } from "@mui/material";
-import { Footer } from "../components/layout/Footer/Footer";
 import { ROUTES } from "../constants/constants";
 
 const ProtectedRoute = ({ children }) => {
@@ -25,7 +22,7 @@ const ProtectedRoute = ({ children }) => {
       return <Navigate to={`/login?returnUrl=${returnUrl}`} replace />;
     }
   } catch (error) {
-    console.error("Invalid token:", error);
+    console.error("Invalid token");
     logout();
     return <Navigate to="/login" replace />;
   }
@@ -34,13 +31,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to={ROUTES.VERIFY_EMAIL} replace />;
   }
 
-  return (
-    <>
-      <Header />
-      <Box component="main">{children}</Box>
-      <Footer />
-    </>
-  );
+  return children;
 };
 
 export default ProtectedRoute;

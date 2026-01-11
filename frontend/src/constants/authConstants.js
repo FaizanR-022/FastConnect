@@ -4,9 +4,13 @@ export const DEPARTMENTS = [
   { value: "ai", label: "Artificial Intelligence" },
   { value: "ds", label: "Data Science" },
   { value: "cys", label: "Cyber Security" },
-  { value: "ft", label: "FinTech" },
-  { value: "ee", label: "Electrical Engineering" },
+  { value: "ft", label: "Financial Technology" },
   { value: "ba", label: "Business Administration" },
+  { value: "bsba", label: "Business Analytics" },
+  { value: "af", label: "Accounting & Finance" },
+  { value: "ee", label: "Electrical Engineering" },
+  { value: "ce", label: "Civil Engineering" },
+  { value: "ceg", label: "Computer Engineering" },
 ];
 
 export const CAMPUSES = [

@@ -1,23 +1,15 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Stack,
-  Alert,
-  CircularProgress,
-  useTheme,
-} from "@mui/material";
-import { Send, AlertCircle } from "lucide-react";
-import { createReplyStyles } from "../../styles/replyStyles";
+import { AlertCircle } from "lucide-react";
+
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+
 import { createReplySchema } from "../../utils/postValidationSchemas";
+import { toast } from "sonner";
 
 export const CreateReply = ({ currentUser, onSubmit, loading }) => {
-  const theme = useTheme();
-  const styles = createReplyStyles(theme);
   const [error, setError] = useState("");
 
   const {
@@ -39,6 +31,7 @@ export const CreateReply = ({ currentUser, onSubmit, loading }) => {
       setError("");
       await onSubmit(data);
       reset();
+      toast.success("Reply posted successfully!");
     } catch (err) {
       setError(err.message || "Failed to post reply");
     }
@@ -46,77 +39,52 @@ export const CreateReply = ({ currentUser, onSubmit, loading }) => {
 
   if (!isAlumni) {
     return (
-      <Box sx={styles.alumniOnlyMessage}>
-        <AlertCircle size={24} style={{ color: "#d97706", flexShrink: 0 }} />
-        <Typography variant="body2" sx={styles.alumniOnlyText}>
+      <div className="flex items-start gap-3 p-4 mb-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+        <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
+        <p className="text-sm text-amber-800 dark:text-amber-200">
           Only alumni can reply to posts. As a student, you can ask questions by
           creating your own posts!
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   return (
-    <Box sx={styles.createReplyContainer}>
-      <Typography variant="h6" sx={styles.createReplyTitle}>
-        Share Your Insights
-      </Typography>
-
+    <div className="p-6 bg-card border border-primary/50 rounded-lg">
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <div className="p-3 mb-4 text-sm text-destructive bg-destructive/10 rounded-lg">
           {error}
-        </Alert>
+        </div>
       )}
 
-      <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
-        <Stack spacing={2}>
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <div className="space-y-2">
           <Controller
             name="body"
             control={control}
             render={({ field }) => (
-              <TextField
+              <Textarea
                 {...field}
-                label="Your Reply"
-                variant="outlined"
-                fullWidth
-                multiline
+                id="reply-body"
                 rows={4}
-                placeholder="Share your experience and advice..."
-                error={!!errors.body}
-                helperText={
-                  errors.body?.message ||
-                  `${field.value.length}/5000 characters`
-                }
-                sx={styles.replyTextField}
+                placeholder="Share your insights and help answer this question..."
+                className={`resize-none ${
+                  errors.body ? "border-destructive" : ""
+                }`}
               />
             )}
           />
+          {errors.body && (
+            <p className="text-xs text-destructive">{errors.body.message}</p>
+          )}
+        </div>
 
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button
-              variant="text"
-              onClick={() => reset()}
-              sx={styles.cancelReplyButton}
-              disabled={isSubmitting || loading}
-            >
-              Clear
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              startIcon={isSubmitting || loading ? null : <Send size={18} />}
-              sx={styles.submitReplyButton}
-              disabled={isSubmitting || loading}
-            >
-              {isSubmitting || loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Post Reply"
-              )}
-            </Button>
-          </Stack>
-        </Stack>
-      </Box>
-    </Box>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isSubmitting || loading}>
+            {isSubmitting || loading ? "Posting..." : "Post Reply"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };

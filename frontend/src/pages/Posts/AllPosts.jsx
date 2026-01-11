@@ -1,25 +1,20 @@
 import { useState } from "react";
-import {
-  Container,
-  Box,
-  Button,
-  Typography,
-  Alert,
-  useTheme,
-} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { usePosts } from "../../hooks/usePosts";
-import { usePost } from "../../hooks/usePost";
+
+import { Button } from "../../components/ui/button";
 import { PostList } from "../../components/posts/PostList";
 import { CreatePost } from "../../components/posts/CreatePost";
-import { RepliesModal } from "../../components/replies/RepliesModal";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
-import { createPostStyles } from "../../styles/postStyles";
+import { PageContainer, PageHeader } from "../../components/layout";
+
+import { usePosts } from "../../hooks/usePosts";
 import useAuthStore from "../../store/authStore";
+import { ROUTES } from "../../constants/constants";
+import { toast } from "sonner";
 
 export default function AllPosts() {
-  const theme = useTheme();
-  const styles = createPostStyles(theme);
+  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const {
@@ -33,36 +28,18 @@ export default function AllPosts() {
   } = usePosts();
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [repliesModalOpen, setRepliesModalOpen] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState(null);
-
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-
-  const {
-    post: selectedPost,
-    replies,
-    repliesLoading,
-    repliesError,
-    createReply,
-    deleteReply,
-  } = usePost(selectedPostId);
 
   const handleCreatePost = async (data) => {
     await createPost(data);
     setCreateModalOpen(false);
   };
 
+  // Navigate to single post page
   const handleRepliesClick = (postId) => {
-    setSelectedPostId(postId);
-    setRepliesModalOpen(true);
-  };
-
-  const handleCloseRepliesModal = () => {
-    setRepliesModalOpen(false);
-    // To avoid visual glitch
-    setTimeout(() => setSelectedPostId(null), 200);
+    navigate(`${ROUTES.ALL_POSTS}/${postId}`);
   };
 
   const handleDeleteClick = (postId) => {
@@ -78,9 +55,9 @@ export default function AllPosts() {
       await deletePost(postToDelete);
       setDeleteDialogOpen(false);
       setPostToDelete(null);
+      toast.success("Post deleted successfully!");
     } catch (err) {
-      // Error already handled in hook
-      console.error("Delete failed:", err);
+      console.error("Delete failed");
     } finally {
       setDeleting(false);
     }
@@ -100,72 +77,52 @@ export default function AllPosts() {
   };
 
   return (
-    <Box sx={styles.pageContainer}>
-      <Container sx={{ py: { xs: 3, md: 5 }, position: "relative", zIndex: 1 }}>
-        <Box sx={styles.pageHeader}>
-          <Box>
-            <Typography variant="h3" sx={styles.pageTitle}>
-              Q&A Forum
-            </Typography>
-            <Typography variant="body1" sx={styles.pageSubtitle}>
-              Ask questions and get answers from FAST-NUCES alumni
-            </Typography>
-          </Box>
-          <Button
-            variant="contained"
-            startIcon={<Plus size={20} />}
-            onClick={() => setCreateModalOpen(true)}
-            sx={styles.createButton}
-          >
-            New Post
-          </Button>
-        </Box>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-
-        <PostList
-          posts={posts}
-          loading={loading}
-          error={error}
-          currentUserId={user?.id}
-          onRepliesClick={handleRepliesClick}
-          onLike={handleLike}
-          onDelete={handleDeleteClick}
+    <PageContainer childrenClassName="max-w-5xl">
+      {/* Page Header with Action Button */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+        <PageHeader
+          title="Q&A Forum"
+          subtitle="Ask questions, share knowledge, and connect with the community"
+          className="mb-0 py-8"
         />
+        <Button
+          onClick={() => setCreateModalOpen(true)}
+          className="gap-2 shrink-0 my-10"
+        >
+          <Plus className="w-4 h-4" />
+          Ask a Question
+        </Button>
+      </div>
 
-        <CreatePost
-          open={createModalOpen}
-          onClose={() => setCreateModalOpen(false)}
-          onSubmit={handleCreatePost}
-        />
+      {/* Posts List */}
+      <PostList
+        posts={posts}
+        loading={loading}
+        error={error}
+        currentUserId={user?.id}
+        onRepliesClick={handleRepliesClick}
+        onLike={handleLike}
+        onDelete={handleDeleteClick}
+      />
 
-        <RepliesModal
-          open={repliesModalOpen}
-          onClose={handleCloseRepliesModal}
-          post={selectedPost}
-          replies={replies}
-          repliesLoading={repliesLoading}
-          repliesError={repliesError}
-          currentUser={user}
-          onCreateReply={createReply}
-          onDeleteReply={deleteReply}
-        />
+      {/* Create Post Modal */}
+      <CreatePost
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSubmit={handleCreatePost}
+      />
 
-        <ConfirmDialog
-          open={deleteDialogOpen}
-          onClose={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
-          title="Delete Post"
-          message="Are you sure you want to delete this post?"
-          confirmText="Delete"
-          cancelText="Cancel"
-          loading={deleting}
-        />
-      </Container>
-    </Box>
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete Post"
+        message="Are you sure you want to delete this post?"
+        confirmText="Delete"
+        cancelText="Cancel"
+        loading={deleting}
+      />
+    </PageContainer>
   );
 }

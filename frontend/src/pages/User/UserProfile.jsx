@@ -1,66 +1,69 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Box, CircularProgress, Alert, Typography } from "@mui/material";
-import { useTheme } from "@mui/material";
-import { createProfileStyles } from "../../styles/profileStyles";
-import { useUserProfile } from "../../hooks/useUserProfile";
-import { ProfileHeader } from "../../components/profile/ProfileHeader";
-import { ProfileDetails } from "../../components/profile/ProfileDetails";
-import { UserPosts } from "../../components/profile/UserPosts";
-import { ContactModal } from "../../components/profile/ContactModal";
-import useAuthStore from "../../store/authStore";
-import { usePosts } from "../../hooks/usePosts";
-import { usePost } from "../../hooks/usePost";
-import { RepliesModal } from "../../components/replies/RepliesModal";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  MapPin,
+  Calendar,
+  Briefcase,
+  Mail,
+  Phone,
+  Linkedin,
+  Heart,
+  MessageCircle,
+} from "lucide-react";
+
+import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../components/ui/avatar";
+import { Badge } from "../../components/ui/badge";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
+import {
+  PageContainer,
+  PageContent,
+  BackButton,
+  LoadingSpinner,
+  ErrorMessage,
+  EmptyState,
+} from "../../components/layout";
+
+import { RepliesSidebar } from "../../components/dashboard/RepliesSidebar";
+
+import { useUserProfile } from "../../hooks/useUserProfile";
+import { usePosts } from "../../hooks/usePosts";
+import useAuthStore from "../../store/authStore";
+import { ROUTES } from "../../constants/constants";
+import { formatDistanceToNow } from "../../utils/dateHelpers";
+import { formatStudentInfo } from "../../utils/userInfoHelpers";
 
 export default function UserProfile() {
-  const theme = useTheme();
-  const styles = createProfileStyles(theme);
   const { userId } = useParams();
+  const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
 
   const {
     user,
     posts,
+    replies,
     isOwnProfile,
     loading,
     postsLoading,
+    repliesLoading,
     error,
-    postsError,
   } = useUserProfile(userId);
 
-  const { likePost, unlikePost, deletePost } = usePosts();
+  const { deletePost } = usePosts();
 
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-  const [repliesModalOpen, setRepliesModalOpen] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-
-  const {
-    post: selectedPost,
-    replies,
-    repliesLoading,
-    repliesError,
-    createReply,
-    deleteReply,
-  } = usePost(selectedPostId);
-
-  const handleContactClick = () => {
-    setContactModalOpen(true);
-  };
-
-  const handleRepliesClick = (postId) => {
-    setSelectedPostId(postId);
-    setRepliesModalOpen(true);
-  };
-
-  const handleCloseRepliesModal = () => {
-    setRepliesModalOpen(false);
-    setTimeout(() => setSelectedPostId(null), 200);
-  };
 
   const handleDeleteClick = (postId) => {
     setPostToDelete(postId);
@@ -75,9 +78,8 @@ export default function UserProfile() {
       await deletePost(postToDelete);
       setDeleteDialogOpen(false);
       setPostToDelete(null);
-      // Optionally refresh posts here
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error("Delete failed");
     } finally {
       setDeleting(false);
     }
@@ -88,96 +90,319 @@ export default function UserProfile() {
     setPostToDelete(null);
   };
 
-  const handleLike = async (postId, isLiked) => {
-    if (isLiked) {
-      await unlikePost(postId);
-    } else {
-      await likePost(postId);
-    }
+  const getInitials = () => {
+    if (!user) return "";
+    return `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`;
   };
 
+  const formatClassInfo = () => {
+    if (user?.role === "student") {
+      return `Batch ${user.batch} • ${user.campus}`;
+    }
+    return `Class of ${user.graduationYear} • ${user.campus}`;
+  };
+
+  const getLocation = () => {
+    if (user?.role === "alumni" && user.currentCity) {
+      return `${user.currentCity}${
+        user.currentCountry ? `, ${user.currentCountry}` : ""
+      }`;
+    }
+    return `${user?.campus}, Pakistan`;
+  };
+
+  const handleReplyClick = (postId) => {
+    navigate(`${ROUTES.ALL_POSTS}/${postId}`);
+  };
+
+  // Loading State
   if (loading) {
     return (
-      <Box sx={styles.loadingContainer}>
-        <CircularProgress size={60} />
-      </Box>
+      <PageContainer>
+        <LoadingSpinner centered />
+      </PageContainer>
     );
   }
 
+  // Error State
   if (error) {
     return (
-      <Box sx={styles.pageContainer}>
-        <Box sx={{ pt: 8, px: 3 }}>
-          <Alert severity="error">{error}</Alert>
-        </Box>
-      </Box>
+      <PageContainer>
+        <PageContent maxWidth="6xl">
+          <ErrorMessage>{error}</ErrorMessage>
+        </PageContent>
+      </PageContainer>
     );
   }
 
+  // Not Found State
   if (!user) {
     return (
-      <Box sx={styles.pageContainer}>
-        <Box sx={styles.emptyState}>
-          <Typography variant="h5" sx={styles.emptyStateTitle}>
-            User Not Found
-          </Typography>
-          <Typography variant="body1" sx={styles.emptyStateText}>
-            The user you're looking for doesn't exist.
-          </Typography>
-        </Box>
-      </Box>
+      <PageContainer>
+        <EmptyState
+          title="User not found"
+          actionLabel="Back to Directory"
+          onAction={() => navigate(ROUTES.ALUMNI_LIST)}
+        />
+      </PageContainer>
     );
   }
 
   return (
-    <Box sx={styles.pageContainer}>
-      <ProfileHeader
-        user={user}
-        isOwnProfile={isOwnProfile}
-        onContactClick={handleContactClick}
-      />
+    <PageContainer>
+      <PageContent maxWidth="6xl">
+        <BackButton className="mb-6" />
 
-      <ProfileDetails user={user} isOwnProfile={isOwnProfile} />
+        {/* Header Card */}
+        <Card className="mb-8">
+          <CardContent className="pt-8">
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <Avatar className="w-32 h-32">
+                <AvatarImage src={user.profilePicture} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
 
-      <UserPosts
-        posts={posts}
-        loading={postsLoading}
-        error={postsError}
-        user={user}
-        currentUserId={currentUser?.id}
-        onRepliesClick={handleRepliesClick}
-        onLike={handleLike}
-        onDelete={handleDeleteClick}
-      />
+              <div className="flex-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h1 className="text-3xl font-medium mb-2">
+                      {user.firstName} {user.lastName}
+                    </h1>
+                    {user.role === "alumni" && user.currentPosition && (
+                      <p className="text-l text-primary font-medium mb-2">
+                        {user.currentPosition}
+                        {user.currentCompany && ` at ${user.currentCompany}`}
+                      </p>
+                    )}
+                    {user.role === "student" && user.email && (
+                      <p className="text-l text-primary font-medium mb-2">
+                        {formatStudentInfo(user.email)}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">{getLocation()}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">
+                        {user.department} • {formatClassInfo()}
+                      </p>
+                    </div>
+                  </div>
 
-      <ContactModal
-        open={contactModalOpen}
-        onClose={() => setContactModalOpen(false)}
-        user={user}
-      />
+                  <Badge
+                    variant={user.role === "student" ? "default" : "secondary"}
+                  >
+                    {user.role === "student" ? "Student" : "Alumni"}
+                  </Badge>
+                </div>
 
-      <RepliesModal
-        open={repliesModalOpen}
-        onClose={handleCloseRepliesModal}
-        post={selectedPost}
-        replies={replies}
-        repliesLoading={repliesLoading}
-        repliesError={repliesError}
-        currentUser={currentUser}
-        onCreateReply={createReply}
-        onDeleteReply={deleteReply}
-      />
+                {isOwnProfile && (
+                  <Button onClick={() => navigate(ROUTES.PROFILE)}>
+                    Edit Profile
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-      <ConfirmDialog
-        open={deleteDialogOpen}
-        onClose={handleCancelDelete}
-        onConfirm={handleConfirmDelete}
-        title="Delete Post"
-        message="Are you sure you want to delete this post?"
-        confirmText="Delete"
-        cancelText="Cancel"
-        loading={deleting}
-      />
-    </Box>
+        {/* Main Grid - 2:1 ratio */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - 2/3 */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Experience Section (Alumni Only) */}
+            {user.role === "alumni" &&
+              user.previousExperiences &&
+              user.previousExperiences.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-medium">
+                      <Briefcase className="w-5 h-5" />
+                      Experience
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {user.previousExperiences.map((exp, index) => (
+                      <div key={index} className="flex gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Briefcase className="w-6 h-6 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium mb-1">{exp.position}</h4>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            {exp.company}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {exp.from} - {exp.to || "Present"}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+            {/* Skills Section (Alumni Only) */}
+            {user.role === "alumni" &&
+              user.skills &&
+              user.skills.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="font-medium">Skills</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {user.skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary">
+                          {skill.name || skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+            {/* Recent Posts */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-medium">Recent Posts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {postsLoading ? (
+                  <div className="flex justify-center py-4">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  </div>
+                ) : posts.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4">
+                    No posts yet
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {posts.map((post) => (
+                      <div
+                        key={post.id}
+                        className="p-3 rounded-lg border hover:border-primary cursor-pointer transition-colors"
+                        onClick={() =>
+                          navigate(`${ROUTES.ALL_POSTS}/${post.id}`)
+                        }
+                      >
+                        <h4 className="font-medium mb-1 line-clamp-1">
+                          {post.title}
+                        </h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Heart className="w-3 h-3" />
+                            {post.likesCount || 0} likes
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageCircle className="w-3 h-3" />
+                            {post.repliesCount || 0} replies
+                          </span>
+                          <span>{formatDistanceToNow(post.createdAt)}</span>
+                        </div>
+                      </div>
+                    ))}
+                    {/* {posts.length > 5 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => navigate(ROUTES.ALL_POSTS)}
+                      >
+                        See All
+                      </Button>
+                    )} */}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - 1/3 */}
+          <div className="space-y-6">
+            {/* Contact Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-medium">Contact Info</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {(isOwnProfile || user.role === "alumni") && user.email && (
+                  <div className="flex items-start gap-3">
+                    <Mail className="w-4 h-4 mt-1 text-muted-foreground" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Email
+                      </p>
+                      <p className="text-sm break-all">{user.email}</p>
+                    </div>
+                  </div>
+                )}
+
+                {user.phone && (isOwnProfile || user.role === "alumni") && (
+                  <div className="flex items-start gap-3">
+                    <Phone className="w-4 h-4 mt-1 text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Phone
+                      </p>
+                      <p className="text-sm">{user.phone}</p>
+                    </div>
+                  </div>
+                )}
+
+                {user.role === "alumni" && user.linkedin && (
+                  <div className="flex items-start gap-3">
+                    <Linkedin className="w-4 h-4 mt-1 text-muted-foreground" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        LinkedIn
+                      </p>
+                      <a
+                        href={user.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline break-all"
+                      >
+                        View Profile
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {!isOwnProfile && user.role === "student" && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Contact information is private
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {user?.role === "alumni" && (
+              <RepliesSidebar
+                replies={replies}
+                loading={repliesLoading}
+                onReplyClick={handleReplyClick}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Delete Post"
+          message="Are you sure you want to delete this post?"
+          confirmText="Delete"
+          cancelText="Cancel"
+          loading={deleting}
+        />
+      </PageContent>
+    </PageContainer>
   );
 }

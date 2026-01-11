@@ -21,14 +21,12 @@ export const useDashboard = () => {
         setPostsLoading(true);
         setPostsError("");
         const data = await userService.getUserPosts(user.id);
-        console.log(data);
         // data.posts = data.posts.map((post) => {
         //   return {
         //     ...post,
         //     author: { id, firstName, lastName, role, profilePicture },
         //   };
         // });
-        console.log(data + "posts");
         setPosts(data.posts || []);
       } catch (err) {
         setPostsError(err.message);
@@ -50,11 +48,9 @@ export const useDashboard = () => {
         setRepliesError("");
         const data = await userService.getUserReplies(user.id);
         setReplies(data.replies || []);
-        console.log(data + "replies");
       } catch (err) {
         setRepliesError(err.message);
         setReplies([]);
-        console.log("error replies");
       } finally {
         setRepliesLoading(false);
       }
@@ -88,7 +84,6 @@ export const useDashboard = () => {
 
       return { success: true, post: postWithAuthor };
     } catch (err) {
-      console.error("Failed to create post:", err);
       return { success: false, error: err.message };
     }
   };

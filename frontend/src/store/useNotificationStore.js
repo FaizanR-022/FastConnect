@@ -19,7 +19,7 @@ const useNotificationStore = create((set, get) => ({
       });
     } catch (error) {
       set({ error: error.message, loading: false });
-      console.error("Error fetching notifications:", error);
+      console.error("Error fetching notifications");
     }
   },
 
@@ -29,7 +29,7 @@ const useNotificationStore = create((set, get) => ({
 
       set({ unreadCount: data.unreadCount || 0 });
     } catch (error) {
-      console.error("Error fetching unread count:", error);
+      console.error("Error fetching unread count:");
     }
   },
 
@@ -45,7 +45,7 @@ const useNotificationStore = create((set, get) => ({
 
       await notificationService.markAsRead(notificationId);
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      console.error("Error marking notification as read:");
       // Revert on error
       get().fetchNotifications();
       get().fetchUnreadCount();
@@ -62,7 +62,7 @@ const useNotificationStore = create((set, get) => ({
 
       await notificationService.markAllAsRead();
     } catch (error) {
-      console.error("Error marking all as read:", error);
+      console.error("Error marking all as read:");
       // Revert on error
       get().fetchNotifications();
       get().fetchUnreadCount();
@@ -87,7 +87,7 @@ const useNotificationStore = create((set, get) => ({
 
       await notificationService.deleteNotification(notificationId);
     } catch (error) {
-      console.error("Error deleting notification:", error);
+      console.error("Error deleting notification:");
       // Revert on error
       get().fetchNotifications();
       get().fetchUnreadCount();

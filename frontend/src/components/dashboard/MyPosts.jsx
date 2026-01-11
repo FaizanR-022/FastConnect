@@ -1,15 +1,6 @@
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Stack,
-  CircularProgress,
-} from "@mui/material";
-import { Plus } from "lucide-react";
-import { useTheme } from "@mui/material";
-import { createDashboardStyles } from "../../styles/dashboardStyles";
-import { PostCard } from "../posts/PostCard";
+import { Plus, Loader2 } from "lucide-react";
+import { Button } from "../ui/button";
+import PostCard from "../posts/PostCard";
 
 export const MyPosts = ({
   posts,
@@ -20,25 +11,22 @@ export const MyPosts = ({
   onDelete,
   onNewPostClick,
 }) => {
-  const theme = useTheme();
-  const styles = createDashboardStyles(theme);
-
   return (
-    <Container sx={styles.mainContent}>
-      <Box sx={styles.sectionHeader}>
-        <Typography sx={styles.sectionTitle}>
-          My Posts
-          <span style={styles.postCount}>{posts?.length || 0}</span>
-        </Typography>
-      </Box>
+    <div className="flex-1">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-medium">My Posts</h2>
+        <Button onClick={onNewPostClick} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Create Post
+        </Button>
+      </div>
 
       {loading ? (
-        <Box sx={styles.loadingContainer}>
-          <CircularProgress size={60} />
-        </Box>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        </div>
       ) : posts && posts.length > 0 ? (
-        <Stack spacing={2} sx={styles.postsList}>
-          {console.log(posts + "hello")}
+        <div className="space-y-4">
           {posts.map((post) => (
             <PostCard
               key={post.id}
@@ -49,27 +37,21 @@ export const MyPosts = ({
               onDelete={onDelete}
             />
           ))}
-        </Stack>
+        </div>
       ) : (
-        <Box sx={styles.emptyState}>
-          <Box sx={styles.emptyIcon}>✍️</Box>
-          <Typography variant="h6" sx={styles.emptyTitle}>
-            No posts yet
-          </Typography>
-          <Typography variant="body2" sx={styles.emptyText}>
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-card rounded-lg border">
+          <div className="text-5xl mb-4">✍️</div>
+          <h3 className="text-lg font-semibold mb-2">No posts yet</h3>
+          <p className="text-muted-foreground text-sm mb-6 max-w-sm">
             Start a conversation! Ask your first question to connect with alumni
             and get valuable insights.
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<Plus size={18} />}
-            onClick={onNewPostClick}
-            sx={styles.emptyCta}
-          >
+          </p>
+          <Button onClick={onNewPostClick}>
+            <Plus className="w-4 h-4 mr-2" />
             Create Your First Post
           </Button>
-        </Box>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };

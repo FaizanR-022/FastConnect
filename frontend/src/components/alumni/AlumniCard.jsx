@@ -1,20 +1,10 @@
-import {
-  Card,
-  CardContent,
-  Typography,
-  Avatar,
-  Chip,
-  Box,
-  Stack,
-  useTheme,
-} from "@mui/material";
 import { MapPin, Briefcase, GraduationCap, Building2 } from "lucide-react";
-import { createAlumniStyles } from "../../styles/alumniStyles";
+import { Card, CardContent } from "../ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
-export const AlumniCard = ({ alumni, onClick }) => {
-  const theme = useTheme();
-  const styles = createAlumniStyles(theme);
-
+export default function AlumniCard({ alumni, onClick }) {
   // Get previous companies display
   const maxVisiblePrevCompanies = 2;
   const visiblePrevCompanies = alumni.previousCompanies.slice(
@@ -25,105 +15,97 @@ export const AlumniCard = ({ alumni, onClick }) => {
     alumni.previousCompanies.length - maxVisiblePrevCompanies;
 
   return (
-    <Card sx={styles.alumniCard} onClick={() => onClick(alumni)}>
-      <CardContent sx={styles.cardContent}>
+    <Card
+      className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all group h-full flex flex-col"
+      onClick={() => onClick(alumni)}
+    >
+      <CardContent className="p-4 md:p-6 flex flex-col flex-1">
         {/* Header Section */}
-        <Stack direction="row" spacing={1.5} sx={{ mb: { xs: 2, md: 3 } }}>
-          <Avatar sx={styles.avatar} src={alumni?.profilePicture}>
-            {alumni.avatar}
+        <div className="flex items-start gap-3 mb-4">
+          <Avatar className="w-12 h-12">
+            {/* <AvatarImage src={alumni?.profilePicture} /> */}
+            {alumni.profilePicture && (
+              <AvatarImage src={alumni.profilePicture} />
+            )}
+            <AvatarFallback className="bg-primary text-primary-foreground">
+              {alumni.avatar}
+            </AvatarFallback>
           </Avatar>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6" sx={styles.alumniName}>
-              {alumni.name}
-            </Typography>
-            <Typography variant="body2" sx={styles.graduationYear}>
-              Class of {alumni.graduationYear} ({alumni.campus})
-            </Typography>
-          </Box>
-        </Stack>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-medium text-lg truncate">{alumni.name}</h3>
+            <p className="text-sm text-muted-foreground">
+              Class of {alumni.graduationYear} • {alumni.campus}
+            </p>
+          </div>
+        </div>
 
         {/* Info Section */}
-        <Stack
-          spacing={1}
-          sx={{ mb: { xs: 2, md: 3 }, minHeight: { md: "165px" } }}
-        >
+        <div className="space-y-2 mb-4 flex-1">
           {/* Current Position & Company */}
-          <Stack direction="row" spacing={1} alignItems="flex-start">
-            <Box sx={{ mt: 0.25, flexShrink: 0 }}>
-              <Briefcase size={16} color={theme.palette.primary.main} />
-            </Box>
-            <Box>
-              <Typography variant="body2" sx={styles.infoLabel}>
-                {alumni.currentPosition}
-              </Typography>
-              <Typography variant="body2" sx={styles.infoText}>
-                {alumni.company}
-              </Typography>
-            </Box>
-          </Stack>
+          <div className="flex items-start gap-2">
+            <Briefcase className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium">{alumni.currentPosition}</p>
+              <p className="text-sm text-muted-foreground">{alumni.company}</p>
+            </div>
+          </div>
 
           {/* Previous Companies */}
           {alumni.previousCompanies.length > 0 && (
-            <Stack direction="row" spacing={1} alignItems="flex-start">
-              <Box sx={{ mt: 0.25, flexShrink: 0 }}>
-                <Building2 size={16} color={theme.palette.text.secondary} />
-              </Box>
-              <Box>
-                <Typography variant="body2" sx={styles.prevCompaniesLabel}>
-                  Previously at:
-                </Typography>
-                <Typography variant="body2" sx={styles.prevCompaniesText}>
+            <div className="flex items-start gap-2">
+              <Building2 className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm text-muted-foreground">Previously at:</p>
+                <p className="text-sm">
                   {visiblePrevCompanies.map((pc) => pc.companyName).join(", ")}
-                  {remainingPrevCompanies > 0 &&
-                    ` +${remainingPrevCompanies} more`}
-                </Typography>
-              </Box>
-            </Stack>
+                  {remainingPrevCompanies > 0 && (
+                    <span className="text-muted-foreground">
+                      {" "}
+                      +{remainingPrevCompanies} more
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
           )}
 
           {/* Department */}
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Box sx={{ flexShrink: 0 }}>
-              <GraduationCap size={16} color={theme.palette.primary.main} />
-            </Box>
-            <Typography variant="body2" sx={styles.infoText}>
-              {alumni.department}
-            </Typography>
-          </Stack>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-4 h-4 text-primary shrink-0" />
+            <p className="text-sm">{alumni.department}</p>
+          </div>
 
           {/* Location */}
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Box sx={{ flexShrink: 0 }}>
-              <MapPin size={16} color={theme.palette.primary.main} />
-            </Box>
-            <Typography variant="body2" sx={styles.infoText}>
-              {alumni.location}
-            </Typography>
-          </Stack>
-        </Stack>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-primary shrink-0" />
+            <p className="text-sm">{alumni.location}</p>
+          </div>
+        </div>
 
         {/* Expertise Section */}
-        <Box sx={{ mb: { xs: 2, md: 3 } }}>
-          <Typography variant="body2" sx={styles.expertiseLabel}>
-            Expertise:
-          </Typography>
-          <Box sx={styles.expertiseContainer}>
-            {alumni.expertise.map((skill, index) => (
-              <Chip
-                key={index}
-                label={skill}
-                size="small"
-                sx={styles.expertiseChip}
-              />
+        <div className="mb-3">
+          <p className="text-sm text-muted-foreground mb-2">Expertise:</p>
+          <div className="flex flex-wrap gap-1.5">
+            {alumni.expertise.slice(0, 4).map((skill, index) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                {skill}
+              </Badge>
             ))}
-          </Box>
-        </Box>
+            {alumni.expertise.length > 4 && (
+              <Badge variant="outline" className="text-xs">
+                +{alumni.expertise.length - 4}
+              </Badge>
+            )}
+          </div>
+        </div>
 
-        {/* Click to view hint */}
-        {/* <Typography variant="caption" sx={styles.clickHint}>
-          Click to view full profile
-        </Typography> */}
+        {/* View Profile Button - Always at bottom, shows on hover */}
+        <div className="pt-2 mt-auto opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button size="sm" variant="outline" className="w-full">
+            View Profile
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
-};
+}

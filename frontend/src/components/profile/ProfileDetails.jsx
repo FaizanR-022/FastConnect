@@ -1,4 +1,3 @@
-import { Box, Container, Typography, Chip, Divider } from "@mui/material";
 import {
   User,
   Mail,
@@ -10,165 +9,141 @@ import {
   Linkedin,
   Award,
 } from "lucide-react";
-import { useTheme } from "@mui/material";
-import { createProfileStyles } from "../../styles/profileStyles";
+import { Card, CardContent } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Separator } from "../ui/separator";
 
 export const ProfileDetails = ({ user, isOwnProfile }) => {
-  const theme = useTheme();
-  const styles = createProfileStyles(theme);
-
   if (!user) return null;
 
   const DetailItem = ({ icon: Icon, label, value }) => {
     if (!value) return null;
 
     return (
-      <Box sx={styles.detailItem}>
-        <Icon size={20} style={styles.detailIcon} />
-        <Typography sx={styles.detailLabel}>{label}:</Typography>
-        <Typography sx={styles.detailValue}>{value}</Typography>
-      </Box>
+      <div className="flex items-center gap-3 py-2">
+        <Icon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        <span className="text-sm text-muted-foreground min-w-[120px]">{label}:</span>
+        <span className="text-sm font-medium text-foreground">{value}</span>
+      </div>
     );
   };
 
   const ExperienceItem = ({ experience }) => (
-    <Box sx={styles.experienceItem}>
-      <Box sx={styles.experienceHeader}>
-        <Briefcase size={18} style={styles.detailIcon} />
-        <Typography sx={styles.experiencePosition}>
-          {experience.position}
-        </Typography>
-      </Box>
-      <Typography sx={styles.experienceCompany}>
-        {experience.company}
-      </Typography>
-      <Typography sx={styles.experienceYear}>
-        <Calendar size={14} />
-        {experience.from} - {experience.to}
-      </Typography>
-    </Box>
+    <div className="p-3 bg-muted/50 rounded-lg mb-2">
+      <div className="flex items-center gap-2 mb-1">
+        <Briefcase className="h-4 w-4 text-muted-foreground" />
+        <span className="font-semibold text-foreground">{experience.position}</span>
+      </div>
+      <p className="text-sm text-muted-foreground ml-6">{experience.company}</p>
+      <div className="flex items-center gap-1 text-xs text-muted-foreground ml-6 mt-1">
+        <Calendar className="h-3 w-3" />
+        <span>{experience.from} - {experience.to}</span>
+      </div>
+    </div>
   );
 
   return (
-    <Container sx={styles.detailsSection}>
-      <Box sx={styles.detailsCard}>
-        <Typography sx={styles.sectionTitle}>
-          <User size={22} />
-          Profile Information
-        </Typography>
+    <div className="container max-w-4xl mx-auto px-4 py-8">
+      <Card>
+        <CardContent className="p-6">
+          {/* Profile Information Header */}
+          <div className="flex items-center gap-2 mb-6">
+            <User className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Profile Information</h2>
+          </div>
 
-        {user.role === "student" && (
-          <>
-            <DetailItem icon={User} label="Full Name" value={user.fullName} />
-            {isOwnProfile && (
-              <DetailItem icon={Mail} label="Email" value={user.email} />
-            )}
-            <DetailItem
-              icon={GraduationCap}
-              label="Department"
-              value={user.department}
-            />
-            <DetailItem icon={Building2} label="Campus" value={user.campus} />
-            <DetailItem icon={Calendar} label="Batch Year" value={user.batch} />
-          </>
-        )}
+          {user.role === "student" && (
+            <>
+              <DetailItem icon={User} label="Full Name" value={user.fullName} />
+              {isOwnProfile && (
+                <DetailItem icon={Mail} label="Email" value={user.email} />
+              )}
+              <DetailItem icon={GraduationCap} label="Department" value={user.department} />
+              <DetailItem icon={Building2} label="Campus" value={user.campus} />
+              <DetailItem icon={Calendar} label="Batch Year" value={user.batch} />
+            </>
+          )}
 
-        {user.role === "alumni" && (
-          <>
-            <DetailItem icon={User} label="Full Name" value={user.fullName} />
-            <DetailItem
-              icon={GraduationCap}
-              label="Department"
-              value={user.department}
-            />
-            <DetailItem icon={Building2} label="Campus" value={user.campus} />
-            <DetailItem
-              icon={Calendar}
-              label="Graduation Year"
-              value={user.graduationYear}
-            />
+          {user.role === "alumni" && (
+            <>
+              <DetailItem icon={User} label="Full Name" value={user.fullName} />
+              <DetailItem icon={GraduationCap} label="Department" value={user.department} />
+              <DetailItem icon={Building2} label="Campus" value={user.campus} />
+              <DetailItem icon={Calendar} label="Graduation Year" value={user.graduationYear} />
 
-            <Divider sx={{ my: 3 }} />
+              <Separator className="my-6" />
 
-            <Typography sx={styles.sectionTitle}>
-              <Briefcase size={22} />
-              Professional Information
-            </Typography>
+              {/* Professional Information */}
+              <div className="flex items-center gap-2 mb-6">
+                <Briefcase className="h-5 w-5 text-primary" />
+                <h2 className="text-lg font-semibold text-foreground">Professional Information</h2>
+              </div>
 
-            <DetailItem
-              icon={Building2}
-              label="Current Company"
-              value={user.currentCompany}
-            />
-            <DetailItem
-              icon={Briefcase}
-              label="Current Position"
-              value={user.currentPosition}
-            />
-            <DetailItem
-              icon={MapPin}
-              label="Location"
-              value={
-                user.currentCity && user.currentCountry
-                  ? `${user.currentCity}, ${user.currentCountry}`
-                  : user.currentCity || user.currentCountry
-              }
-            />
-            {user.linkedin && (
+              <DetailItem icon={Building2} label="Current Company" value={user.currentCompany} />
+              <DetailItem icon={Briefcase} label="Current Position" value={user.currentPosition} />
               <DetailItem
-                icon={Linkedin}
-                label="LinkedIn"
+                icon={MapPin}
+                label="Location"
                 value={
+                  user.currentCity && user.currentCountry
+                    ? `${user.currentCity}, ${user.currentCountry}`
+                    : user.currentCity || user.currentCountry
+                }
+              />
+              {user.linkedin && (
+                <div className="flex items-center gap-3 py-2">
+                  <Linkedin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  <span className="text-sm text-muted-foreground min-w-[120px]">LinkedIn:</span>
                   <a
                     href={user.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      color: theme.palette.primary.main,
-                      textDecoration: "none",
-                    }}
+                    className="text-sm font-medium text-primary hover:underline"
                   >
                     View Profile
                   </a>
-                }
-              />
-            )}
+                </div>
+              )}
 
-            {user.previousExperiences &&
-              user.previousExperiences.length > 0 && (
+              {/* Previous Experience */}
+              {user.previousExperiences && user.previousExperiences.length > 0 && (
                 <>
-                  <Divider sx={{ my: 3 }} />
-                  <Typography sx={styles.sectionTitle}>
-                    <Award size={22} />
-                    Previous Experience
-                  </Typography>
+                  <Separator className="my-6" />
+                  <div className="flex items-center gap-2 mb-4">
+                    <Award className="h-5 w-5 text-primary" />
+                    <h2 className="text-lg font-semibold text-foreground">Previous Experience</h2>
+                  </div>
                   {user.previousExperiences.map((exp, index) => (
                     <ExperienceItem key={index} experience={exp} />
                   ))}
                 </>
               )}
 
-            {user.skills && user.skills.length > 0 && (
-              <>
-                <Divider sx={{ my: 3 }} />
-                <Typography sx={styles.sectionTitle}>
-                  <Award size={22} />
-                  Skills & Expertise
-                </Typography>
-                <Box sx={styles.skillsContainer}>
-                  {user.skills.map((skill, index) => (
-                    <Chip
-                      key={index}
-                      label={skill.name}
-                      sx={styles.skillChip}
-                    />
-                  ))}
-                </Box>
-              </>
-            )}
-          </>
-        )}
-      </Box>
-    </Container>
+              {/* Skills */}
+              {user.skills && user.skills.length > 0 && (
+                <>
+                  <Separator className="my-6" />
+                  <div className="flex items-center gap-2 mb-4">
+                    <Award className="h-5 w-5 text-primary" />
+                    <h2 className="text-lg font-semibold text-foreground">Skills & Expertise</h2>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {user.skills.map((skill, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-primary/10 text-primary hover:bg-primary/20"
+                      >
+                        {skill.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };

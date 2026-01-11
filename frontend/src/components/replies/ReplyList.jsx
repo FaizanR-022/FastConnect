@@ -1,13 +1,5 @@
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Stack,
-  useTheme,
-} from "@mui/material";
-import { MessageCircle } from "lucide-react";
-import { ReplyCard } from "./ReplyCard";
-import { createReplyStyles } from "../../styles/replyStyles";
+import { MessageCircle, Loader2 } from "lucide-react";
+import ReplyCard from "./ReplyCard";
 
 export const ReplyList = ({
   replies,
@@ -16,69 +8,56 @@ export const ReplyList = ({
   currentUser,
   onDelete,
 }) => {
-  const theme = useTheme();
-  const styles = createReplyStyles(theme);
-
   if (loading) {
     return (
-      <Box sx={styles.replyLoadingContainer}>
-        <CircularProgress size={40} />
-      </Box>
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box sx={styles.replyEmptyState}>
-        <Typography variant="h6" sx={styles.replyEmptyStateTitle}>
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <h3 className="text-lg font-semibold text-destructive mb-2">
           Error Loading Replies
-        </Typography>
-        <Typography variant="body2" sx={styles.replyEmptyStateText}>
-          {error}
-        </Typography>
-      </Box>
+        </h3>
+        <p className="text-sm text-muted-foreground">{error}</p>
+      </div>
     );
   }
 
   if (!replies || replies.length === 0) {
     return (
-      <Box sx={styles.replyEmptyState}>
-        <MessageCircle
-          size={48}
-          color={theme.palette.text.disabled}
-          style={{ marginBottom: 16 }}
-        />
-        <Typography variant="h6" sx={styles.replyEmptyStateTitle}>
-          No replies yet
-        </Typography>
-        <Typography variant="body2" sx={styles.replyEmptyStateText}>
+      <div className="flex flex-col items-center justify-center py-8 text-center">
+        <MessageCircle className="w-12 h-12 text-muted-foreground/50 mb-4" />
+        <h3 className="text-lg font-semibold mb-2">No replies yet</h3>
+        <p className="text-sm text-muted-foreground">
           Be the first alumni to share your insights!
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   return (
-    <Box sx={styles.replySection}>
-      <Box sx={styles.replySectionHeader}>
-        <Typography variant="h6" sx={styles.replySectionTitle}>
-          Replies
-        </Typography>
-        <Typography variant="body2" sx={styles.replyCount}>
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">Replies</h3>
+        <span className="text-sm text-muted-foreground">
           {replies.length} {replies.length === 1 ? "reply" : "replies"}
-        </Typography>
-      </Box>
+        </span>
+      </div>
 
-      <Stack spacing={2}>
+      <div className="space-y-4">
         {replies.map((reply) => (
           <ReplyCard
             key={reply.id}
             reply={reply}
-            currentUser={currentUser}
+            currentUserId={currentUser.id}
             onDelete={onDelete}
           />
         ))}
-      </Stack>
-    </Box>
+      </div>
+    </div>
   );
 };

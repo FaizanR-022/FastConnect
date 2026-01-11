@@ -1,19 +1,14 @@
+import { useState } from "react";
+import { X, Mail, Phone, Copy, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  Box,
-  Typography,
-  IconButton,
-  useTheme,
-  Button,
-} from "@mui/material";
-import { X, Mail, Phone, Copy, Check } from "lucide-react";
-import { createProfileStyles } from "../../styles/profileStyles";
-import { useState } from "react";
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 
 export const ContactModal = ({ open, onClose, user }) => {
-  const theme = useTheme();
-  const styles = createProfileStyles(theme);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
 
@@ -36,48 +31,63 @@ export const ContactModal = ({ open, onClose, user }) => {
   if (!user) return null;
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: styles.modalPaper,
-      }}
-    >
-      <DialogContent sx={styles.modalContent}>
-        <Box sx={styles.modalHeader}>
-          <Typography variant="h5" sx={styles.modalTitle}>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">
             Contact Information
-          </Typography>
-          <IconButton onClick={onClose} sx={styles.closeButton}>
-            <X size={24} />
-          </IconButton>
-        </Box>
+          </DialogTitle>
+        </DialogHeader>
 
-        <Box>
-          <Box sx={styles.contactItem}>
-            <Mail size={24} style={styles.contactIcon} />
-            <Box sx={styles.contactText}>
-              <Typography sx={styles.contactLabel}>Email</Typography>
-              <Typography sx={styles.contactValue}>{user.email}</Typography>
-            </Box>
-            <IconButton onClick={handleCopyEmail} sx={styles.copyButton}>
-              {copiedEmail ? <Check size={20} /> : <Copy size={20} />}
-            </IconButton>
-          </Box>
+        <div className="space-y-4 mt-4">
+          {/* Email */}
+          <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+            <div className="flex-shrink-0">
+              <Mail className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-muted-foreground">Email</p>
+              <p className="font-medium text-foreground truncate">{user.email}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCopyEmail}
+              className="flex-shrink-0"
+            >
+              {copiedEmail ? (
+                <Check className="h-4 w-4 text-green-600" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
 
+          {/* Phone */}
           {user.phone && (
-            <Box sx={styles.contactItem}>
-              <Phone size={24} style={styles.contactIcon} />
-              <Box sx={styles.contactText}>
-                <Typography sx={styles.contactLabel}>Phone</Typography>
-                <Typography sx={styles.contactValue}>{user.phone}</Typography>
-              </Box>
-              <IconButton onClick={handleCopyPhone} sx={styles.copyButton}>
-                {copiedPhone ? <Check size={20} /> : <Copy size={20} />}
-              </IconButton>
-            </Box>
+            <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+              <div className="flex-shrink-0">
+                <Phone className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-muted-foreground">Phone</p>
+                <p className="font-medium text-foreground">{user.phone}</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCopyPhone}
+                className="flex-shrink-0"
+              >
+                {copiedPhone ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           )}
-        </Box>
+        </div>
       </DialogContent>
     </Dialog>
   );

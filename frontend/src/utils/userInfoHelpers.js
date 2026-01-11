@@ -25,3 +25,9 @@ export const formatAlumniInfo = (position, company) => {
   if (!company) return position;
   return `${position} at ${company}`;
 };
+
+export const getInitials = (firstName, lastName) => {
+  const first = firstName?.[0] || "";
+  const last = lastName?.[0] || "";
+  return `${first}${last}`.toUpperCase();
+};

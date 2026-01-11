@@ -1,18 +1,13 @@
-// components/Alumni/AlumniSearchFilters.jsx
-import {
-  Box,
-  Grid,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  InputAdornment,
-  useTheme,
-  Button,
-} from "@mui/material";
 import { Search } from "lucide-react";
-import { createAlumniStyles } from "../../styles/alumniStyles";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export const AlumniSearchFilters = ({
   searchQuery,
@@ -31,9 +26,6 @@ export const AlumniSearchFilters = ({
   onSearch,
   loading,
 }) => {
-  const theme = useTheme();
-  const styles = createAlumniStyles(theme);
-
   const searchAttributes = [
     { value: "name", label: "Name" },
     { value: "company", label: "Company" },
@@ -51,157 +43,114 @@ export const AlumniSearchFilters = ({
   };
 
   return (
-    <Box sx={styles.filtersContainer}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          gap: { xs: 1.5, md: 2 },
-        }}
-      >
-        {/* Search Field with Button */}
-        <Box
-          sx={{
-            flex: { xs: "1 1 100%", md: "1 1 35%" },
-            display: "flex",
-            gap: 1,
-          }}
-        >
-          <TextField
-            fullWidth
-            placeholder={`Search by ${searchAttribute}...`}
-            variant="outlined"
-            value={searchQuery}
-            onChange={onSearchChange}
-            onKeyPress={handleKeyPress}
-            sx={styles.searchField}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search size={20} color={theme.palette.primary.main} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Select
-                    value={searchAttribute}
-                    onChange={onSearchAttributeChange}
-                    variant="standard"
-                    disableUnderline
-                    sx={{
-                      fontSize: "0.875rem",
-                      color: theme.palette.primary.main,
-                      fontWeight: 500,
-                      "& .MuiSelect-select": {
-                        paddingRight: "24px !important",
-                        paddingTop: 0,
-                        paddingBottom: 0,
-                      },
-                      "& .MuiSvgIcon-root": {
-                        color: theme.palette.primary.main,
-                      },
-                    }}
-                  >
-                    {searchAttributes.map((attr) => (
-                      <MenuItem key={attr.value} value={attr.value}>
-                        {attr.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-
-        {/* Filters Container */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row", md: "row" },
-            gap: { xs: 1.5, md: 2 },
-            flex: { xs: "1 1 100%", md: "0 1 65%" },
-            justifyContent: { md: "flex-end" },
-          }}
-        >
-          {/* Department Filter */}
-          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "25%", md: "27%" } }}>
-            <FormControl fullWidth sx={styles.filterSelect}>
-              <InputLabel>Department</InputLabel>
-              <Select
-                value={departmentFilter}
-                label="Department"
-                onChange={onDepartmentChange}
-              >
-                <MenuItem value="all">All Departments</MenuItem>
-                {departments.map((dept) => (
-                  <MenuItem key={dept.value} value={dept.value}>
-                    {dept.label}
-                  </MenuItem>
+    <div className="bg-card border rounded-xl p-4 md:p-6 mb-6">
+      <div className="flex flex-col gap-4">
+        {/* Search Row */}
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Search Field */}
+          <div className="flex-1 flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary" />
+              <Input
+                placeholder={`Search by ${searchAttribute}...`}
+                value={searchQuery}
+                onChange={onSearchChange}
+                onKeyPress={handleKeyPress}
+                className="pl-10"
+              />
+            </div>
+            <Select
+              value={searchAttribute}
+              onValueChange={(val) =>
+                onSearchAttributeChange({ target: { value: val } })
+              }
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {searchAttributes.map((attr) => (
+                  <SelectItem key={attr.value} value={attr.value}>
+                    {attr.label}
+                  </SelectItem>
                 ))}
-              </Select>
-            </FormControl>
-          </Box>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Filters Row */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Department Filter */}
+          <div className="flex-1">
+            <Select
+              value={departmentFilter}
+              onValueChange={(val) =>
+                onDepartmentChange({ target: { value: val } })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All Departments" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.value} value={dept.value}>
+                    {dept.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Campus Filter */}
-          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "25%", md: "23%" } }}>
-            <FormControl fullWidth sx={styles.filterSelect}>
-              <InputLabel>Campus</InputLabel>
-              <Select
-                value={campusFilter}
-                label="Campus"
-                onChange={onCampusChange}
-              >
-                <MenuItem value="all">All Campuses</MenuItem>
+          <div className="flex-1">
+            <Select
+              value={campusFilter}
+              onValueChange={(val) =>
+                onCampusChange({ target: { value: val } })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All Campuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Campuses</SelectItem>
                 {campuses.map((campus) => (
-                  <MenuItem key={campus} value={campus}>
+                  <SelectItem key={campus} value={campus}>
                     {campus}
-                  </MenuItem>
+                  </SelectItem>
                 ))}
-              </Select>
-            </FormControl>
-          </Box>
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Year Filter */}
-          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "25%", md: "20%" } }}>
-            <FormControl fullWidth sx={styles.filterSelect}>
-              <InputLabel>Graduation Year</InputLabel>
-              <Select
-                value={yearFilter}
-                label="Graduation Year"
-                onChange={onYearChange}
-              >
-                <MenuItem value="all">All Years</MenuItem>
-                {years.map((year) => (
-                  <MenuItem key={year} value={year}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "25%", md: "20%" } }}>
-            <Button
-              variant="contained"
-              onClick={onSearch}
-              disabled={loading}
-              sx={{
-                mt: 0.5,
-                minWidth: { xs: "80px", md: "100px" },
-                background: theme.palette.primary.main,
-                "&:hover": {
-                  background: theme.palette.primary.dark,
-                },
-                textTransform: "none",
-                fontWeight: 600,
-                boxShadow: theme.shadows[2],
-              }}
+          <div className="flex-1">
+            <Select
+              value={yearFilter}
+              onValueChange={(val) => onYearChange({ target: { value: val } })}
             >
-              {loading ? "..." : "Search"}
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+              <SelectTrigger>
+                <SelectValue placeholder="All Years" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All batches</SelectItem>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Search Button */}
+          <Button onClick={onSearch} disabled={loading} className="sm:w-auto">
+            {loading ? "..." : "Search"}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };

@@ -1,42 +1,33 @@
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Avatar,
-  Box,
-  Stack,
-  useTheme,
-  Chip,
-} from "@mui/material";
-import { Heart, MessageCircle, Trash2 } from "lucide-react";
-import { createPostStyles } from "../../styles/postStyles";
-import { formatDistanceToNow } from "../../utils/dateHelpers";
-import { ROUTES } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
+import { Heart, MessageCircle, Trash2, Link2 } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { formatDistanceToNow } from "../../utils/dateHelpers";
 import {
   formatAlumniInfo,
   extractRollNumber,
+  getInitials,
 } from "../../utils/userInfoHelpers";
+import { ROUTES } from "../../constants/constants";
 
-export const PostCard = ({
+export default function PostCard({
   post,
   onRepliesClick,
   onLike,
   onDelete,
   currentUserId,
-}) => {
-  const theme = useTheme();
+  showFullBody = false,
+}) {
   const navigate = useNavigate();
-  const styles = createPostStyles(theme);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  console.log(post.author);
-  console.log;
   const isOwnPost = currentUserId === post.author.id;
   const isLiked = post.isLikedByCurrentUser;
-
-  const isTruncated = post.body.length > 200;
+  const isTruncated = !showFullBody && post.body.length > 200;
 
   const handleLikeClick = (e) => {
     e.stopPropagation();
@@ -50,7 +41,28 @@ export const PostCard = ({
 
   const handleRepliesClick = (e) => {
     e.stopPropagation();
-    onRepliesClick(post.id);
+    if (onRepliesClick) {
+      onRepliesClick(post.id);
+    } else {
+      navigate(ROUTES.SINGLE_POST.replace(":id", post.id));
+    }
+  };
+
+  const handleCopyLink = async (e) => {
+    e.stopPropagation();
+
+    const postUrl = `${window.location.origin}${ROUTES.SINGLE_POST.replace(
+      ":id",
+      post.id
+    )}`;
+
+    try {
+      await navigator.clipboard.writeText(postUrl);
+      toast.success("Link copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+      toast.error("Failed to copy link");
+    }
   };
 
   const toggleExpand = (e) => {
@@ -63,8 +75,8 @@ export const PostCard = ({
     navigate(ROUTES.USER_PROFILE.replace(":userId", post.author.id));
   };
 
-  const getInitials = (firstName, lastName) => {
-    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
+  const handlePostClick = () => {
+    navigate(ROUTES.SINGLE_POST.replace(":id", post.id));
   };
 
   const getAuthorInfo = () => {
@@ -82,118 +94,120 @@ export const PostCard = ({
   const authorInfo = getAuthorInfo();
 
   return (
-    <Card sx={styles.postCard}>
-      <CardContent sx={styles.postCardContent}>
-        <Box sx={styles.postHeader}>
+    <Card
+      className="cursor-pointer hover:border-primary/50 transition-colors"
+      onClick={handlePostClick}
+    >
+      <CardHeader className="pb-3 relative">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-4 right-4 h-8 w-8 p-0"
+          onClick={handleCopyLink}
+          title="Copy link"
+        >
+          <Link2 className="w-4 h-4" />
+        </Button>
+
+        <div className="flex items-start gap-3 pr-10">
           <Avatar
+            className="w-10 h-10 cursor-pointer"
             onClick={handleAuthorClick}
-            sx={styles.postAvatar}
-            src={post.author?.profilePicture}
           >
-            {getInitials(post.author.firstName, post.author.lastName)}
+            <AvatarImage src={post.author?.profilePicture} />
+            <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+              {getInitials(post.author.firstName, post.author.lastName)}
+            </AvatarFallback>
           </Avatar>
-          <Box sx={styles.postAuthorInfo}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography
-                variant="body1"
-                sx={styles.postAuthorName}
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="font-medium cursor-pointer hover:underline"
                 onClick={handleAuthorClick}
               >
                 {post.author.firstName} {post.author.lastName}
-              </Typography>
-              <Chip
-                label={post.author.role}
-                size="small"
-                sx={
-                  post.author.role === "student"
-                    ? { ...styles.roleBadge, ...styles.studentBadge }
-                    : { ...styles.roleBadge, ...styles.alumniBadge }
+              </span>
+              <Badge
+                variant={
+                  post.author.role === "student" ? "default" : "secondary"
                 }
-              />
-            </Stack>
-            {authorInfo && (
-              <Typography
-                variant="body2"
-                sx={{
-                  color: theme.palette.primary.main,
-                  fontSize: { xs: "0.75rem", md: "0.813rem" },
-                  fontWeight: 500,
-                  mt: 0.25,
-                }}
+                className="text-xs"
               >
+                {post.author.role === "student" ? "Student" : "Alumni"}
+              </Badge>
+            </div>
+            {authorInfo && (
+              <p className="text-sm text-primary font-medium mt-0.5">
                 {authorInfo}
-              </Typography>
+              </p>
             )}
-            <Typography variant="caption" sx={styles.postTimestamp}>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {formatDistanceToNow(post.createdAt)}
-            </Typography>
-          </Box>
-        </Box>
+            </p>
+          </div>
+        </div>
 
-        {/* Post Content */}
-        <Typography variant="h6" sx={styles.postTitle}>
-          {post.title}
-        </Typography>
+        <CardTitle className="text-xl mt-3">{post.title}</CardTitle>
+      </CardHeader>
 
-        <Box>
-          <Typography
-            variant="body2"
-            sx={isExpanded ? styles.postBodyFull : styles.postBody}
+      <CardContent>
+        <div className="mb-4">
+          <p
+            className={`text-base whitespace-pre-wrap ${
+              !showFullBody && !isExpanded ? "line-clamp-3" : ""
+            }`}
           >
             {post.body}
-          </Typography>
-
+          </p>
           {isTruncated && (
-            <Typography
-              variant="body2"
+            <button
+              className="text-primary font-semibold text-sm mt-1 hover:underline"
               onClick={toggleExpand}
-              sx={{
-                color: theme.palette.primary.main,
-                fontWeight: 600,
-                cursor: "pointer",
-                mt: 0.5,
-                display: "inline-block",
-                "&:hover": {
-                  textDecoration: "underline",
-                },
-              }}
             >
               {isExpanded ? "See less" : "See more..."}
-            </Typography>
+            </button>
           )}
-        </Box>
+        </div>
 
-        <Box sx={styles.postFooter}>
-          <Box sx={styles.postActions}>
-            <Box
-              sx={{
-                ...styles.likeButton,
-                ...(isLiked && styles.likeButtonActive),
-              }}
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`gap-2 ${isLiked ? "text-destructive" : ""}`}
               onClick={handleLikeClick}
             >
-              <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
-              <Typography component="span" sx={styles.actionCount}>
-                {post.likesCount}
-              </Typography>
-            </Box>
+              <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+              <span>{post.likesCount}</span>
+            </Button>
 
-            <Box sx={styles.actionButton} onClick={handleRepliesClick}>
-              <MessageCircle size={18} />
-              <Typography component="span" sx={styles.actionCount}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={handleRepliesClick}
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>
                 {post.repliesCount}{" "}
                 {post.repliesCount === 1 ? "reply" : "replies"}
-              </Typography>
-            </Box>
-          </Box>
+              </span>
+            </Button>
+          </div>
 
           {isOwnPost && (
-            <Box sx={styles.deleteButton} onClick={handleDeleteClick}>
-              <Trash2 size={16} />
-            </Box>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={handleDeleteClick}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
           )}
-        </Box>
+        </div>
       </CardContent>
     </Card>
   );
-};
+}

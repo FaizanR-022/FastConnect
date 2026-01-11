@@ -1,26 +1,29 @@
 import { useState, useEffect } from "react";
-import {
-  Container,
-  Box,
-  Grid,
-  useTheme,
-  CircularProgress,
-  Alert,
-  Pagination,
-} from "@mui/material";
-import { createAlumniStyles } from "../../styles/alumniStyles";
-import { AlumniPageHeader } from "../../components/alumni/AlumniPageHeader";
+import { useNavigate } from "react-router-dom";
+
+import AlumniCard from "../../components/alumni/AlumniCard";
 import { AlumniSearchFilters } from "../../components/alumni/AlumniSearchFilters";
-import { AlumniResultsCounter } from "../../components/alumni/AlumniResultsCounter";
-import { AlumniCard } from "../../components/alumni/AlumniCard";
-import { AlumniEmptyState } from "../../components/alumni/AlumniEmptyState";
-import { AlumniDetailModal } from "../../components/alumni/AlumniDetailModal";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../../components/ui/pagination";
+import {
+  PageContainer,
+  PageHeader,
+  LoadingSpinner,
+  ErrorMessage,
+} from "../../components/layout";
+
 import { alumniService } from "../../services/alumniService";
 import { CAMPUSES, DEPARTMENTS, YEARS } from "../../constants/authConstants";
+import { ROUTES } from "../../constants/constants";
 
 export default function AlumniList() {
-  const theme = useTheme();
-  const styles = createAlumniStyles(theme);
+  const navigate = useNavigate();
 
   // Data states
   const [alumni, setAlumni] = useState([]);
@@ -39,10 +42,6 @@ export default function AlumniList() {
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [campusFilter, setCampusFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
-
-  // Modal state
-  const [selectedAlumni, setSelectedAlumni] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
 
   // Fetch alumni function
   const fetchAlumni = async (page = 1) => {
@@ -95,30 +94,20 @@ export default function AlumniList() {
     fetchAlumni(1); // Reset to page 1 when searching
   };
 
-  // Handle page change
-  const handlePageChange = (event, newPage) => {
+  const handlePageChange = (newPage) => {
     fetchAlumni(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Handle alumni card click
   const handleAlumniClick = (alumni) => {
-    setSelectedAlumni(alumni);
-    setModalOpen(true);
+    navigate(`/user/${alumni.id}`);
   };
 
-  // Handle modal close
-  const handleModalClose = () => {
-    setModalOpen(false);
-    setTimeout(() => setSelectedAlumni(null), 200);
-  };
-
-  // Transform backend alumni data to match AlumniCard expected format
   const transformAlumniForCard = (alumniData) => {
     return alumniData.map((alum) => ({
       id: alum.publicId,
       name: alum.name,
-      email: "", // Not provided by backend for listing
+      email: "",
       phone: null,
       graduationYear: alum.graduationYear.toString(),
       department: alum.department,
@@ -143,90 +132,144 @@ export default function AlumniList() {
   const transformedAlumni = transformAlumniForCard(alumni);
 
   return (
-    <Box sx={styles.pageContainer}>
-      <Container sx={{ py: { xs: 3, md: 5 }, position: "relative", zIndex: 1 }}>
-        <AlumniPageHeader />
-
-        <AlumniSearchFilters
-          searchQuery={searchQuery}
-          searchAttribute={searchAttribute}
-          departmentFilter={departmentFilter}
-          campusFilter={campusFilter}
-          yearFilter={yearFilter}
-          departments={DEPARTMENTS}
-          campuses={CAMPUSES}
-          years={YEARS}
-          onSearchChange={(e) => setSearchQuery(e.target.value)}
-          onSearchAttributeChange={(e) => setSearchAttribute(e.target.value)}
-          onDepartmentChange={(e) => setDepartmentFilter(e.target.value)}
-          onCampusChange={(e) => setCampusFilter(e.target.value)}
-          onYearChange={(e) => setYearFilter(e.target.value)}
-          onSearch={handleSearch}
-          loading={loading}
-        />
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
-
-        {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: "400px",
-            }}
-          >
-            <CircularProgress size={60} />
-          </Box>
-        ) : (
-          <>
-            <AlumniResultsCounter count={pagination.total} />
-
-            <Grid container spacing={{ xs: 2, md: 3 }}>
-              {transformedAlumni.map((alumniItem) => (
-                <Grid item xs={12} sm={6} md={4} key={alumniItem.id}>
-                  <AlumniCard alumni={alumniItem} onClick={handleAlumniClick} />
-                </Grid>
-              ))}
-            </Grid>
-
-            {transformedAlumni.length === 0 && !loading && <AlumniEmptyState />}
-
-            {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  mt: 5,
-                  mb: 2,
-                }}
-              >
-                <Pagination
-                  count={pagination.totalPages}
-                  page={pagination.page}
-                  onChange={handlePageChange}
-                  color="primary"
-                  size="large"
-                  showFirstButton
-                  showLastButton
-                />
-              </Box>
-            )}
-          </>
-        )}
-      </Container>
-
-      {/* Alumni Detail Modal */}
-      <AlumniDetailModal
-        alumni={selectedAlumni}
-        open={modalOpen}
-        onClose={handleModalClose}
+    <PageContainer childrenClassName="max-w-7xl">
+      <PageHeader
+        title="Alumni Directory"
+        subtitle="Connect with FAST-NUCES alumni from around the world"
       />
-    </Box>
+
+      {/* Search and Filters */}
+      <AlumniSearchFilters
+        searchQuery={searchQuery}
+        searchAttribute={searchAttribute}
+        departmentFilter={departmentFilter}
+        campusFilter={campusFilter}
+        yearFilter={yearFilter}
+        departments={DEPARTMENTS}
+        campuses={CAMPUSES}
+        years={YEARS}
+        onSearchChange={(e) => setSearchQuery(e.target.value)}
+        onSearchAttributeChange={(e) => setSearchAttribute(e.target.value)}
+        onDepartmentChange={(e) => setDepartmentFilter(e.target.value)}
+        onCampusChange={(e) => setCampusFilter(e.target.value)}
+        onYearChange={(e) => setYearFilter(e.target.value)}
+        onSearch={handleSearch}
+        loading={loading}
+      />
+
+      {/* Error Message */}
+      <ErrorMessage>{error}</ErrorMessage>
+
+      {/* Loading State */}
+      {loading ? (
+        <LoadingSpinner centered />
+      ) : (
+        <>
+          {/* Results Counter */}
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-muted-foreground">
+              <span className="font-semibold text-foreground">
+                {pagination.total}
+              </span>{" "}
+              alumni found
+            </p>
+          </div>
+
+          {/* Alumni Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {transformedAlumni.map((alumniItem) => (
+              <AlumniCard
+                key={alumniItem.id}
+                alumni={alumniItem}
+                onClick={handleAlumniClick}
+              />
+            ))}
+          </div>
+
+          {/* Empty State */}
+          {transformedAlumni.length === 0 && !loading && (
+            <div className="text-center py-16">
+              <h3 className="text-lg font-semibold mb-2">No alumni found</h3>
+              <p className="text-muted-foreground">
+                Try adjusting your search or filters
+              </p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        handlePageChange(Math.max(1, pagination.page - 1))
+                      }
+                      className={
+                        pagination.page === 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+
+                  {Array.from(
+                    { length: pagination.totalPages },
+                    (_, i) => i + 1
+                  )
+                    .filter((page) => {
+                      // Show first, last, current, and adjacent pages
+                      return (
+                        page === 1 ||
+                        page === pagination.totalPages ||
+                        Math.abs(page - pagination.page) <= 1
+                      );
+                    })
+                    .map((page, index, array) => {
+                      // Add ellipsis if there's a gap
+                      const showEllipsis =
+                        index > 0 && page - array[index - 1] > 1;
+                      return (
+                        <span key={page} className="flex items-center">
+                          {showEllipsis && (
+                            <PaginationItem>
+                              <span className="px-2">...</span>
+                            </PaginationItem>
+                          )}
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => handlePageChange(page)}
+                              isActive={page === pagination.page}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        </span>
+                      );
+                    })}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        handlePageChange(
+                          Math.min(pagination.totalPages, pagination.page + 1)
+                        )
+                      }
+                      className={
+                        pagination.page === pagination.totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </>
+      )}
+    </PageContainer>
   );
 }

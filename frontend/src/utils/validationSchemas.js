@@ -126,6 +126,14 @@ export const alumniSignupSchema = yup.object().shape({
     .notRequired(),
   city: yup.string().required("City is required"),
   country: yup.string().required("Country is required"),
+  linkedin: yup
+    .string()
+    .required("LinkedIn profile is required")
+    .url("Please enter a valid LinkedIn URL")
+    .matches(
+      /^(https?:\/\/)?(www\.)?linkedin\.com\/(in|pub|company)\/.+$/,
+      "Please enter a valid LinkedIn profile URL"
+    ),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")

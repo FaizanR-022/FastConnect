@@ -1,49 +1,43 @@
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  Box,
-  Button,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-  FormHelperText,
-  InputAdornment,
-  IconButton,
-  Alert,
-} from "@mui/material";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
-import { FormContainer } from "../../components/auth/FormContainer";
-import { PageHeader } from "../../components/auth/PageHeader";
-import { createAuthStyles } from "../../styles/authStyles";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+
 import {
   DEPARTMENTS,
   BATCH_YEARS,
   CAMPUSES,
 } from "../../constants/authConstants";
 import { studentSignupSchema } from "../../utils/validationSchemas";
-import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/constants";
-import { useState, useEffect } from "react";
 import useAuthStore from "../../store/authStore";
-import authService from "../../services/authService";
 import { useAuth } from "../../hooks/useAuth";
 import ImageUpload from "../../components/common/ImageUpload";
 
-export default function SignupStudent({ props }) {
+export default function SignupStudent() {
   const { signupStudent, error, clearError } = useAuth();
-  const theme = useTheme();
-  const styles = createAuthStyles(theme);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
 
-  // const [err, setErr] = useState("");
-  // const login = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -76,23 +70,8 @@ export default function SignupStudent({ props }) {
     },
   });
 
-  // const onSubmit = async (data) => {
-  //   try {
-  //     setErr("");
-  //     console.log("Student signup submitted:", data);
-  //     const { token, user } = await authService.signupStudent(data);
-  //     login(user, token);
-  //     reset();
-  //     navigate(ROUTES.ALUMNI_LIST);
-  //   } catch (error) {
-  //     console.error("Signup error:", error);
-  //     setErr(error.message);
-  //   }
-  // };
-
   const onSubmit = async (data) => {
     clearError();
-    console.log(data);
     const result = await signupStudent(data);
     if (result.success) {
       reset();
@@ -100,291 +79,296 @@ export default function SignupStudent({ props }) {
   };
 
   return (
-    <FormContainer name="signupStudent">
-      <PageHeader
-        icon={UserPlus}
-        title="Student Registration"
-        subtitle="Create your account using your @nu.edu.pk email address"
-      />
+    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-8 px-4">
+      <Card className="w-full max-w-lg">
+        <CardHeader className="text-center pb-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <UserPlus className="w-8 h-8 text-primary" />
+          </div>
+          <CardTitle className="text-2xl">Student Registration</CardTitle>
+          <CardDescription>
+            Create your account using your @nu.edu.pk email address
+          </CardDescription>
+        </CardHeader>
 
-      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        <Stack spacing={2}>
-          <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
-            <Box sx={{ flex: 1 }}>
-              {/* <Grid container spacing={2}> */}
-              {/* <Grid item xs={12} sm={6}> */}
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">
+                {error}
+              </div>
+            )}
+
+            {/* First Name & Last Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Controller
+                  name="firstName"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="firstName"
+                      placeholder="John"
+                      className={errors.firstName ? "border-destructive" : ""}
+                    />
+                  )}
+                />
+                {errors.firstName && (
+                  <p className="text-xs text-destructive">
+                    {errors.firstName.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Controller
+                  name="lastName"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="lastName"
+                      placeholder="Doe"
+                      className={errors.lastName ? "border-destructive" : ""}
+                    />
+                  )}
+                />
+                {errors.lastName && (
+                  <p className="text-xs text-destructive">
+                    {errors.lastName.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="email">University Email</Label>
               <Controller
-                name="firstName"
+                name="email"
                 control={control}
                 render={({ field }) => (
-                  <TextField
+                  <Input
                     {...field}
-                    label="First Name"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    error={!!errors.firstName}
-                    helperText={errors.firstName?.message}
+                    id="email"
+                    type="email"
+                    placeholder="your.name@nu.edu.pk"
+                    className={errors.email ? "border-destructive" : ""}
                   />
                 )}
               />
-              {/* </Grid> */}
-              {/* <Grid item xs={12} sm={6}> */}
-            </Box>
-            <Box sx={{ flex: 1 }}>
+              {errors.email ? (
+                <p className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Must be a valid @nu.edu.pk email
+                </p>
+              )}
+            </div>
+
+            {/* Campus */}
+            <div className="space-y-2">
+              <Label>Campus</Label>
               <Controller
-                name="lastName"
+                name="campus"
                 control={control}
                 render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Last Name"
-                    variant="outlined"
-                    fullWidth
-                    size="small"
-                    error={!!errors.lastName}
-                    helperText={errors.lastName?.message}
-                  />
-                )}
-              />
-              {/* </Grid> */}
-              {/* </Grid> */}
-            </Box>
-          </Stack>
-
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="University Email"
-                type="email"
-                variant="outlined"
-                fullWidth
-                size="small"
-                placeholder="your.name@nu.edu.pk"
-                error={!!errors.email}
-                helperText={
-                  errors.email?.message || "Must be a valid @nu.edu.pk email"
-                }
-              />
-            )}
-          />
-
-          <Controller
-            name="campus"
-            control={control}
-            render={({ field }) => (
-              <FormControl fullWidth size="small" error={!!errors.campus}>
-                <InputLabel>Campus</InputLabel>
-                <Select {...field} label="Campus">
-                  {CAMPUSES.map((camp) => (
-                    <MenuItem key={camp} value={camp}>
-                      {camp}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.campus && (
-                  <FormHelperText>{errors.campus.message}</FormHelperText>
-                )}
-              </FormControl>
-            )}
-          />
-
-          {/* <Grid container spacing={2}> */}
-          <Stack spacing={2} direction={{ xs: "column", sm: "row" }}>
-            <Box sx={{ flex: 1 }}>
-              {/* <Grid item xs={12} sm={6}> */}
-              <Controller
-                name="department"
-                control={control}
-                render={({ field }) => (
-                  <FormControl
-                    fullWidth
-                    size="small"
-                    error={!!errors.department}
-                  >
-                    <InputLabel>Department</InputLabel>
-                    <Select {...field} label="Department">
-                      {DEPARTMENTS.map((dept) => (
-                        <MenuItem key={dept.value} value={dept.value}>
-                          {dept.label}
-                        </MenuItem>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger
+                      className={errors.campus ? "border-destructive" : ""}
+                    >
+                      <SelectValue placeholder="Select campus" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CAMPUSES.map((camp) => (
+                        <SelectItem key={camp} value={camp}>
+                          {camp}
+                        </SelectItem>
                       ))}
-                    </Select>
-                    {errors.department && (
-                      <FormHelperText>
-                        {errors.department.message}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
+                    </SelectContent>
+                  </Select>
                 )}
               />
-            </Box>
-            {/* </Grid> */}
-            {/* <Grid item xs={12} sm={6}> */}
-            <Box sx={{ flex: 1 }}>
-              <Controller
-                name="batch"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth size="small" error={!!errors.batch}>
-                    <InputLabel>Batch Year</InputLabel>
-                    <Select {...field} label="Batch Year">
-                      {BATCH_YEARS.map((year) => (
-                        <MenuItem key={year} value={year}>
-                          {year}
-                        </MenuItem>
-                      ))}
+              {errors.campus && (
+                <p className="text-xs text-destructive">
+                  {errors.campus.message}
+                </p>
+              )}
+            </div>
+
+            {/* Department & Batch Year */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Department</Label>
+                <Controller
+                  name="department"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger
+                        className={
+                          errors.department ? "border-destructive" : ""
+                        }
+                      >
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DEPARTMENTS.map((dept) => (
+                          <SelectItem key={dept.value} value={dept.value}>
+                            {dept.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
-                    {errors.batch && (
-                      <FormHelperText>{errors.batch.message}</FormHelperText>
-                    )}
-                  </FormControl>
+                  )}
+                />
+                {errors.department && (
+                  <p className="text-xs text-destructive">
+                    {errors.department.message}
+                  </p>
                 )}
-              />
-            </Box>
-          </Stack>
+              </div>
 
-          {/* <Controller
-            name="profilePicture"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Profile Picture URL (Optional)"
-                variant="outlined"
-                fullWidth
-                size="small"
-                placeholder="https://example.com/your-photo.jpg"
-                error={!!errors.profilePicture}
-                helperText={
-                  errors.profilePicture?.message ||
-                  "Paste a link to your profile picture"
-                }
-              />
-            )}
-          /> */}
-
-          <Controller
-            name="profilePicture"
-            control={control}
-            render={({ field }) => (
-              <ImageUpload
-                value={field.value}
-                onChange={field.onChange}
-                label="Profile Picture (Optional)"
-              />
-            )}
-          />
-
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                variant="outlined"
-                fullWidth
-                size="small"
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label={
-                          showPassword
-                            ? "hide the password"
-                            : "display the password"
-                        }
-                        onClick={handleShowPassword}
-                        edge="end"
+              <div className="space-y-2">
+                <Label>Batch Year</Label>
+                <Controller
+                  name="batch"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger
+                        className={errors.batch ? "border-destructive" : ""}
                       >
-                        {showPassword ? (
-                          <Eye size={16} />
-                        ) : (
-                          <EyeOff size={16} />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )}
-          />
+                        <SelectValue placeholder="Select batch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BATCH_YEARS.map((year) => (
+                          <SelectItem key={year} value={year}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.batch && (
+                  <p className="text-xs text-destructive">
+                    {errors.batch.message}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          <Controller
-            name="confirmPassword"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Confirm Password"
-                type={showConfirmPassword ? "text" : "password"}
-                variant="outlined"
-                fullWidth
-                size="small"
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword?.message}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label={
-                          showConfirmPassword
-                            ? "hide the password"
-                            : "display the password"
-                        }
-                        onClick={handleShowConfirmPassword}
-                        edge="end"
-                      >
-                        {showConfirmPassword ? (
-                          <Eye size={16} />
-                        ) : (
-                          <EyeOff size={16} />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )}
-          />
+            {/* Profile Picture */}
+            <Controller
+              name="profilePicture"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  label="Profile Picture (Optional)"
+                />
+              )}
+            />
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            disabled={isSubmitting}
-            sx={styles.submitButton}
-          >
-            {isSubmitting ? "Creating Account..." : "Create Student Account"}
-          </Button>
+            {/* Password */}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      className={
+                        errors.password ? "border-destructive pr-10" : "pr-10"
+                      }
+                    />
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={handleShowPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-xs text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
 
-          <Typography
-            variant="body2"
-            sx={{ textAlign: "center", color: "text.secondary", mt: 2 }}
-          >
-            Already have an account?{" "}
-            <Box
-              component="span"
-              onClick={() => navigate(ROUTES.LOGIN)}
-              sx={styles.link}
-            >
-              Login here
-            </Box>
-          </Typography>
-        </Stack>
-      </Box>
-    </FormContainer>
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Controller
+                  name="confirmPassword"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      className={
+                        errors.confirmPassword
+                          ? "border-destructive pr-10"
+                          : "pr-10"
+                      }
+                    />
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={handleShowConfirmPassword}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showConfirmPassword ? (
+                    <Eye className="w-4 h-4" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-xs text-destructive">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Creating Account..." : "Create Student Account"}
+            </Button>
+
+            <p className="text-sm text-center text-muted-foreground">
+              Already have an account?{" "}
+              <span
+                onClick={() => navigate(ROUTES.LOGIN)}
+                className="text-primary hover:underline cursor-pointer"
+              >
+                Login here
+              </span>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

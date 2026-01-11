@@ -69,6 +69,12 @@ export const API_ENDPOINTS = {
   GET_POST_REPLIES: "/posts/:id/replies",
   CREATE_REPLY: "/posts/:id/replies",
   DELETE_REPLY: "/replies/:id",
+
+  // Feedback
+  CREATE_FEEDBACK: "/feedback",
+  GET_MY_FEEDBACKS: "/feedback/my-feedbacks",
+  GET_ALL_FEEDBACKS: "/feedback/all",
+  UPDATE_FEEDBACK_STATUS: "/feedback/:id/status",
 };
 
 export const EMAIL_DOMAINS = {

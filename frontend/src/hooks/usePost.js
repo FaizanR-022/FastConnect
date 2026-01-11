@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { postService } from "../services/postService";
 import { replyService } from "../services/replyService";
+import { toast } from "sonner";
 
 export const usePost = (postId) => {
   const [post, setPost] = useState(null);
@@ -56,6 +57,7 @@ export const usePost = (postId) => {
     try {
       setRepliesError("");
       await replyService.deleteReply(replyId);
+      toast.success("Reply deleted successfully!");
       setReplies((prevReplies) =>
         prevReplies.filter((reply) => reply.id !== replyId)
       );

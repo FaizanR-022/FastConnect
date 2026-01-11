@@ -1,14 +1,7 @@
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  Avatar,
-  Typography,
-  CircularProgress,
-  IconButton,
-  Stack,
-} from "@mui/material";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
 import api from "../../services/api";
 
 function ImageUpload({ value, onChange, label = "Profile Picture" }) {
@@ -58,7 +51,6 @@ function ImageUpload({ value, onChange, label = "Profile Picture" }) {
       // Update parent with Cloudinary URL
       onChange(response.data.data.url);
     } catch (err) {
-      console.error("Upload error:", err);
       setError(err.response?.data?.message || "Failed to upload image");
       setPreview(value || null); // Revert to original on error
     } finally {
@@ -73,103 +65,70 @@ function ImageUpload({ value, onChange, label = "Profile Picture" }) {
   };
 
   return (
-    <Box>
-      <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-        {label}
-      </Typography>
+    <div>
+      <p className="text-sm font-medium mb-2">{label}</p>
 
-      <Stack direction="row" alignItems="center" spacing={2}>
+      <div className="flex items-center gap-4">
         {/* Avatar Preview */}
-        <Box sx={{ position: "relative" }}>
-          <Avatar
-            src={preview}
-            sx={{
-              width: 80,
-              height: 80,
-              border: "2px solid",
-              borderColor: "divider",
-            }}
-          />
+        <div className="relative">
+          <Avatar className="w-20 h-20 border-2 border-border">
+            <AvatarImage src={preview} />
+            <AvatarFallback className="text-lg">?</AvatarFallback>
+          </Avatar>
+
           {uploading && (
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                bgcolor: "rgba(0,0,0,0.5)",
-                borderRadius: "50%",
-              }}
-            >
-              <CircularProgress size={30} sx={{ color: "white" }} />
-            </Box>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+              <Loader2 className="w-8 h-8 text-white animate-spin" />
+            </div>
           )}
+
           {preview && !uploading && (
-            <IconButton
-              size="small"
+            <button
+              type="button"
               onClick={handleRemove}
-              sx={{
-                position: "absolute",
-                top: -5,
-                right: -5,
-                bgcolor: "background.paper",
-                boxShadow: 1,
-                "&:hover": { bgcolor: "error.light", color: "white" },
-              }}
+              className="absolute -top-1 -right-1 p-1 bg-background border border-border rounded-full shadow-sm hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-colors"
             >
-              <X size={16} />
-            </IconButton>
+              <X className="w-4 h-4" />
+            </button>
           )}
-        </Box>
+        </div>
 
         {/* Upload Button */}
-        <Box sx={{ flex: 1 }}>
+        <div className="flex-1">
           <Button
-            variant="outlined"
-            component="label"
-            startIcon={<Upload size={18} />}
+            type="button"
+            variant="outline"
+            size="sm"
             disabled={uploading}
-            size="small"
+            asChild
           >
-            {uploading
-              ? "Uploading..."
-              : preview
-              ? "Change Photo"
-              : "Upload Photo"}
-            <input
-              type="file"
-              hidden
-              accept="image/jpeg,image/png,image/jpg,image/webp"
-              onChange={handleFileSelect}
-              disabled={uploading}
-            />
+            <label className="cursor-pointer">
+              <Upload className="w-4 h-4 mr-2" />
+              {uploading
+                ? "Uploading..."
+                : preview
+                ? "Change Photo"
+                : "Upload Photo"}
+              <input
+                type="file"
+                className="hidden"
+                accept="image/jpeg,image/png,image/jpg,image/webp"
+                onChange={handleFileSelect}
+                disabled={uploading}
+              />
+            </label>
           </Button>
 
-          {error && (
-            <Typography
-              variant="caption"
-              color="error"
-              sx={{ display: "block", mt: 0.5 }}
-            >
-              {error}
-            </Typography>
-          )}
+          {error && <p className="text-xs text-destructive mt-1">{error}</p>}
 
           {!error && (
-            <Typography
-              variant="caption"
-              sx={{ display: "block", mt: 0.5, color: "text.secondary" }}
-            >
+            <p className="text-xs text-muted-foreground mt-1">
               Max 5MB • JPG, PNG, WEBP
-            </Typography>
+            </p>
           )}
-        </Box>
-      </Stack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }
 

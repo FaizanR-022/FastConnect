@@ -1,68 +1,58 @@
-import { Box, CircularProgress, Typography, Stack } from "@mui/material";
-import { MessageSquare } from "lucide-react";
-import { PostCard } from "./PostCard";
-import { createPostStyles } from "../../styles/postStyles";
-import { useTheme } from "@mui/material";
+import { Loader2, MessageSquare } from "lucide-react";
+import PostCard from "./PostCard";
 
 export const PostList = ({
   posts,
   loading,
   error,
-  currentUser,
+  currentUserId,
   onRepliesClick,
   onLike,
   onDelete,
 }) => {
-  const theme = useTheme();
-  const styles = createPostStyles(theme);
-
   if (loading) {
     return (
-      <Box sx={styles.loadingContainer}>
-        <CircularProgress size={60} />
-      </Box>
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box sx={styles.emptyState}>
-        <Typography variant="h6" sx={styles.emptyStateTitle}>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <h3 className="text-lg font-semibold text-destructive mb-2">
           Error Loading Posts
-        </Typography>
-        <Typography variant="body2" sx={styles.emptyStateText}>
-          {error}
-        </Typography>
-      </Box>
+        </h3>
+        <p className="text-sm text-muted-foreground">{error}</p>
+      </div>
     );
   }
 
   if (!posts || posts.length === 0) {
     return (
-      <Box sx={styles.emptyState}>
-        <MessageSquare size={64} color={theme.palette.text.disabled} />
-        <Typography variant="h6" sx={{ ...styles.emptyStateTitle, mt: 2 }}>
-          No posts yet
-        </Typography>
-        <Typography variant="body2" sx={styles.emptyStateText}>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <MessageSquare className="w-16 h-16 text-muted-foreground/50 mb-4" />
+        <h3 className="text-lg font-semibold mb-2">No posts yet</h3>
+        <p className="text-sm text-muted-foreground">
           Be the first to start a discussion!
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   return (
-    <Stack spacing={2}>
+    <div className="space-y-4">
       {posts.map((post) => (
         <PostCard
           key={post.id}
           post={post}
-          currentUser={currentUser}
+          currentUserId={currentUserId}
           onRepliesClick={onRepliesClick}
           onLike={onLike}
           onDelete={onDelete}
         />
       ))}
-    </Stack>
+    </div>
   );
 };

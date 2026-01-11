@@ -1,11 +1,13 @@
-import { Box, Avatar, Typography } from "@mui/material";
-import { useTheme } from "@mui/material";
-import { createDashboardStyles } from "../../styles/dashboardStyles";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Card, CardContent } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import useAuthStore from "../../store/authStore";
+import { ROUTES } from "../../constants/constants";
 
 export const UserInfoCard = () => {
-  const theme = useTheme();
-  const styles = createDashboardStyles(theme);
+  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const getInitials = () => {
@@ -13,41 +15,67 @@ export const UserInfoCard = () => {
     return `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`;
   };
 
-  const getUserDetails = () => {
-    if (!user) return [];
-
-    const details = [
-      { icon: "🎓", text: user.department },
-      { icon: "🏛️", text: user.campus },
-    ];
-
-    if (user.role === "student") {
-      details.push({ icon: "📅", text: `Batch ${user.batch}` });
-    } else if (user.role === "alumni") {
-      details.push({ icon: "📅", text: `Class of ${user.graduationYear}` });
-    }
-
-    return details;
-  };
-
   return (
-    <Box sx={styles.userInfo}>
-      <Avatar sx={styles.userAvatar} src={user?.profilePicture}>
-        {getInitials()}
-      </Avatar>
+    <Card>
+      <CardContent className="pt-6">
+        <div className="text-center">
+          <Avatar className="w-24 h-24 mx-auto mb-4">
+            <AvatarImage src={user?.profilePicture} />
+            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+              {getInitials()}
+            </AvatarFallback>
+          </Avatar>
 
-      <Typography sx={styles.userName}>
-        {user?.firstName} {user?.lastName}
-      </Typography>
+          <h3 className="text-xl font-medium mb-1">
+            {user?.firstName} {user?.lastName}
+          </h3>
+          <p className="text-sm text-muted-foreground mb-2">{user?.email}</p>
+          <Badge variant={user?.role === "student" ? "default" : "secondary"}>
+            {user?.role === "student" ? "Student" : "Alumni"}
+          </Badge>
 
-      <Box sx={styles.userDetailsList}>
-        {getUserDetails().map((detail, index) => (
-          <Box key={index} sx={styles.userDetailItem}>
-            <span style={styles.detailIcon}>{detail.icon}</span>
-            <span>{detail.text}</span>
-          </Box>
-        ))}
-      </Box>
-    </Box>
+          <div className="mt-4 pt-4 border-t space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Department:</span>
+              <span>{user?.department}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Campus:</span>
+              <span>{user?.campus}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                {user?.role === "student" ? "Batch:" : "Graduated:"}
+              </span>
+              <span>
+                {user?.role === "student" ? user?.batch : user?.graduationYear}
+              </span>
+            </div>
+            {user?.role === "alumni" && user?.currentCompany && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Company:</span>
+                <span className="truncate ml-2">{user?.currentCompany}</span>
+              </div>
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            className="w-full mt-4"
+            // onClick={() => navigate(`/user/${user?.publicId || user?.id}`)}
+            onClick={() =>
+              navigate(
+                ROUTES.USER_PROFILE.replace(
+                  ":userId",
+                  user?.publicId || user?.id
+                )
+              )
+            }
+          >
+            View Profile
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

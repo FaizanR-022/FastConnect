@@ -1,14 +1,5 @@
-import {
-  Box,
-  Container,
-  Typography,
-  CircularProgress,
-  Stack,
-} from "@mui/material";
-import { MessageSquare } from "lucide-react";
-import { useTheme } from "@mui/material";
-import { createProfileStyles } from "../../styles/profileStyles";
-import { PostCard } from "../posts/PostCard";
+import { MessageSquare, Loader2 } from "lucide-react";
+import PostCard from "../posts/PostCard";
 
 export const UserPosts = ({
   posts,
@@ -20,43 +11,40 @@ export const UserPosts = ({
   onLike,
   onDelete,
 }) => {
-  const theme = useTheme();
-  const styles = createProfileStyles(theme);
-
   return (
-    <Container sx={styles.postsSection}>
-      <Box sx={styles.postsHeader}>
-        <Typography sx={styles.postsTitle}>Posts</Typography>
-        <Typography sx={styles.postsCount}>
+    <div className="container max-w-4xl mx-auto px-4 pb-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-foreground">Posts</h2>
+        <span className="text-sm text-muted-foreground">
           {posts.length} {posts.length === 1 ? "post" : "posts"}
-        </Typography>
-      </Box>
+        </span>
+      </div>
 
+      {/* Content */}
       {loading ? (
-        <Box sx={styles.loadingContainer}>
-          <CircularProgress size={60} />
-        </Box>
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
       ) : error ? (
-        <Box sx={styles.emptyState}>
-          <Typography variant="h6" sx={styles.emptyStateTitle}>
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Error Loading Posts
-          </Typography>
-          <Typography variant="body2" sx={styles.emptyStateText}>
-            {error}
-          </Typography>
-        </Box>
+          </h3>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </div>
       ) : posts.length === 0 ? (
-        <Box sx={styles.emptyState}>
-          <MessageSquare size={64} color={theme.palette.text.disabled} />
-          <Typography variant="h6" sx={{ ...styles.emptyStateTitle, mt: 2 }}>
+        <div className="text-center py-12">
+          <MessageSquare className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             No posts yet
-          </Typography>
-          <Typography variant="body2" sx={styles.emptyStateText}>
+          </h3>
+          <p className="text-sm text-muted-foreground">
             {user?.firstName} hasn't posted anything yet.
-          </Typography>
-        </Box>
+          </p>
+        </div>
       ) : (
-        <Stack spacing={2}>
+        <div className="space-y-4">
           {posts.map((post) => (
             <PostCard
               key={post.id}
@@ -76,8 +64,8 @@ export const UserPosts = ({
               onDelete={onDelete}
             />
           ))}
-        </Stack>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
