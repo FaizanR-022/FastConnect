@@ -231,7 +231,13 @@ export default function Login() {
 
               <div className="pt-8 border-t">
                 <p className="text-sm text-muted-foreground">
-                  Developed by a Fastian for Fastians.
+                  If you face any error/issue, feel free to{" "}
+                  <a
+                    href="mailto:faizanfaisal05@gmail.com"
+                    className="text-primary hover:underline"
+                  >
+                    contact us
+                  </a>
                 </p>
               </div>
             </div>

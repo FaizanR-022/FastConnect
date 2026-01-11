@@ -10,6 +10,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import digestRoutes from "./routes/digestRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
+import healthRoutes from "./routes/healthRoutes.js";
 import { sequelize } from "./config/database.js";
 import { syncDatabase } from "./models/index.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -29,12 +30,15 @@ const app = express();
 app.set("trust proxy", 1);
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use("/api", globalLimiter);
-app.use("/api", verifyApiKey);
-
 app.get("/", (req, res) => {
   res.send("FastConnect Backend Running");
 });
+
+app.use("/", healthRoutes); // Health check endpoint at /health
+app.use("/api/digest", digestRoutes); // NEW: Daily digest endpoint (no rate limit - called by Vercel cron)
+
+app.use("/api", globalLimiter);
+app.use("/api", verifyApiKey);
 
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/user", apiLimiter, userRoutes);
@@ -44,7 +48,6 @@ app.use("/api/replies", apiLimiter, replyRoutes);
 app.use("/api/upload", apiLimiter, uploadRoutes);
 app.use("/api/notifications", apiLimiter, notificationRoutes);
 app.use("/api/feedback", apiLimiter, feedbackRoutes);
-app.use("/api/digest", digestRoutes); // NEW: Daily digest endpoint (no rate limit - called by Vercel cron)
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
