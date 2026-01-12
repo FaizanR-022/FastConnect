@@ -1,34 +1,26 @@
-import nodemailer from "nodemailer";
+import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-export const transporter = nodemailer.createTransport({
-  // service: "gmail", // (handles host/port automatically)
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
+// Brevo API configuration
+const brevoApiKey = process.env.BREVO_API_KEY;
+const brevoApiUrl = "https://api.brevo.com/v3/smtp/email";
 
-  // Extended timeouts for Render
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
-
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error("Email configuration error:", error);
-  } else {
-    console.log(" Email server is working");
+// Test Brevo configuration
+const testBrevo = async () => {
+  try {
+    if (!process.env.BREVO_API_KEY) {
+      console.error("BREVO_API_KEY not found in environment variables");
+      return;
+    }
+    console.log("Brevo is configured and ready to send emails (300/day limit)");
+  } catch (error) {
+    console.error("Brevo configuration error:", error);
   }
-});
+};
+
+testBrevo();
 
 export const emailTemplates = {
   sendOTP: (otp, expiryMinutes = 5) => ({
@@ -134,19 +126,50 @@ FastConnect Team
 
 export const sendEmail = async (to, subject, html, text) => {
   try {
-    const info = await transporter.sendMail({
-      from:
-        process.env.EMAIL_FROM || `"FastConnect" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-      text,
-    });
+    const response = await axios.post(
+      brevoApiUrl,
+      {
+        sender: {
+          name: "FastConnect",
+          email: process.env.BREVO_SENDER_EMAIL,
+        },
+        to: [
+          {
+            email: to,
+          },
+        ],
+        subject: subject,
+        htmlContent: html,
+        textContent: text,
+      },
+      {
+        headers: {
+          "api-key": brevoApiKey,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
 
-    console.log("Email sent:", info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log(
+      "✅ Email sent successfully via Brevo:",
+      response.data.messageId
+    );
+    return { success: true, messageId: response.data.messageId };
   } catch (error) {
-    console.error("Email send error:", error);
+    console.error(
+      "❌ Email send error:",
+      error.response?.data || error.message
+    );
     return { success: false, error: error.message };
   }
+};
+
+// For backward compatibility with existing code
+export const transporter = {
+  verify: (callback) => {
+    testBrevo()
+      .then(() => callback(null, true))
+      .catch(callback);
+  },
 };
