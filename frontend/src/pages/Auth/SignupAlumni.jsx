@@ -523,7 +523,10 @@ export default function SignupAlumni() {
                               </SelectTrigger>
                               <SelectContent>
                                 {YEARS.map((year) => (
-                                  <SelectItem key={year} value={year}>
+                                  <SelectItem
+                                    key={year}
+                                    value={year.toString()}
+                                  >
                                     {year}
                                   </SelectItem>
                                 ))}
@@ -559,7 +562,10 @@ export default function SignupAlumni() {
                               </SelectTrigger>
                               <SelectContent>
                                 {YEARS.map((year) => (
-                                  <SelectItem key={year} value={year}>
+                                  <SelectItem
+                                    key={year}
+                                    value={year.toString()}
+                                  >
                                     {year}
                                   </SelectItem>
                                 ))}
