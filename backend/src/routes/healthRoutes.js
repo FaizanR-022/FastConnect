@@ -4,7 +4,7 @@ import express from "express";
 // (Not added in routes yet)
 const router = express.Router();
 
-router.get("/health", (req, res) => {
+router.get("/", (req, res) => {
   // res.json({
   //   success: true,
   //   message: "Server is running!",
