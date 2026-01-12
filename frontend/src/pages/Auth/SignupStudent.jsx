@@ -248,7 +248,7 @@ export default function SignupStudent() {
                       </SelectTrigger>
                       <SelectContent>
                         {BATCH_YEARS.map((year) => (
-                          <SelectItem key={year} value={year}>
+                          <SelectItem key={year} value={year.toString()}>
                             {year}
                           </SelectItem>
                         ))}
