@@ -10,13 +10,10 @@ router.get("/health", (req, res) => {
   //   message: "Server is running!",
   //   timestamp: new Date().toISOString(),
   // });
-  res.json({
-    success: true,
-    message: "Server is running!",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || "development",
-  });
+  // res.json({
+  //   success: true,
+  // });
+  res.status(200).send("OK");
 });
 
 export default router;

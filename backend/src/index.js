@@ -22,6 +22,7 @@ import {
 import { corsOptions } from "./middleware/corsMiddleware.js";
 import { verifyApiKey } from "./middleware/apiKeyMiddleware.js";
 import { initializeCronJobs } from "./jobs/cronJobs.js";
+import { autoSeedStaticData } from "./scripts/seedStaticData.js";
 
 dotenv.config();
 
@@ -60,6 +61,8 @@ app.listen(PORT, async () => {
 
     await syncDatabase();
     console.log("Synced successfully!");
+
+    await autoSeedStaticData();
 
     initializeCronJobs();
   } catch (error) {
