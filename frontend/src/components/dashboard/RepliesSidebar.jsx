@@ -40,10 +40,18 @@ export const RepliesSidebar = ({
                   onClick={() => onReplyClick(reply.postId)}
                   className="p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
                 >
-                  <p className="text-sm line-clamp-2 mb-2">{reply.body}</p>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <span>On:</span>
-                    <span className="font-medium text-foreground truncate">
+                  <p
+                    className="text-sm line-clamp-2 mb-2"
+                    style={{
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    {reply.body}
+                  </p>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground min-w-0">
+                    <span className="flex-shrink-0">On:</span>
+                    <span className="font-medium text-foreground truncate min-w-0">
                       {reply.postTitle}
                     </span>
                   </div>
