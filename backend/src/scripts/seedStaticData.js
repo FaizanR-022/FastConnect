@@ -56,7 +56,7 @@
 
 export async function autoSeedStaticData() {
   try {
-    const { Department, Campus } = await import("./models/index.js");
+    const { Department, Campus } = await import("../models/index.js");
 
     // Check if data already exists
     const deptCount = await Department.count();
