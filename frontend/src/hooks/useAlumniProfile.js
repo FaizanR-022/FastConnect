@@ -64,7 +64,7 @@ export const useAlumniProfile = () => {
           currentPosition: data.user.currentPosition || "",
           currentCity: data.user.currentCity || "",
           currentCountry: data.user.currentCountry || "",
-          linkedin: data.user.linkedIn || "",
+          linkedin: data.user.linkedin || "",
           profilePicture: data.user.profilePicture || "",
           previousExperiences: data.user.previousExperiences || [],
           skills: data.user.skills || [],

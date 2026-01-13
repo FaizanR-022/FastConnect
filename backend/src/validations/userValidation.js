@@ -59,7 +59,7 @@ export const updateAlumniProfileSchema = yup.object().shape({
     )
     .optional(),
 
-  linkedin: yup.string().url("Please enter a valid URL").nullable().optional(),
+  linkedin: yup.string().nullable().optional(),
 
   profilePicture: yup
     .string()
