@@ -33,7 +33,7 @@ export default function AlumniList() {
     page: 1,
     totalPages: 1,
     total: 0,
-    limit: 12,
+    limit: 30,
   });
 
   // Filter states
