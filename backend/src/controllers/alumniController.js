@@ -50,7 +50,7 @@ export const getAllAlumni = asyncHandler(async (req, res) => {
     campus,
     graduationYear,
     sortBy = "graduationYear",
-    sortOrder = "desc",
+    sortOrder = "asc",
   } = req.query;
 
   // Validate pagination
