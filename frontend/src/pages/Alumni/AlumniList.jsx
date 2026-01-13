@@ -59,7 +59,7 @@ export default function AlumniList() {
         campus: campusFilter !== "all" ? campusFilter : undefined,
         graduationYear: yearFilter !== "all" ? yearFilter : undefined,
         sortBy: "graduationYear",
-        sortOrder: "desc",
+        sortOrder: "asc",
       };
 
       // Remove undefined values
