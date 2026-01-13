@@ -17,7 +17,7 @@ const Country = sequelize.define(
 
     country_code: {
       type: DataTypes.STRING,
-      unique: true,
+      // unique: true,
       allowNull: false,
     },
   },

@@ -5,15 +5,21 @@ export const updateStudentProfileSchema = yup.object().shape({
     .string()
     .required("First name is required")
     .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must not exceed 50 characters"),
+    .max(50, "First name must not exceed 50 characters")
+    .trim(),
 
   lastName: yup
     .string()
     .required("Last name is required")
     .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must not exceed 50 characters"),
+    .max(50, "Last name must not exceed 50 characters")
+    .trim(),
 
-  profilePicture: yup.string().url("Please enter a valid URL").notRequired(),
+  profilePicture: yup
+    .string()
+    .url("Please enter a valid URL")
+    .notRequired()
+    .trim(),
 });
 
 export const updateAlumniProfileSchema = yup.object().shape({
@@ -21,13 +27,15 @@ export const updateAlumniProfileSchema = yup.object().shape({
     .string()
     .required("First name is required")
     .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must not exceed 50 characters"),
+    .max(50, "First name must not exceed 50 characters")
+    .trim(),
 
   lastName: yup
     .string()
     .required("Last name is required")
     .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must not exceed 50 characters"),
+    .max(50, "Last name must not exceed 50 characters")
+    .trim(),
 
   phone: yup
     .string()
@@ -39,33 +47,40 @@ export const updateAlumniProfileSchema = yup.object().shape({
     .matches(
       /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/,
       "Please enter a valid phone number"
-    ),
+    )
+    .trim(),
 
   currentCompany: yup
     .string()
     .required("Current company is required")
-    .min(2, "Company name must be at least 2 characters"),
+    .min(2, "Company name must be at least 2 characters")
+    .trim(),
 
   currentPosition: yup
     .string()
     .required("Current position is required")
-    .min(2, "Position must be at least 2 characters"),
+    .min(2, "Position must be at least 2 characters")
+    .trim(),
 
-  currentCity: yup.string().required("City is required"),
+  currentCity: yup.string().required("City is required").trim(),
 
-  currentCountry: yup.string().required("Country is required"),
+  currentCountry: yup.string().required("Country is required").trim(),
 
-  linkedin: yup.string().url("Please enter a valid URL").notRequired(),
+  linkedin: yup.string().url("Please enter a valid URL").notRequired().trim(),
 
-  profilePicture: yup.string().url("Please enter a valid URL").notRequired(),
+  profilePicture: yup
+    .string()
+    .url("Please enter a valid URL")
+    .notRequired()
+    .trim(),
 
   previousExperiences: yup
     .array()
     .of(
       yup.object().shape({
         id: yup.number().notRequired(),
-        company: yup.string().required("Company name is required"),
-        role: yup.string().required("Role is required"),
+        company: yup.string().required("Company name is required").trim(),
+        role: yup.string().required("Role is required").trim(),
         from: yup
           .number()
           .required("Start year is required")
@@ -96,7 +111,8 @@ export const updateAlumniProfileSchema = yup.object().shape({
         name: yup
           .string()
           .min(2, "Skill name must be at least 2 characters")
-          .required("Skill name is required"),
+          .required("Skill name is required")
+          .trim(),
       })
     )
     .notRequired(),
