@@ -32,13 +32,12 @@ app.set("trust proxy", 1);
 app.use(express.json());
 
 app.use("/health", healthRoutes); // Health check endpoint at /health
+app.use("/api/digest", digestRoutes); // NEW: Daily digest endpoint (no rate limit - called by Vercel cron)
 
 app.use(cors(corsOptions));
 app.get("/", (req, res) => {
   res.send("FastConnect Backend Running");
 });
-
-app.use("/api/digest", digestRoutes); // NEW: Daily digest endpoint (no rate limit - called by Vercel cron)
 
 app.use("/api", globalLimiter);
 app.use("/api", verifyApiKey);
