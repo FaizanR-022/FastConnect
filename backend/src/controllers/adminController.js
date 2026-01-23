@@ -1,8 +1,11 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { AppError } from "../utils/AppError.js";
 import { User, Student, Department, Campus } from "../models/index.js";
+import dotenv from "dotenv";
 
-const ADMIN_EMAIL = "k230922@nu.edu.pk";
+dotenv.config();
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
 export const getAllStudents = asyncHandler(async (req, res) => {
   if (req.user.email !== ADMIN_EMAIL) {
