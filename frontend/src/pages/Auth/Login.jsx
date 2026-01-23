@@ -142,9 +142,9 @@ export default function Login() {
                         Remember me
                       </Label>
                     </div>
-                    <span className="text-sm text-primary cursor-pointer hover:underline">
+                    {/* <span className="text-sm text-primary cursor-pointer hover:underline">
                       Forgot Password?
-                    </span>
+                    </span> */}
                   </div>
 
                   <Button
