@@ -22,6 +22,7 @@ export const ROUTES = {
   NOTIFICATIONS: "/notifications",
   // MY_POSTS: "/my-posts",
   // CREATE_POST: "/posts/create",
+  ADMIN_STUDENTS: "/admin/students",
 };
 
 export const API_ENDPOINTS = {
@@ -75,6 +76,9 @@ export const API_ENDPOINTS = {
   GET_MY_FEEDBACKS: "/feedback/my-feedbacks",
   GET_ALL_FEEDBACKS: "/feedback/all",
   UPDATE_FEEDBACK_STATUS: "/feedback/:id/status",
+
+  // Admin
+  ADMIN_STUDENTS: "/admin/students",
 };
 
 export const EMAIL_DOMAINS = {

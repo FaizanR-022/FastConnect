@@ -23,6 +23,7 @@ import UserProfile from "../pages/User/UserProfile";
 import EditProfile from "../pages/User/EditProfile";
 import NotificationsPage from "../pages/Notifications/NotificationsPage";
 import FeedbackPage from "../pages/Feedback/FeedbackPage";
+import AdminStudentsPage from "../pages/Admin/AdminStudentsPage";
 
 function AppRoutes({ darkMode, toggleDarkMode }) {
   return (
@@ -124,6 +125,15 @@ function AppRoutes({ darkMode, toggleDarkMode }) {
             element={
               <ProtectedRoute>
                 <FeedbackPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={ROUTES.ADMIN_STUDENTS}
+            element={
+              <ProtectedRoute>
+                <AdminStudentsPage />
               </ProtectedRoute>
             }
           />

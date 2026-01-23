@@ -11,6 +11,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import digestRoutes from "./routes/digestRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { sequelize } from "./config/database.js";
 import { syncDatabase } from "./models/index.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -50,6 +51,7 @@ app.use("/api/replies", apiLimiter, replyRoutes);
 app.use("/api/upload", apiLimiter, uploadRoutes);
 app.use("/api/notifications", apiLimiter, notificationRoutes);
 app.use("/api/feedback", apiLimiter, feedbackRoutes);
+app.use("/api/admin", apiLimiter, adminRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
