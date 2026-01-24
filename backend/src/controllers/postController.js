@@ -162,9 +162,19 @@ export const getAllPosts = asyncHandler(async (req, res) => {
       },
     ],
     order: [
+      // Pin post with post_id = 1 at the top
+      [
+        sequelize.literal(`CASE WHEN "Post"."post_id" = 1 THEN 0 ELSE 1 END`),
+        "ASC",
+      ],
       [
         sequelize.literal(
-          `("likes_count" * 0.5) - (EXTRACT(EPOCH FROM (NOW() - "Post"."createdAt")) / 86400)`
+          `("likes_count" * 0.9) + 
+          (COALESCE((
+            SELECT COUNT(*) FROM "replies" 
+            WHERE "replies"."post_id" = "Post"."post_id"
+          ), 0) * 0.9) - 
+          (EXTRACT(EPOCH FROM (NOW() - "Post"."createdAt")) / 86400)`,
         ),
         "DESC",
       ],
@@ -708,7 +718,7 @@ export const likePost = asyncHandler(async (req, res) => {
         post_id: id,
         user_id: user_id,
       },
-      { transaction: t }
+      { transaction: t },
     );
 
     await post.increment("likes_count", { transaction: t });
