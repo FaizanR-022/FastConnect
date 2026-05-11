@@ -18,7 +18,7 @@ export const studentSignupSchema = yup.object().shape({
     .email("Please enter a valid email address")
     .matches(
       /^[a-zA-Z0-9._%+-]+@nu\.edu\.pk$/,
-      "Students must use @nu.edu.pk email"
+      "Students must use @nu.edu.pk email",
     )
     .required("Email is required"),
 
@@ -65,7 +65,7 @@ export const alumniSignupSchema = yup.object().shape({
     .notRequired()
     .matches(
       /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/,
-      "Please enter a valid phone number"
+      "Please enter a valid phone number",
     ),
 
   department: yup.string().required("Department is required"),
@@ -108,9 +108,9 @@ export const alumniSignupSchema = yup.object().shape({
             function (value) {
               const { from } = this.parent;
               return value >= from;
-            }
+            },
           ),
-      })
+      }),
     )
     .notRequired(),
 
@@ -133,4 +133,28 @@ export const loginSchema = yup.object().shape({
     .required("Email is required"),
 
   password: yup.string().required("Password is required"),
+});
+
+export const forgotPasswordSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Please enter a valid email address")
+    .required("Email is required")
+    .trim(),
+});
+
+export const resetPasswordSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Please enter a valid email address")
+    .required("Email is required")
+    .trim(),
+  otp: yup
+    .string()
+    .matches(/^\d{6}$/, "OTP must be exactly 6 digits")
+    .required("OTP is required"),
+  newPassword: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("New password is required"),
 });

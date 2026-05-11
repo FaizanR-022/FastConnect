@@ -25,6 +25,9 @@ import NotificationsPage from "../pages/Notifications/NotificationsPage";
 import FeedbackPage from "../pages/Feedback/FeedbackPage";
 import AdminStudentsPage from "../pages/Admin/AdminStudentsPage";
 
+import ForgotPassword from "../pages/Auth/ForgotPassword";
+import ResetPassword from "../pages/Auth/ResetPassword";
+
 function AppRoutes({ darkMode, toggleDarkMode }) {
   return (
     <>
@@ -37,6 +40,8 @@ function AppRoutes({ darkMode, toggleDarkMode }) {
           <Route path={ROUTES.SIGNUP_CHOICE} element={<SignupChoice />} />
           <Route path={ROUTES.SIGNUP_STUDENT} element={<SignupStudent />} />
           <Route path={ROUTES.SIGNUP_ALUMNI} element={<SignupAlumni />} />
+          <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+          <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
 
           <Route
             path={ROUTES.VERIFY_EMAIL}

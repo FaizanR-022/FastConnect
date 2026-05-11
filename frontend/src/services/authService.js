@@ -6,35 +6,35 @@ export const authService = {
   login: async (credentials) => {
     return handleApiCall(
       () => api.post(API_ENDPOINTS.LOGIN, credentials),
-      "Login Failed"
+      "Login Failed",
     );
   },
 
   signupStudent: async (studentData) => {
     return handleApiCall(
       () => api.post(API_ENDPOINTS.SIGNUP_STUDENT, studentData),
-      "Signup Failed"
+      "Signup Failed",
     );
   },
 
   signupAlumni: async (alumniData) => {
     return handleApiCall(
       () => api.post(API_ENDPOINTS.SIGNUP_ALUMNI, alumniData),
-      "Signup Failed"
+      "Signup Failed",
     );
   },
 
   verifySignupOTP: async (otp) => {
     return handleApiCall(
       () => api.post(API_ENDPOINTS.VERIFY_SIGNUP_OTP, { otp }),
-      "OTP Verification Failed"
+      "OTP Verification Failed",
     );
   },
 
   resendSignupOTP: async () => {
     return handleApiCall(
       () => api.post(API_ENDPOINTS.RESEND_SIGNUP_OTP),
-      "Failed to Resend OTP"
+      "Failed to Resend OTP",
     );
   },
 
@@ -43,6 +43,27 @@ export const authService = {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     return Promise.resolve();
+  },
+
+  forgotPassword: async (email) => {
+    return handleApiCall(
+      () => api.post(API_ENDPOINTS.FORGOT_PASSWORD, { email }),
+      "Failed to send reset code. Please try again.",
+    );
+  },
+
+  resetPassword: async (data) => {
+    return handleApiCall(
+      () => api.post(API_ENDPOINTS.RESET_PASSWORD, data),
+      "Failed to reset password. Please try again.",
+    );
+  },
+
+  resendResetOTP: async (email) => {
+    return handleApiCall(
+      () => api.post(API_ENDPOINTS.RESEND_RESET_OTP, { email }),
+      "Failed to resend reset code. Please try again.",
+    );
   },
 
   verifyEmail: async (token) => {

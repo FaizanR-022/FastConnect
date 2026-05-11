@@ -23,6 +23,8 @@ export const ROUTES = {
   // MY_POSTS: "/my-posts",
   // CREATE_POST: "/posts/create",
   ADMIN_STUDENTS: "/admin/students",
+  FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/reset-password",
 };
 
 export const API_ENDPOINTS = {
@@ -79,6 +81,10 @@ export const API_ENDPOINTS = {
 
   // Admin
   ADMIN_STUDENTS: "/admin/students",
+
+  FORGOT_PASSWORD: "/auth/forgot-password",
+  RESET_PASSWORD: "/auth/reset-password",
+  RESEND_RESET_OTP: "/auth/resend-reset-otp",
 };
 
 export const EMAIL_DOMAINS = {

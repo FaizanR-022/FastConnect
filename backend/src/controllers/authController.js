@@ -64,7 +64,7 @@ export const signupStudent = asyncHandler(async (req, res) => {
         user_type: "student",
         is_email_verified: false,
       },
-      { transaction: t }
+      { transaction: t },
     );
 
     const student = await Student.create(
@@ -79,7 +79,7 @@ export const signupStudent = asyncHandler(async (req, res) => {
         batch_year: batch,
         pfp_url: profilePicture,
       },
-      { transaction: t }
+      { transaction: t },
     );
     return { user, student };
   });
@@ -188,7 +188,7 @@ export const signupAlumni = asyncHandler(async (req, res) => {
         password: hashedPassword,
         user_type: "alumni",
       },
-      { transaction: t }
+      { transaction: t },
     );
 
     const alumni = await Alumni.create(
@@ -206,7 +206,7 @@ export const signupAlumni = asyncHandler(async (req, res) => {
         pfp_url: profilePicture,
         linkedin_url: linkedin,
       },
-      { transaction: t }
+      { transaction: t },
     );
 
     let experiences = [];
@@ -235,7 +235,7 @@ export const signupAlumni = asyncHandler(async (req, res) => {
             end_year: prev.to,
             city_id: null, // handle city per experience if needed
           },
-          { transaction: t }
+          { transaction: t },
         );
 
         experiences.push({
@@ -362,7 +362,7 @@ export const resendSignupOTP = asyncHandler(async (req, res) => {
   if (recentOTP) {
     throw new AppError(
       "Please wait 60 seconds before requesting a new OTP",
-      429
+      429,
     );
   }
 
@@ -415,5 +415,111 @@ export const login = asyncHandler(async (req, res) => {
       token,
       user: userData,
     },
+  });
+});
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) throw new AppError("Email is required", 400);
+
+  const user = await User.findOne({ where: { email } });
+
+  // Don't reveal whether account exists (security best practice)
+  if (!user) {
+    return res.status(200).json({
+      success: true,
+      message: "Account with this Email does not exist",
+    });
+  }
+
+  const recentOTP = await OTP.findOne({
+    where: {
+      user_id: user.user_id,
+      createdAt: { [Op.gt]: new Date(Date.now() - 60 * 1000) },
+    },
+  });
+
+  if (recentOTP) {
+    throw new AppError(
+      "Please wait 60 seconds before requesting a new code.",
+      429,
+    );
+  }
+
+  const otpResult = await createAndSendOTP(user);
+
+  return res.status(200).json({
+    success: true,
+    message:
+      "If an account with that email exists, a reset code has been sent.",
+    data: { expiresAt: otpResult.expiresAt },
+  });
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  if (!email || !otp || !newPassword) {
+    throw new AppError("Email, OTP, and new password are required", 400);
+  }
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) throw new AppError("Invalid request", 400);
+
+  const attemptsCheck = await checkOTPAttempts(user.user_id);
+  if (attemptsCheck.locked) throw new AppError(attemptsCheck.message, 429);
+
+  const verification = await verifyOTP(user.user_id, otp);
+  if (!verification.valid) throw new AppError(verification.reason, 400);
+
+  const hashedPassword = await hashPassword(newPassword);
+  await User.update(
+    { password: hashedPassword },
+    { where: { user_id: user.user_id } },
+  );
+
+  return res.status(200).json({
+    success: true,
+    message:
+      "Password reset successfully. Please log in with your new password.",
+  });
+});
+
+export const resendResetOTP = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ where: { email } });
+
+  // Same response whether or not user exists (security)
+  if (!user) {
+    return res.status(200).json({
+      success: true,
+      message:
+        "If an account with that email exists, a new code has been sent.",
+    });
+  }
+
+  const recentOTP = await OTP.findOne({
+    where: {
+      user_id: user.user_id,
+      createdAt: { [Op.gt]: new Date(Date.now() - 60 * 1000) },
+    },
+  });
+
+  if (recentOTP) {
+    throw new AppError(
+      "Please wait 60 seconds before requesting a new code.",
+      429,
+    );
+  }
+
+  const otpResult = await createAndSendOTP(user);
+
+  return res.status(200).json({
+    success: true,
+    message: "If an account with that email exists, a new code has been sent.",
+    data: { expiresAt: otpResult.expiresAt },
   });
 });
