@@ -4,6 +4,7 @@ import {
   Alumni,
   Company,
   JobRole,
+  Notification,
   Post,
   PostLike,
   Reply,
@@ -559,6 +560,14 @@ export const deletePost = asyncHandler(async (req, res) => {
 
     await PostLike.destroy({
       where: { post_id: id },
+      transaction: t,
+    });
+
+    await Notification.destroy({
+      where: {
+        target_id: id,
+        target_type: "post",
+      },
       transaction: t,
     });
 
