@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { AppError } from "../utils/AppError.js";
 import { User, Student, Department, Campus } from "../models/index.js";
 import dotenv from "dotenv";
-import { Op, fn, col, where } from "sequelize";
+import { Op } from "sequelize";
 
 dotenv.config();
 
@@ -40,14 +40,33 @@ export const getAllStudents = asyncHandler(async (req, res) => {
   }
 
   if (search && search.trim()) {
-    const searchTerm = `%${search.trim()}%`;
-    studentWhereClause[Op.or] = [
-      { first_name: { [Op.iLike]: searchTerm } },
-      { last_name: { [Op.iLike]: searchTerm } },
-      where(fn("concat", col("first_name"), " ", col("last_name")), {
-        [Op.iLike]: searchTerm,
-      }),
+    const trimmedSearch = search.trim();
+    const searchTerm = `%${trimmedSearch}%`;
+    const searchWords = trimmedSearch.split(/\s+/);
+
+    const searchConditions = [
+      { "$studentProfile.first_name$": { [Op.iLike]: searchTerm } },
+      { "$studentProfile.last_name$": { [Op.iLike]: searchTerm } },
     ];
+
+    if (searchWords.length > 1) {
+      searchConditions.push({
+        [Op.and]: [
+          {
+            "$studentProfile.first_name$": {
+              [Op.iLike]: `%${searchWords[0]}%`,
+            },
+          },
+          {
+            "$studentProfile.last_name$": {
+              [Op.iLike]: `%${searchWords.slice(1).join(" ")}%`,
+            },
+          },
+        ],
+      });
+    }
+
+    userWhereClause[Op.or] = searchConditions;
   }
 
   const { count, rows: students } = await User.findAndCountAll({
