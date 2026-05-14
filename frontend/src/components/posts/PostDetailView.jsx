@@ -47,10 +47,20 @@ export const PostDetailView = ({ post, onLike, onDelete, showDelete }) => {
                 {author.firstName} {author.lastName}
               </h3>
               <Badge
-                variant={author.role === "student" ? "default" : "secondary"}
+                variant={
+                  author.email === import.meta.env.VITE_ADMIN_EMAIL
+                    ? "destructive"
+                    : author.role === "student"
+                    ? "default"
+                    : "secondary"
+                }
                 className="text-xs"
               >
-                {author.role.toUpperCase()}
+                {author.email === import.meta.env.VITE_ADMIN_EMAIL
+                  ? "Admin"
+                  : author.role === "student"
+                  ? "Student"
+                  : "Alumni"}
               </Badge>
             </div>
             {author.role === "alumni" && author.currentPosition && (

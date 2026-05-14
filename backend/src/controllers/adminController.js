@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { AppError } from "../utils/AppError.js";
 import { User, Student, Department, Campus } from "../models/index.js";
 import dotenv from "dotenv";
+import { Op } from "sequelize";
 
 dotenv.config();
 
