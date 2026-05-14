@@ -127,8 +127,19 @@ export default function Header({ darkMode, toggleDarkMode }) {
                       <p className="text-sm text-muted-foreground">
                         {user.email}
                       </p>
-                      <Badge variant="secondary" className="mt-1 text-xs">
-                        {user.role === "student" ? "Student" : "Alumni"}
+                      <Badge
+                        variant={
+                          user.email === import.meta.env.VITE_ADMIN_EMAIL
+                            ? "destructive"
+                            : "secondary"
+                        }
+                        className="mt-1 text-xs"
+                      >
+                        {user.email === import.meta.env.VITE_ADMIN_EMAIL
+                          ? "Admin"
+                          : user.role === "student"
+                            ? "Student"
+                            : "Alumni"}
                       </Badge>
                     </div>
                     <DropdownMenuItem onClick={() => navigate(ROUTES.PROFILE)}>

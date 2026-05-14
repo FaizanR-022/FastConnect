@@ -195,9 +195,19 @@ export default function UserProfile() {
                   </div>
 
                   <Badge
-                    variant={user.role === "student" ? "default" : "secondary"}
+                    variant={
+                      user.email === import.meta.env.VITE_ADMIN_EMAIL
+                        ? "destructive"
+                        : user.role === "student"
+                          ? "default"
+                          : "secondary"
+                    }
                   >
-                    {user.role === "student" ? "Student" : "Alumni"}
+                    {user.email === import.meta.env.VITE_ADMIN_EMAIL
+                      ? "Admin"
+                      : user.role === "student"
+                        ? "Student"
+                        : "Alumni"}
                   </Badge>
                 </div>
 

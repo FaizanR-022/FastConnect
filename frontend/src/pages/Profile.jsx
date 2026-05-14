@@ -85,9 +85,19 @@ export default function Profile() {
                   </div>
 
                   <Badge
-                    variant={user.role === "student" ? "default" : "secondary"}
+                    variant={
+                      user.email === import.meta.env.VITE_ADMIN_EMAIL
+                        ? "destructive"
+                        : user.role === "student"
+                          ? "default"
+                          : "secondary"
+                    }
                   >
-                    {user.role === "student" ? "Student" : "Alumni"}
+                    {user.email === import.meta.env.VITE_ADMIN_EMAIL
+                      ? "Admin"
+                      : user.role === "student"
+                        ? "Student"
+                        : "Alumni"}
                   </Badge>
                 </div>
 
@@ -129,9 +139,7 @@ export default function Profile() {
                         <p className="text-sm text-muted-foreground mb-1">
                           {user.currentCompany}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          Present
-                        </p>
+                        <p className="text-xs text-muted-foreground">Present</p>
                       </div>
                     </div>
                   )}
@@ -192,7 +200,9 @@ export default function Profile() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {user.role === "student" ? "Batch Year" : "Graduation Year"}
+                      {user.role === "student"
+                        ? "Batch Year"
+                        : "Graduation Year"}
                     </p>
                     <p className="font-medium">
                       {user.role === "student"
@@ -224,7 +234,9 @@ export default function Profile() {
                   <div className="flex items-start gap-3">
                     <Phone className="w-4 h-4 mt-1 text-muted-foreground" />
                     <div className="flex-1">
-                      <p className="text-sm text-muted-foreground mb-1">Phone</p>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Phone
+                      </p>
                       <p className="text-sm">{user.phone}</p>
                     </div>
                   </div>

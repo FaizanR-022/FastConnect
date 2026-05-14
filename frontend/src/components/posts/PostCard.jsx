@@ -53,7 +53,7 @@ export default function PostCard({
 
     const postUrl = `${window.location.origin}${ROUTES.SINGLE_POST.replace(
       ":id",
-      post.id
+      post.id,
     )}`;
 
     try {
@@ -83,7 +83,7 @@ export default function PostCard({
     if (post.author.role === "alumni") {
       return formatAlumniInfo(
         post.author.currentPosition,
-        post.author.currentCompany
+        post.author.currentCompany,
       );
     } else if (post.author.role === "student") {
       return extractRollNumber(post.author.email);
@@ -130,11 +130,19 @@ export default function PostCard({
               </span>
               <Badge
                 variant={
-                  post.author.role === "student" ? "default" : "secondary"
+                  post.author.email === import.meta.env.VITE_ADMIN_EMAIL
+                    ? "destructive"
+                    : post.author.role === "student"
+                      ? "default"
+                      : "secondary"
                 }
                 className="text-xs"
               >
-                {post.author.role === "student" ? "Student" : "Alumni"}
+                {post.author.email === import.meta.env.VITE_ADMIN_EMAIL
+                  ? "Admin"
+                  : post.author.role === "student"
+                    ? "Student"
+                    : "Alumni"}
               </Badge>
             </div>
             {authorInfo && (

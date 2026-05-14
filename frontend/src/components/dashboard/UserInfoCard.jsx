@@ -30,8 +30,20 @@ export const UserInfoCard = () => {
             {user?.firstName} {user?.lastName}
           </h3>
           <p className="text-sm text-muted-foreground mb-2">{user?.email}</p>
-          <Badge variant={user?.role === "student" ? "default" : "secondary"}>
-            {user?.role === "student" ? "Student" : "Alumni"}
+          <Badge
+            variant={
+              user?.email === import.meta.env.VITE_ADMIN_EMAIL
+                ? "destructive"
+                : user?.role === "student"
+                  ? "default"
+                  : "secondary"
+            }
+          >
+            {user?.email === import.meta.env.VITE_ADMIN_EMAIL
+              ? "Admin"
+              : user?.role === "student"
+                ? "Student"
+                : "Alumni"}
           </Badge>
 
           <div className="mt-4 pt-4 border-t space-y-2 text-sm">
@@ -67,8 +79,8 @@ export const UserInfoCard = () => {
               navigate(
                 ROUTES.USER_PROFILE.replace(
                   ":userId",
-                  user?.publicId || user?.id
-                )
+                  user?.publicId || user?.id,
+                ),
               )
             }
           >

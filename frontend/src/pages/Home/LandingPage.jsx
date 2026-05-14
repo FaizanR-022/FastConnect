@@ -22,33 +22,34 @@ import { ROUTES } from "../../constants/constants";
 // ─── Tiny mock data for the hero visual panel ───────────────────────────────
 const MOCK_ALUMNI = [
   {
-    initials: "AK",
-    name: "Ahmed Khan",
-    role: "Senior Engineer · Google",
+    initials: "WJ",
+    name: "Wahaj Javed",
+    role: "Senior Engineer · Securiti",
     location: "San Francisco",
-    tags: ["ML", "React"],
+    tags: ["Node", "React"],
     color: "bg-teal-600",
   },
   {
-    initials: "SR",
-    name: "Sara Raza",
-    role: "Product Manager · Microsoft",
+    initials: "AZ",
+    name: "Anmol Zehrah",
+    role: "AI Engineer · Atomic Computing",
     location: "Seattle",
-    tags: ["Agile", "UX"],
+    tags: ["Azure", "ML"],
     color: "bg-amber-500",
   },
   {
-    initials: "HM",
-    name: "Hassan Malik",
-    role: "Tech Lead · Amazon",
+    initials: "HZ",
+    name: "Hassan Zahid",
+    role: "Tech Lead · Wise",
     location: "Dubai",
-    tags: ["AWS", "DevOps"],
+    tags: ["Docker", "DevOps"],
     color: "bg-emerald-600",
   },
 ];
 
 const MOCK_POST = {
-  question: "How do I crack SWE interviews at FAANG companies?",
+  // question: "How can I get internship referrals from alumni?",
+  question: "What’s the best way to grow skills while managing studies?",
   replies: 7,
   likes: 24,
   tag: "Career",
