@@ -51,16 +51,16 @@ export const PostDetailView = ({ post, onLike, onDelete, showDelete }) => {
                   author.email === import.meta.env.VITE_ADMIN_EMAIL
                     ? "destructive"
                     : author.role === "student"
-                    ? "default"
-                    : "secondary"
+                      ? "default"
+                      : "secondary"
                 }
                 className="text-xs"
               >
                 {author.email === import.meta.env.VITE_ADMIN_EMAIL
                   ? "Admin"
                   : author.role === "student"
-                  ? "Student"
-                  : "Alumni"}
+                    ? "Student"
+                    : "Alumni"}
               </Badge>
             </div>
             {author.role === "alumni" && author.currentPosition && (

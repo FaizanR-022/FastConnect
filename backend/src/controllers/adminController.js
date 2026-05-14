@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { AppError } from "../utils/AppError.js";
 import { User, Student, Department, Campus } from "../models/index.js";
 import dotenv from "dotenv";
-import { Op } from "sequelize";
+import { Op, fn, col, where } from "sequelize";
 
 dotenv.config();
 
@@ -40,10 +40,13 @@ export const getAllStudents = asyncHandler(async (req, res) => {
   }
 
   if (search && search.trim()) {
-    const searchTerm = search.trim();
+    const searchTerm = `%${search.trim()}%`;
     studentWhereClause[Op.or] = [
-      { first_name: { [Op.iLike]: `%${searchTerm}%` } },
-      { last_name: { [Op.iLike]: `%${searchTerm}%` } },
+      { first_name: { [Op.iLike]: searchTerm } },
+      { last_name: { [Op.iLike]: searchTerm } },
+      where(fn("concat", col("first_name"), " ", col("last_name")), {
+        [Op.iLike]: searchTerm,
+      }),
     ];
   }
 
