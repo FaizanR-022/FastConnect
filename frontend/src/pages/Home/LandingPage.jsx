@@ -102,10 +102,10 @@ const ALUMNI_STEPS = [
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
 const STATS = [
-  { value: "5+", label: "FAST Campuses" },
-  { value: "12+", label: "Departments" },
-  { value: "100%", label: "Free to Use" },
-  { value: "∞", label: "Connections" },
+  { value: "200+", label: "FAST Students Connected" },
+  { value: "50+", label: "Verified Alumni Mentors" },
+  { value: "100%", label: "Always Free" },
+  { value: "∞", label: "Lifetime Connections" },
 ];
 
 export default function LandingPage() {
