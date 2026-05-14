@@ -4,6 +4,7 @@ import ProtectedRoute from "./ProtectedRoutes";
 import EmailVerificationRoute from "./EmailVerificationRoute";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import ScrollToTop from "../components/common/ScrollToTop";
 
 // Auth Pages
 import Login from "../pages/Auth/Login";
@@ -33,6 +34,7 @@ function AppRoutes({ darkMode, toggleDarkMode }) {
     <>
       <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <main className="flex-1">
+        <ScrollToTop />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
