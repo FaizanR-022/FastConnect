@@ -54,6 +54,7 @@ export default function AdminStudentsPage() {
   const [limit] = useState(50);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [campusFilter, setCampusFilter] = useState("all");
   const [batchFilter, setBatchFilter] = useState("all");
@@ -62,8 +63,16 @@ export default function AdminStudentsPage() {
   const batches = Array.from({ length: 7 }, (_, i) => currentYear - i);
 
   useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  useEffect(() => {
     fetchStudents();
-  }, [page, searchTerm, departmentFilter, campusFilter, batchFilter]);
+  }, [page, debouncedSearchTerm, departmentFilter, campusFilter, batchFilter]);
 
   const fetchStudents = async () => {
     try {
@@ -75,7 +84,7 @@ export default function AdminStudentsPage() {
         offset: page * limit,
       };
 
-      if (searchTerm) params.search = searchTerm;
+      if (debouncedSearchTerm) params.search = debouncedSearchTerm;
       if (departmentFilter !== "all") params.department = departmentFilter;
       if (campusFilter !== "all") params.campus = campusFilter;
       if (batchFilter !== "all") params.batch = batchFilter;
