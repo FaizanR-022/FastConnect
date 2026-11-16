@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import AppRoutes from "./routes/AppRoutes";
 import useNotificationPolling from "./hooks/useNotificationPolling";
 import { Toaster } from "./components/ui/sonner";
+import ServiceNotice from "./components/common/ServiceNotice";
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -25,6 +26,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <ServiceNotice />
       <AppRoutes darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <Toaster position="top-right" closeButton richColors offset="80px" />
     </div>
